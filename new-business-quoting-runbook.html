@@ -1133,8 +1133,8 @@ function submitCopyRequest(e) {
 
   fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
+    mode: 'no-cors'
   }).catch(function() {});
 
   // Show success regardless (don't block UX on form service)
@@ -1144,11 +1144,7 @@ function submitCopyRequest(e) {
 }
 </script>
 <script>
-fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
-  method: 'POST',
-  body: JSON.stringify({ email: '(page view)', page: document.title, timestamp: new Date().toISOString() }),
-  mode: 'no-cors'
-});
+new Image().src = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=(page view)&page=' + encodeURIComponent(document.title);
 </script>
 </body>
 </html>
