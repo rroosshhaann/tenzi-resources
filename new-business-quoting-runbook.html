@@ -1131,9 +1131,7 @@ function submitCopyRequest(e) {
   var email = document.getElementById('copyEmail').value;
   var data = { email: email, page: document.title, timestamp: new Date().toISOString() };
 
-  // POST to Formspree — replace YOUR_FORM_ID with your Formspree form ID
-  // Sign up free at https://formspree.io (50 submissions/month)
-  fetch('https://formspree.io/f/YOUR_FORM_ID', {
+  fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
