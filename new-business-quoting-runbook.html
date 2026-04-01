@@ -141,69 +141,75 @@
     }
 
     .step-body { position: relative; }
-    .btn-notes {
-      position: absolute;
-      top: 0;
-      right: 0;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 2px 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .btn-notes:hover { background: #f5f3f0; }
-    .btn-notes.active { color: var(--accent); border-color: var(--accent); }
-    .btn-notes svg { width: 12px; height: 12px; }
 
-    .step-note {
+    .modal-overlay {
       display: none;
-      grid-column: 1 / -1;
-      margin-top: 6px;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
     }
-    .step-note.open { display: block; }
-    .step-note textarea {
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    .modal h3 { font-size: 18px; margin-bottom: 8px; }
+    .modal p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    .modal input[type="email"] {
       width: 100%;
-      min-height: 60px;
+      padding: 10px 12px;
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 8px;
-      font: 12px/1.5 Inter, system-ui, sans-serif;
-      color: var(--text);
-      resize: vertical;
-      background: #faf8f4;
+      border-radius: 8px;
+      font: 14px Inter, system-ui, sans-serif;
+      margin-bottom: 12px;
     }
-    .step-note textarea:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
-
-    .btn-save {
-      font-size: 12px;
-      font-weight: 600;
-      color: #fff;
+    .modal input[type="email"]:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+    .modal .btn-send {
+      width: 100%;
+      padding: 10px;
       background: #2563eb;
+      color: #fff;
       border: none;
       border-radius: 8px;
-      padding: 7px 16px;
+      font: 600 14px Inter, system-ui, sans-serif;
       cursor: pointer;
+    }
+    .modal .btn-send:hover { background: #1d4ed8; }
+    .modal .btn-send:disabled { background: #94a3b8; cursor: not-allowed; }
+    .modal .close-link {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .modal .form-view, .modal .success-view { }
+    .modal .success-view { display: none; text-align: center; }
+    .btn-request {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      background: none;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 5px 12px;
       white-space: nowrap;
     }
-    .btn-save:hover { background: #1d4ed8; }
-
-    .has-note { position: relative; }
-    .has-note::after {
-      content: "";
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
+    .btn-request:hover { background: #eff6ff; }
 
     @media (max-width: 700px) {
       .step { grid-template-columns: 40px 1fr; }
@@ -220,7 +226,10 @@
       <p style="font-size:11px; color:var(--muted); margin:0;">Questions or feedback: <a href="mailto:roshan@tenzi.ai" style="color:var(--accent); text-decoration:none;">Roshan Khozouei</a> (roshan@tenzi.ai)</p>
     </div>
     <div style="display:flex; align-items:center; gap:16px;">
-      <a onclick="saveWithNotes()" style="display:flex; align-items:center; gap:5px; cursor:pointer; color:var(--accent); font-size:12px; font-weight:600; text-decoration:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save</a>
+      <button class="btn-request" onclick="document.getElementById('copyModal').classList.add('open')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Request a Copy
+      </button>
     <svg style="height: 32px; width: auto;"
    width="201mm"
    height="65mm"
@@ -1097,61 +1106,45 @@
 
 
 </div>
+<div id="copyModal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="form-view">
+      <h3>Get your own copy</h3>
+      <p>Enter your email and we'll send you this runbook so you can reference it anytime.</p>
+      <form id="copyForm" onsubmit="return submitCopyRequest(event)">
+        <input type="email" id="copyEmail" placeholder="you@yourbrokerage.com.au" required>
+        <button type="submit" class="btn-send">Send me a copy</button>
+      </form>
+      <a class="close-link" onclick="document.getElementById('copyModal').classList.remove('open')">No thanks</a>
+    </div>
+    <div class="success-view">
+      <h3>Got it!</h3>
+      <p>We'll send the runbook to your inbox shortly.</p>
+      <a class="close-link" onclick="document.getElementById('copyModal').classList.remove('open')">Close</a>
+    </div>
+  </div>
+</div>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.step').forEach(function(step) {
-    var body = step.querySelector('.step-body');
-    if (!body) return;
+function submitCopyRequest(e) {
+  e.preventDefault();
+  var email = document.getElementById('copyEmail').value;
+  var data = { email: email, page: document.title, timestamp: new Date().toISOString() };
 
-    var btn = document.createElement('button');
-    btn.className = 'btn-notes';
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>Notes';
-    body.appendChild(btn);
+  // POST to Formspree — replace YOUR_FORM_ID with your Formspree form ID
+  // Sign up free at https://formspree.io (50 submissions/month)
+  fetch('https://formspree.io/f/YOUR_FORM_ID', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).catch(function() {});
 
-    var noteDiv = document.createElement('div');
-    noteDiv.className = 'step-note';
-    var ta = document.createElement('textarea');
-    ta.placeholder = 'Add notes...';
-    noteDiv.appendChild(ta);
-    step.appendChild(noteDiv);
-
-    if (ta.textContent.trim()) {
-      ta.value = ta.textContent.trim();
-      noteDiv.classList.add('open');
-      btn.classList.add('active');
-      step.classList.add('has-note');
-    }
-
-    btn.addEventListener('click', function() {
-      noteDiv.classList.toggle('open');
-      btn.classList.toggle('active');
-      if (noteDiv.classList.contains('open')) ta.focus();
-    });
-
-    ta.addEventListener('input', function() {
-      if (ta.value.trim()) {
-        step.classList.add('has-note');
-      } else {
-        step.classList.remove('has-note');
-      }
-    });
-  });
-});
-
-function saveWithNotes() {
-  document.querySelectorAll('.step-note textarea').forEach(function(ta) {
-    ta.setAttribute('data-note', ta.value);
-    ta.textContent = ta.value;
-  });
-
-  var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-  var blob = new Blob([html], { type: 'text/html' });
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = document.title.replace(/[^a-zA-Z0-9 —-]/g, '') + '.html';
-  a.click();
-  URL.revokeObjectURL(a.href);
+  // Show success regardless (don't block UX on form service)
+  document.querySelector('.form-view').style.display = 'none';
+  document.querySelector('.success-view').style.display = 'block';
+  return false;
 }
 </script>
+<script data-goatcounter="https://tenzi.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
