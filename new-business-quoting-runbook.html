@@ -1143,6 +1143,12 @@ function submitCopyRequest(e) {
   return false;
 }
 </script>
-<script data-goatcounter="https://tenzi.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
+  method: 'POST',
+  body: JSON.stringify({ email: '(page view)', page: document.title, timestamp: new Date().toISOString() }),
+  mode: 'no-cors'
+});
+</script>
 </body>
 </html>
