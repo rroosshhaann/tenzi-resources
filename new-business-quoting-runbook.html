@@ -1135,7 +1135,7 @@ fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).th
 function submitCopyRequest(e) {
   e.preventDefault();
   var email = document.getElementById('copyEmail').value;
-  var data = { email: email, page: document.title, timestamp: new Date().toISOString(), ip: visitorIp };
+  var data = { email: email, page: document.title, timestamp: new Date().toISOString(), ip: visitorIp, referrer: document.referrer };
 
   fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
     method: 'POST',
@@ -1151,7 +1151,7 @@ function submitCopyRequest(e) {
 </script>
 <script>
 fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){
-  new Image().src = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=(page view)&page=' + encodeURIComponent(document.title) + '&ip=' + encodeURIComponent(d.ip);
+  new Image().src = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=(page view)&page=' + encodeURIComponent(document.title) + '&ip=' + encodeURIComponent(d.ip) + '&ref=' + encodeURIComponent(document.referrer);
 }).catch(function(){
   new Image().src = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=(page view)&page=' + encodeURIComponent(document.title);
 });
