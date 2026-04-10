@@ -267,10 +267,10 @@ body {
          style="font-size:192px;fill:url(#linearGradient2)"
          aria-label="tenzi"
          /></g></g></svg>
-    <a href="gi-broker-movement-dashboard.html" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:#1A5E45;color:#fff;border:none;border-radius:8px;font:600 13px 'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='#0C3B2E'" onmouseout="this.style.background='#1A5E45'">
+    <button onclick="document.getElementById('subscribeModal').classList.add('open')" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:#1A5E45;color:#fff;border:none;border-radius:8px;font:600 13px 'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='#0C3B2E'" onmouseout="this.style.background='#1A5E45'">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
       Subscribe to updates
-    </a>
+    </button>
   </div>
 
   <div class="header">
@@ -317,6 +317,47 @@ body {
   </div>
 
 </div>
+
+<div id="subscribeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;" onclick="if(event.target===this)this.classList.remove('open')">
+  <div style="background:#fff;border-radius:12px;padding:32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+    <div class="form-view">
+      <h3 style="font-size:18px;margin-bottom:8px;">Subscribe to monthly updates</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5;">We publish GI broker movement data every month using the latest ASIC register data. Enter your email and we'll send it straight to your inbox.</p>
+      <form onsubmit="return submitSubscription(event)">
+        <input type="email" id="subEmail" placeholder="you@yourbrokerage.com.au" required style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:14px 'DM Sans',sans-serif;margin-bottom:12px;">
+        <button type="submit" style="width:100%;padding:10px;background:#1A5E45;color:#fff;border:none;border-radius:8px;font:600 14px 'DM Sans',sans-serif;cursor:pointer;">Subscribe</button>
+      </form>
+      <p style="font-size:11px;color:var(--muted);margin-top:12px;margin-bottom:0;">No spam, no marketing. Unsubscribe anytime.</p>
+      <a onclick="document.getElementById('subscribeModal').classList.remove('open')" style="display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--muted);cursor:pointer;">No thanks</a>
+    </div>
+    <div class="success-view" style="display:none;text-align:center;">
+      <h3 style="font-size:18px;margin-bottom:8px;">You're in!</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">We'll send you the next dashboard as soon as it's ready.</p>
+      <a onclick="document.getElementById('subscribeModal').classList.remove('open')" style="display:block;text-align:center;font-size:12px;color:var(--muted);cursor:pointer;">Close</a>
+    </div>
+  </div>
+</div>
+
+<style>#subscribeModal.open { display:flex !important; }</style>
+
+<script>
+var visitorIp = '';
+fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){ visitorIp = d.ip; }).catch(function(){});
+
+function submitSubscription(e) {
+  e.preventDefault();
+  var email = document.getElementById('subEmail').value;
+  var data = { email: email, page: document.title, timestamp: new Date().toISOString(), ip: visitorIp, referrer: document.referrer };
+  fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    mode: 'no-cors'
+  }).catch(function() {});
+  document.querySelector('#subscribeModal .form-view').style.display = 'none';
+  document.querySelector('#subscribeModal .success-view').style.display = 'block';
+  return false;
+}
+</script>
 
 <script>
 fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){
