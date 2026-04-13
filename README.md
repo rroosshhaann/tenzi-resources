@@ -42,10 +42,12 @@ Every page tracks page views and email signups via a Google Apps Script endpoint
 
 ## Adding a new page
 
+Every page must have all of the following:
+
 1. Create a self-contained HTML file (inline CSS, no build step)
 2. Copy the nav bar (back-link + Tenzi logo SVG) from an existing page
-3. Add the page view tracking `<script>` block at the bottom
-4. Optionally add a subscribe modal (copy from an existing page)
+3. Add page view tracking script with IP (via `api.ipify.org`) and referrer (`document.referrer`) — copy the standard block from any existing page
+4. Add a CTA that collects email addresses via modal — "Request a Copy" for runbooks, "Subscribe to updates" for free reports. Premium samples can link to Cal.com instead.
 5. Add a card linking to it in `index.html`
 6. Push to `main`
 

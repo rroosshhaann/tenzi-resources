@@ -61,12 +61,28 @@ Dashboard data comes from the `ar-dataset/` project in the `python-scrapbook` re
 - ABS population data for per-capita calculations
 - See `python-scrapbook` memory for corrected broker filter definition and data caveats
 
-## Adding a new page
+## Adding a new page — MANDATORY checklist
 
-1. Create a self-contained HTML file with inline CSS
-2. Include the Tenzi logo SVG in the nav bar (copy from an existing page)
-3. Add back-link: `<a class="back-link" href="index.html">&larr; All Resources</a>`
-4. Add page view tracking script at bottom (copy from existing page)
-5. If collecting emails: add subscribe modal + form submission script
-6. Add a card linking to the new page in `index.html`
-7. Commit and push to `main` — GitHub Pages deploys automatically
+Every page on the site MUST have all of the following. No exceptions.
+
+1. **Nav bar** — back-link on left, Tenzi logo SVG on right. Copy from an existing page. Back-link href should use `../index.html` for pages in subfolders.
+2. **Page view tracking** — the IP + referrer beacon script at the bottom of the page. This is the standard block (copy from any existing page):
+   ```html
+   <script>
+   fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){
+     new Image().src = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=(page view)&page=' + encodeURIComponent(document.title) + '&ip=' + encodeURIComponent(d.ip) + '&ref=' + encodeURIComponent(document.referrer);
+   }).catch(function(){
+     new Image().src = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=(page view)&page=' + encodeURIComponent(document.title);
+   });
+   </script>
+   ```
+3. **CTA with email collection** — every page must have a call-to-action that collects an email address via modal. The type depends on the page:
+   - **Runbooks**: "Request a Copy" button in header → `copyModal` with email form
+   - **Free reports/dashboards**: "Subscribe to updates" button in header → `subscribeModal` with email form
+   - **Premium samples**: "Get the full report" / "Book a call" button linking to Cal.com (no modal needed, but page view tracking is still required)
+   - Form submissions must include: `email`, `page` (document.title), `timestamp`, `ip` (visitorIp), `referrer` (document.referrer)
+   - IP is fetched on page load into a `visitorIp` variable, then included in POST body
+   - Use `mode: 'no-cors'` for fetch, show success immediately without waiting for response
+4. **Card on index.html** — add a card linking to the new page with appropriate theme class (`theme-green` for data, `theme-warm` for operations)
+5. **Self-contained HTML** — inline CSS, no build step, no external frameworks
+6. Commit and push to `main` — GitHub Pages deploys automatically

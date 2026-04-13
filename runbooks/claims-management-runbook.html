@@ -155,69 +155,73 @@
     .questions li { margin-bottom: 4px; }
 
     .step-body { position: relative; }
-    .btn-notes {
-      position: absolute;
-      top: 0;
-      right: 0;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 2px 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .btn-notes:hover { background: #f5f3f0; }
-    .btn-notes.active { color: var(--accent); border-color: var(--accent); }
-    .btn-notes svg { width: 12px; height: 12px; }
 
-    .step-note {
+    .modal-overlay {
       display: none;
-      grid-column: 1 / -1;
-      margin-top: 6px;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
     }
-    .step-note.open { display: block; }
-    .step-note textarea {
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    .modal h3 { font-size: 18px; margin-bottom: 8px; }
+    .modal p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    .modal input[type="email"] {
       width: 100%;
-      min-height: 60px;
+      padding: 10px 12px;
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 8px;
-      font: 12px/1.5 Inter, system-ui, sans-serif;
-      color: var(--text);
-      resize: vertical;
-      background: #faf8f4;
+      border-radius: 8px;
+      font: 14px Inter, system-ui, sans-serif;
+      margin-bottom: 12px;
     }
-    .step-note textarea:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
-
-    .btn-save {
-      font-size: 12px;
-      font-weight: 600;
+    .modal input[type="email"]:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+    .modal .btn-send {
+      width: 100%;
+      padding: 10px;
+      background: #2563eb;
       color: #fff;
+      border: none;
+      border-radius: 8px;
+      font: 600 14px Inter, system-ui, sans-serif;
+      cursor: pointer;
+    }
+    .modal .btn-send:hover { background: #1d4ed8; }
+    .modal .close-link {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .modal .success-view { display: none; text-align: center; }
+    .btn-request {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      color: #fff;
+      font: 600 13px 'Inter', system-ui, sans-serif;
+      text-decoration: none;
       background: #2563eb;
       border: none;
       border-radius: 8px;
-      padding: 7px 16px;
-      cursor: pointer;
+      padding: 10px 18px;
       white-space: nowrap;
+      transition: background 0.2s;
     }
-    .btn-save:hover { background: #1d4ed8; }
-
-    .has-note { position: relative; }
-    .has-note::after {
-      content: "";
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
+    .btn-request:hover { background: #1d4ed8; }
 
     @media (max-width: 700px) {
       .step { grid-template-columns: 40px 1fr; }
@@ -227,16 +231,8 @@
 <body>
 <div class="wrap">
 
-  <a href="../index.html" style="display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;margin-bottom:16px;">&larr; All Resources</a>
-
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-    <div>
-      <h1>Claims Management — Broker Workflow Runbook</h1>
-      <p class="subtitle">End-to-end claims process from first notice of loss through to resolution and file closure. Version 2.0.</p>
-      <p style="font-size:11px; color:var(--muted); margin:0;">Questions or feedback: <a href="mailto:roshan@tenzi.ai" style="color:var(--accent); text-decoration:none;">Roshan Khozouei</a> (roshan@tenzi.ai)</p>
-    </div>
-    <div style="display:flex; align-items:center; gap:16px;">
-      <a onclick="saveWithNotes()" style="display:flex; align-items:center; gap:5px; cursor:pointer; color:var(--accent); font-size:12px; font-weight:600; text-decoration:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save</a>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <a href="../index.html" style="display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;">&larr; All Resources</a>
     <svg style="height: 32px; width: auto;"
    width="201mm"
    height="65mm"
@@ -448,7 +444,18 @@
          style="font-size:192px;font-family:THICCCBOI;-inkscape-font-specification:'THICCCBOI, Normal';fill:url(#linearGradient2)"
          aria-label="tenzi"
          sodipodi:nodetypes="scsccscscccsccccccsscsscccsccccscssccsccscccssssccscscscccccscccccccccccscscssscsccccc" /></g></g></svg>
+  </div>
+
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+    <div>
+      <h1>Claims Management — Broker Workflow Runbook</h1>
+      <p class="subtitle">End-to-end claims process from first notice of loss through to resolution and file closure. Version 2.0.</p>
+      <p style="font-size:11px; color:var(--muted); margin:0;">Questions or feedback: <a href="mailto:roshan@tenzi.ai" style="color:var(--accent); text-decoration:none;">Roshan Khozouei</a> (roshan@tenzi.ai)</p>
     </div>
+    <button class="btn-request" onclick="document.getElementById('copyModal').classList.add('open')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      Request a Copy
+    </button>
   </div>
 
   <div class="legend">
@@ -1180,63 +1187,52 @@
 
 
 </div>
+<div id="copyModal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="form-view">
+      <h3>Get your own copy</h3>
+      <p>Enter your email and we'll send you this runbook so you can reference it anytime.</p>
+      <p>We'll never spam you or market to you.</p>
+      <form id="copyForm" onsubmit="return submitCopyRequest(event)">
+        <input type="email" id="copyEmail" placeholder="you@yourbrokerage.com.au" required>
+        <button type="submit" class="btn-send">Send me a copy</button>
+      </form>
+      <a class="close-link" onclick="document.getElementById('copyModal').classList.remove('open')">No thanks</a>
+    </div>
+    <div class="success-view">
+      <h3>Got it!</h3>
+      <p>We'll send the runbook to your inbox shortly.</p>
+      <a class="close-link" onclick="document.getElementById('copyModal').classList.remove('open')">Close</a>
+    </div>
+  </div>
+</div>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.step').forEach(function(step) {
-    var body = step.querySelector('.step-body');
-    if (!body) return;
+var visitorIp = '';
+fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){ visitorIp = d.ip; }).catch(function(){});
 
-    var btn = document.createElement('button');
-    btn.className = 'btn-notes';
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>Notes';
-    body.appendChild(btn);
+function submitCopyRequest(e) {
+  e.preventDefault();
+  var email = document.getElementById('copyEmail').value;
+  var data = { email: email, page: document.title, timestamp: new Date().toISOString(), ip: visitorIp, referrer: document.referrer };
 
-    var noteDiv = document.createElement('div');
-    noteDiv.className = 'step-note';
-    var ta = document.createElement('textarea');
-    ta.placeholder = 'Add notes...';
-    noteDiv.appendChild(ta);
-    step.appendChild(noteDiv);
+  fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    mode: 'no-cors'
+  }).catch(function() {});
 
-    // Restore note from existing textarea content (for saved files)
-    if (ta.textContent.trim()) {
-      ta.value = ta.textContent.trim();
-      noteDiv.classList.add('open');
-      btn.classList.add('active');
-      step.classList.add('has-note');
-    }
-
-    btn.addEventListener('click', function() {
-      noteDiv.classList.toggle('open');
-      btn.classList.toggle('active');
-      if (noteDiv.classList.contains('open')) ta.focus();
-    });
-
-    ta.addEventListener('input', function() {
-      if (ta.value.trim()) {
-        step.classList.add('has-note');
-      } else {
-        step.classList.remove('has-note');
-      }
-    });
-  });
-});
-
-function saveWithNotes() {
-  // Persist textarea values into the DOM so they survive serialization
-  document.querySelectorAll('.step-note textarea').forEach(function(ta) {
-    ta.setAttribute('data-note', ta.value);
-    ta.textContent = ta.value;
-  });
-
-  var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-  var blob = new Blob([html], { type: 'text/html' });
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = document.title.replace(/[^a-zA-Z0-9 —-]/g, '') + '.html';
-  a.click();
-  URL.revokeObjectURL(a.href);
+  document.querySelector('.form-view').style.display = 'none';
+  document.querySelector('.success-view').style.display = 'block';
+  return false;
 }
+</script>
+<script>
+fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){
+  new Image().src = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=(page view)&page=' + encodeURIComponent(document.title) + '&ip=' + encodeURIComponent(d.ip) + '&ref=' + encodeURIComponent(document.referrer);
+}).catch(function(){
+  new Image().src = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=(page view)&page=' + encodeURIComponent(document.title);
+});
 </script>
 </body>
 </html>
