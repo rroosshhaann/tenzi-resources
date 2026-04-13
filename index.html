@@ -65,6 +65,7 @@ body {
   text-decoration: none;
   color: var(--text);
   display: block;
+  position: relative;
   transition: box-shadow 0.2s, border-color 0.2s;
 }
 
@@ -110,6 +111,18 @@ body {
   letter-spacing: 0.5px;
   flex-shrink: 0;
 }
+
+.card::after {
+  content: '\2192';
+  position: absolute;
+  bottom: 16px;
+  right: 20px;
+  font-size: 14px;
+  color: var(--muted);
+  transition: transform 0.2s;
+}
+
+.card:hover::after { transform: translateX(3px); }
 
 /* Theme: green for AFSL data */
 .card.theme-green .card-eyebrow { color: #27805C; }
