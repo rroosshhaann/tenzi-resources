@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GI Broker AFSL Race Chart — May 2024 to April 2026</title>
+<title>Resilium AR Flow Analysis — May 2022 to April 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -236,7 +236,6 @@ body {
   .header h1 { font-size: 20px; }
   .cta-card { padding: 24px 20px; }
   .cta-card h3 { font-size: 17px; }
-  .chart-insights { grid-template-columns: 1fr !important; }
 }
 
 @keyframes fadeUp {
@@ -262,11 +261,11 @@ body {
 
   <!-- Header -->
   <div class="header">
-    <div class="header-eyebrow">Premium Analytics</div>
+    <div class="header-eyebrow">Premium Analytics &middot; AFSL Flow</div>
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
       <div>
-        <h1>Top 20 GI Broker AFSLs — Race Chart <span class="badge-sample">Sample</span></h1>
-        <div class="header-sub"><span>May 2024 &rarr; April 2026</span> &middot; 24 months of AR movement, animated</div>
+        <h1>Resilium AR Flow Analysis <span class="badge-sample">Sample</span></h1>
+        <div class="header-sub"><span>May 2022 &rarr; April 2026</span> &middot; 48 months of AR movement in and out of Resilium</div>
       </div>
       <a href="https://cal.com/roshan-khozouei/30min" target="_blank" onclick="trackCta('PREMIUM_get_full_report_click')" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:var(--g700);color:#fff;border:none;border-radius:8px;font:600 13px 'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--g900)'" onmouseout="this.style.background='var(--g700)'">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -279,17 +278,17 @@ body {
   <div class="card">
     <h3>What the data shows</h3>
     <ul>
-      <li><strong>Resilium is in sustained decline</strong> &mdash; down 137 ARs (-22%) over 24 months, falling in 14 of 23 months. McLardy McShane has overtaken them for #3.</li>
-      <li><strong>PSC Connect is shrinking at the same rate</strong> &mdash; down 82 (-26%), falling in 16 of 23 months. Both networks are being sold by Envest to Steadfast.</li>
-      <li><strong>The decline was visible long before the deal.</strong> PSC lost access to Steadfast&rsquo;s Client Trading Platform (SCTP) in mid-2023 after leaving the network. AR attrition at both Resilium and PSC Connect accelerated from there &mdash; well before the April 2026 Steadfast acquisition was announced.</li>
-      <li><strong>CBN dominates but may have peaked</strong> &mdash; grew from 879 to 1,115 (+27%), but has dropped 26 since hitting a high of 1,141 in Feb 2026.</li>
-      <li><strong>McLardy McShane is the steadiest grower</strong> &mdash; up 175 (+46%), positive in 19 of 23 months. Remarkably consistent.</li>
+      <li><strong>Resilium lost 20% of its AR/CAR network over 4 years</strong> &mdash; 615 ARs in May 2022, 492 by April 2026. Last week Steadfast announced it will acquire Resilium and PSC Connect from Envest, integrating both into Ausure.</li>
+      <li><strong>The transition didn't start last week &mdash; it's been happening for years.</strong> 540 ARs left and 413 joined over 48 months. That level of turnover through a ~500-600 person network is significant.</li>
+      <li><strong>The Steadfast ecosystem was already the destination.</strong> Ausure (net -38), McLardy McShane (net -36), and Community Broker Network (net -32) together account for 123 identified departures &mdash; exactly equal to Resilium's total net headcount loss.</li>
+      <li><strong>December and January are consistently the worst months</strong> &mdash; likely driven by end-of-year contract cycles. January 2025 alone saw 49 departures.</li>
+      <li><strong>January 2024 anomaly: +63 joiners in a single month</strong> &mdash; looks like a bulk transfer, but the gains were gradually eroded through the rest of 2024 and into 2025.</li>
     </ul>
   </div>
 
   <!-- Chart -->
   <div class="chart-wrap">
-    <img src="ar_race_chart.gif" alt="Animated race chart showing Top 20 GI Broker AFSLs by AR count from May 2024 to April 2026">
+    <img src="afsl_flow_RESILIUM_INSURANCE_BROKING.gif" alt="Animated flow chart showing AR movements in and out of Resilium Insurance Broking from May 2022 to April 2026">
   </div>
 
   <!-- CTA -->
@@ -304,12 +303,12 @@ body {
 
   <!-- Caveats -->
   <div class="caveats">
-    <p><strong>Data notes:</strong> GI-primary AFSLs only (50%+ broker ARs). Ceased AR records have authorisation flags cleared by ASIC. Term-change cessations excluded by name + date matching. Source: ASIC AFS Register, April 2026 snapshot.</p>
+    <p><strong>Data notes:</strong> Movement matching is inferred from name, AR number, and timing, not tracked directly by ASIC. 71% of departures couldn't be matched to a specific destination, so the full picture is incomplete. Source: ASIC AFS Register, May 2022 to April 2026.</p>
   </div>
 
   <!-- Footer -->
   <div class="footer">
-    <span>Source: ASIC Financial Advisers Register &middot; Individual ARs, General Insurance</span>
+    <span>Source: ASIC Financial Advisers Register &middot; AR/CAR movements, Resilium Insurance Broking</span>
     <span>Apr 2026 &middot; <a href="https://tenzi.ai">Tenzi</a></span>
   </div>
 

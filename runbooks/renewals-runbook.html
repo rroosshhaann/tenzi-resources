@@ -440,7 +440,7 @@
       <p class="subtitle">End-to-end renewal process from identification through market review, recommendation, and binding. Version 1.0.</p>
       <p style="font-size:11px; color:var(--muted); margin:0;">Questions or feedback: <a href="mailto:roshan@tenzi.ai" style="color:var(--accent); text-decoration:none;">Roshan Khozouei</a> (roshan@tenzi.ai)</p>
     </div>
-    <button class="btn-request" onclick="document.getElementById('copyModal').classList.add('open')">
+    <button class="btn-request" onclick="trackCta('request_copy_click'); document.getElementById('copyModal').classList.add('open')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
       Request a Copy
     </button>
@@ -1180,11 +1180,16 @@ function submitCopyRequest(e) {
 }
 </script>
 <script>
-fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){
-  new Image().src = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=(page view)&page=' + encodeURIComponent(document.title) + '&ip=' + encodeURIComponent(d.ip) + '&ref=' + encodeURIComponent(document.referrer);
-}).catch(function(){
-  new Image().src = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=(page view)&page=' + encodeURIComponent(document.title);
-});
+function trackBeacon(eventName) {
+  var url = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=' + encodeURIComponent(eventName) + '&page=' + encodeURIComponent(document.title);
+  fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){
+    new Image().src = url + '&ip=' + encodeURIComponent(d.ip) + '&ref=' + encodeURIComponent(document.referrer);
+  }).catch(function(){
+    new Image().src = url + '&ref=' + encodeURIComponent(document.referrer);
+  });
+}
+function trackCta(action) { trackBeacon('(cta: ' + action + ')'); }
+trackBeacon('(page view)');
 </script>
 </body>
 </html>
