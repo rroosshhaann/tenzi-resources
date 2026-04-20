@@ -6,10 +6,26 @@ Live at **https://resources.tenzi.ai**
 
 ## Pages
 
-- **Resources index** (`index.html`) — Landing page linking to all resources
-- **GI Broker Movement Dashboard** (`gi-broker-movement-dashboard.html`) — Monthly AR movement analysis: who's growing, shrinking, and where brokers are moving between AFSLs
-- **Profile of the Average GI Broker AR** (`gi-broker-ar-profile.html`) — State distribution, tenure, AFSL loyalty stats, and record holders
-- **New Business / Quotes Runbook** (`new-business-quoting-runbook.html`) — End-to-end broker workflow from enquiry to binding
+```
+tenzi-resources/
+  index.html              Central landing page
+  reports/                Free analytics reports
+  runbooks/               Free operational runbooks
+  premium-samples/        Samples of premium paid reports
+```
+
+**Free reports** (`reports/`)
+- **GI Broker Movement Dashboard** — Monthly AR movement analysis: who's growing, shrinking, and where brokers are moving between AFSLs
+- **Profile of the Average GI Broker AR** — State distribution, tenure, AFSL loyalty stats, and record holders
+
+**Runbooks** (`runbooks/`)
+- **New Business / Quotes** — End-to-end broker workflow from enquiry to binding
+- **Renewals** — Identification through market review, recommendation, and binding
+- **Claims Management** — First notice of loss through to resolution and file closure
+
+**Premium samples** (`premium-samples/`)
+- **GI Broker AFSL Race Chart** — Animated 24-month view of the Top 20 GI broker networks
+- **Resilium AR Flow Analysis** — 48 months of inbound/outbound AR movement for a single AFSL
 
 ## Hosting
 
@@ -17,20 +33,31 @@ GitHub Pages from `main` branch with custom domain (`resources.tenzi.ai`). HTTPS
 
 ## Analytics
 
-Every page tracks page views and email signups via a Google Apps Script endpoint that writes to a Google Sheet.
+Every page tracks page views, CTA clicks, and email signups via a Google Apps Script endpoint that writes to a Google Sheet.
 
-**What's collected:**
+**Sheet columns:**
 
 | Column | Field | Source |
 |-|-|-|
-| A | Email | Form input, or `(page view)` for visits |
+| A | Email | Form input, `(page view)`, or `(cta: action_name)` |
 | B | Page | `document.title` |
-| C | Timestamp | `new Date().toISOString()` |
+| C | Timestamp | Server-side Melbourne time (`Australia/Melbourne`, formatted in Apps Script) |
 | D | IP | Client-side lookup via `api.ipify.org` |
 | E | Referrer | `document.referrer` |
 
+**Event types** (in the email column):
+- `(page view)` — visitor loaded the page
+- `(cta: subscribe_click)` — clicked Subscribe (modal opened, may not have submitted)
+- `(cta: request_copy_click)` — clicked Request a Copy on a runbook
+- `(cta: book_chat_click)` — clicked Book a chat (Cal.com)
+- `(cta: PREMIUM_get_full_report_click)` — clicked premium "Get the full report"
+- `(cta: PREMIUM_book_call_click)` — clicked premium "Book a call to discuss"
+- Real email — form submission
+
+Compare CTA click counts vs actual form submissions to measure drop-off per page.
+
 **How it works:**
-- Page views fire a GET request via an `Image()` beacon
+- Page views and CTA clicks fire a GET request via an `Image()` beacon
 - Form submissions use `fetch()` POST with `mode: 'no-cors'`
 - Success is shown immediately without waiting for a response
 - IP lookup is best-effort — tracking still fires if it fails
@@ -46,17 +73,26 @@ Every page must have all of the following:
 
 1. Create a self-contained HTML file (inline CSS, no build step)
 2. Copy the nav bar (back-link + Tenzi logo SVG) from an existing page
-3. Add page view tracking script with IP (via `api.ipify.org`) and referrer (`document.referrer`) — copy the standard block from any existing page
-4. Add a CTA that collects email addresses via modal — "Request a Copy" for runbooks, "Subscribe to updates" for free reports. Premium samples can link to Cal.com instead.
-5. Add a card linking to it in `index.html`
+3. Add the standard tracking script block (with `trackBeacon`, `trackCta`, and page view fire) — copy from any existing page
+4. Add a CTA appropriate to the page type:
+   - **Runbooks** → "Request a Copy" modal, `trackCta('request_copy_click')`
+   - **Free reports** → "Subscribe to updates" modal, `trackCta('subscribe_click')`
+   - **Premium samples** → Cal.com link, `trackCta('PREMIUM_get_full_report_click')` or `trackCta('PREMIUM_book_call_click')`
+5. Add a card linking to it in `index.html` with the appropriate theme:
+   - `theme-green` for free data/reports
+   - `theme-warm` for runbooks
+   - `theme-premium` for premium samples
 6. Push to `main`
+
+See `CLAUDE.md` for full code snippets.
 
 ## Design notes
 
 - No frameworks — each page is a single HTML file with inline styles
-- Fonts: DM Sans + JetBrains Mono (Google Fonts). Runbook uses Inter.
+- Fonts: DM Sans + JetBrains Mono (Google Fonts). Runbooks use Inter.
 - Primary accent: deep teal (`#0F766E`), chosen to complement the Tenzi logo
 - Movement dashboard uses forest green (`#1A5E45`)
+- Premium pills use the Tenzi rainbow gradient (pink → orange → purple → cyan)
 - Responsive at 700px breakpoint
 
 ## Data sources
