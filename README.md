@@ -26,6 +26,7 @@ tenzi-resources/
 **Premium samples** (`premium-samples/`)
 - **GI Broker AFSL Race Chart** — Animated 24-month view of the Top 20 GI broker networks
 - **Resilium AR Flow Analysis** — 48 months of inbound/outbound AR movement for a single AFSL
+- **PSC Connect AR Flow Analysis** — 48 months of AR movement showing McLardy McShane capturing 57% of traceable departures
 
 ## Hosting
 
@@ -52,6 +53,8 @@ Every page tracks page views, CTA clicks, and email signups via a Google Apps Sc
 - `(cta: book_chat_click)` — clicked Book a chat (Cal.com)
 - `(cta: PREMIUM_get_full_report_click)` — clicked premium "Get the full report"
 - `(cta: PREMIUM_book_call_click)` — clicked premium "Book a call to discuss"
+- `(cta: linkedin_click)` — clicked "Join the conversation" on a free report/runbook
+- `(cta: PREMIUM_linkedin_click)` — clicked "Join the conversation" on a premium sample
 - Real email — form submission
 
 Compare CTA click counts vs actual form submissions to measure drop-off per page.
@@ -78,6 +81,7 @@ Every page must have all of the following:
    - **Runbooks** → "Request a Copy" modal, `trackCta('request_copy_click')`
    - **Free reports** → "Subscribe to updates" modal, `trackCta('subscribe_click')`
    - **Premium samples** → Cal.com link, `trackCta('PREMIUM_get_full_report_click')` or `trackCta('PREMIUM_book_call_click')`
+   - **LinkedIn "Join the conversation"** (when a post exists) → secondary button in the header paired with the primary CTA, `trackCta('linkedin_click')` or `trackCta('PREMIUM_linkedin_click')`
 5. Add a card linking to it in `index.html` with the appropriate theme:
    - `theme-green` for free data/reports
    - `theme-warm` for runbooks

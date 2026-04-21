@@ -59,6 +59,8 @@ All pages track via a Google Apps Script endpoint that writes to a Google Sheet.
 | `(cta: book_chat_click)` | Clicked Book a chat (Cal.com link) |
 | `(cta: PREMIUM_get_full_report_click)` | Clicked "Get the full report" header button on premium sample |
 | `(cta: PREMIUM_book_call_click)` | Clicked "Book a call to discuss" CTA on premium sample |
+| `(cta: linkedin_click)` | Clicked "Join the conversation" LinkedIn button on a free report/runbook |
+| `(cta: PREMIUM_linkedin_click)` | Clicked "Join the conversation" LinkedIn button on a premium sample |
 | Real email address | Form submission (subscribe or request copy) |
 
 Compare CTA click counts vs actual form submissions to measure drop-off.
@@ -90,7 +92,21 @@ Every CTA button needs `onclick="trackCta('action_name'); ..."` prepended to its
 
 <!-- Cal.com link (premium) -->
 <a href="https://cal.com/roshan-khozouei/30min" target="_blank" onclick="trackCta('PREMIUM_book_call_click')">
+
+<!-- LinkedIn "Join the conversation" (secondary, when a post exists for the page) -->
+<a href="https://www.linkedin.com/posts/roshan-khozouei_..." target="_blank" rel="noopener" onclick="trackCta('linkedin_click')">
 ```
+
+### LinkedIn conversation button
+
+When a LinkedIn post exists for a page, add a "Join the conversation" secondary button in the header, paired with the primary CTA inside a flex wrapper so both buttons sit on the same row and wrap on narrow screens. Use LinkedIn blue (`#0A66C2`) and the LinkedIn "in" icon so the brand read is immediate.
+
+- Tracking: `trackCta('linkedin_click')` on free reports and runbooks, `trackCta('PREMIUM_linkedin_click')` on premium samples (PREMIUM_ prefix is mandatory for filtering).
+- Placement: to the left of the primary CTA, inside `<div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">`.
+- External link safety: always `target="_blank" rel="noopener"`.
+- Strip LinkedIn's `?utm_source=share&utm_medium=...&rcm=...` tracking params from the URL before committing — they bloat the link without benefit.
+- Font size matches the primary CTA on the page (13px on DM Sans pages, 14px on the Inter-based runbook).
+- Copy the full button markup from an existing page rather than retyping the SVG path.
 
 ### Apps Script (for reference, lives in the linked Google Sheet)
 
@@ -149,6 +165,7 @@ Every page on the site MUST have all of the following. No exceptions.
    - **Free reports/dashboards**: "Subscribe to updates" button in header → opens `subscribeModal`. Use `trackCta('subscribe_click')`.
    - **Premium samples**: "Get the full report" + "Book a call" → links to Cal.com. Use `trackCta('PREMIUM_get_full_report_click')` and `trackCta('PREMIUM_book_call_click')`. PREMIUM_ prefix is mandatory for filtering.
    - **Index page Book a chat**: `trackCta('book_chat_click')`.
+   - **LinkedIn "Join the conversation"** (when a post exists for the page): secondary button in the header paired with the primary CTA inside a flex wrapper. Use `trackCta('linkedin_click')` on free pages, `trackCta('PREMIUM_linkedin_click')` on premium samples. See the "LinkedIn conversation button" section above for placement and styling rules.
 4. **Email modal (for subscribe/copy CTAs)** — copy modal HTML and form submission script from an existing page. Form data must include `email`, `page`, `timestamp`, `ip`, `referrer`. Use `mode: 'no-cors'` and show success view immediately.
 5. **Card on index.html** — add a card linking to the new page with appropriate theme class:
    - `theme-green` — free data/reports
