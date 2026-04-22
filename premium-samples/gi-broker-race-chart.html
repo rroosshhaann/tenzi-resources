@@ -3,321 +3,357 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GI Broker AFSL Race Chart — May 2024 to April 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Top 20 GI Broker AFSLs — Race Chart · May 2024 → April 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
+  --bg: #faf8f4;
+  --panel: #ffffff;
+  --panel-hover: #fafaf7;
+  --border: #e5e1d9;
+  --border-bright: #d3cec3;
+  --border-light: #ece8df;
+  --text: #1a1a1a;
+  --muted: #6b6560;
+  --dim: #a59f93;
+  --accent: #2ca471;
+  --accent-hover: #249765;
   --g900: #0A4A45;
   --g700: #0F766E;
   --g500: #14A399;
   --g300: #5EEAD4;
   --g100: #CCFBF1;
-  --g50: #F0FDFA;
-  --bg: #FFFFFF;
-  --surface: #F7FAFA;
-  --border: #D5E5E3;
-  --border-light: #E8F0EF;
-  --text: #1A2B28;
-  --text-secondary: #4A6B65;
-  --text-muted: #7DA39C;
-  --radius: 10px;
+  --g50:  #F0FDFA;
+  --radius: 6px;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
+body { font: 14px/1.7 'Inter Tight', Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 28px 28px 8px; }
 
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
+.nav-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.back-link { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 500; color: var(--muted); text-decoration: none; }
+.back-link:hover { color: var(--text); }
 
-.page {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 28px 20px 48px;
-}
-
-.nav-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
-  text-decoration: none;
-}
-.back-link:hover { color: var(--g700); }
-
-.header {
-  margin-bottom: 24px;
-}
-
-.header-eyebrow {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--g500);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.header-eyebrow::before {
-  content: '';
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--g500);
-}
-
-.header h1 {
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
-  line-height: 1.2;
-  margin-bottom: 4px;
-  color: var(--g900);
-}
-
-.header-sub {
-  color: var(--text-secondary);
-  font-size: 13px;
-}
-
-.header-sub span {
-  color: var(--text);
-  font-weight: 600;
-}
-
+.header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+.eyebrow { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; display: inline-flex; align-items: center; gap: 8px; }
+.eyebrow::before { content:''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+h1 { font-size: 28px; letter-spacing: -0.02em; line-height: 1.2; font-weight: 500; color: var(--g900); margin-bottom: 6px; }
 .badge-sample {
   display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 4px;
-  letter-spacing: 0.5px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+  padding: 3px 7px;
+  border-radius: 2px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  background: linear-gradient(135deg, #EC2BA6, #F69068, #762BB7, #2FC2EF);
-  color: #fff;
-  margin-left: 8px;
-  vertical-align: middle;
+  color: #ffffff;
+  background: linear-gradient(135deg, #EC2BA6, #F69068 40%, #762BB7 75%, #2FC2EF);
+  margin-left: 10px;
+  vertical-align: 3px;
 }
+.subtitle { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.subtitle strong { color: var(--text); font-weight: 500; }
+.meta-line { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px; }
 
-/* Chart */
+.cta-group { display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0; justify-content: flex-end; }
+.btn-linkedin { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; background: transparent; color: #3d8aa8; border: 1px solid rgba(61,138,168,0.35); border-radius: var(--radius); font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; text-decoration: none; white-space: nowrap; transition: border-color 0.15s, background 0.15s; }
+.btn-linkedin:hover { border-color: rgba(61,138,168,0.7); background: rgba(61,138,168,0.06); }
+.btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font: 500 11px 'IBM Plex Mono', ui-monospace, monospace; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; white-space: nowrap; text-decoration: none; transition: background 0.15s; }
+.btn-primary:hover { background: var(--accent-hover); }
+
+.section-label { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin: 36px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; justify-content: space-between; }
+.section-label .section-num { color: var(--dim); }
+
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; transition: border-color 0.15s; }
+.card:hover { border-color: var(--border-bright); }
+.card-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; gap: 12px; }
+.card h3 { font-size: 15px; font-weight: 500; letter-spacing: -0.01em; margin: 0; line-height: 1.35; color: var(--g900); }
+.card-index { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; color: var(--dim); letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; }
+.card-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 18px; line-height: 1.5; }
+
+/* Insights list */
+.insights { list-style: none; padding: 0; margin: 0; }
+.insights li {
+  position: relative;
+  padding: 14px 0 14px 34px;
+  border-bottom: 1px dashed var(--border);
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+.insights li:last-child { border-bottom: none; padding-bottom: 4px; }
+.insights li::before {
+  content: counter(ins, decimal-leading-zero);
+  counter-increment: ins;
+  position: absolute;
+  left: 0; top: 14px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--dim);
+  letter-spacing: 0.08em;
+  padding-top: 2px;
+}
+.insights { counter-reset: ins; }
+.insights strong { color: var(--text); font-weight: 500; }
+
+/* Chart wrap */
 .chart-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border-light);
+  background: var(--panel);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 20px;
-  text-align: center;
+  padding: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.chart-wrap img { display: block; max-width: 100%; width: 100%; height: auto; border-radius: 4px; }
+.chart-caption {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 12px 14px 4px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-.chart-wrap img {
-  max-width: 100%;
-  border-radius: 6px;
-}
-
-/* Insights */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 12px;
-}
-
-.card h3 {
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 10px;
-  color: var(--g900);
-}
-
-.card ul {
-  padding-left: 18px;
-}
-
-.card li {
-  font-size: 13px;
-  line-height: 1.6;
-  margin-bottom: 8px;
-  color: var(--text-secondary);
-}
-
-.card li strong {
-  color: var(--text);
-}
-
-/* CTA */
-.cta-card {
-  background: linear-gradient(135deg, var(--g900) 0%, var(--g700) 100%);
-  border-radius: var(--radius);
+/* CTA strip */
+.cta-strip {
+  margin-top: 40px;
   padding: 32px;
-  color: #fff;
-  text-align: center;
-  margin-top: 24px;
-  margin-bottom: 16px;
-}
-
-.cta-card h3 {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.cta-card p {
-  font-size: 14px;
-  opacity: 0.85;
-  line-height: 1.6;
-  max-width: 540px;
-  margin: 0 auto 20px;
-}
-
-.cta-card .btn-primary {
-  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: radial-gradient(ellipse at 50% 0%, rgba(44,164,113,0.08), transparent 60%), var(--panel);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
   align-items: center;
-  gap: 6px;
-  padding: 12px 24px;
-  background: #fff;
-  color: var(--g900);
-  border: none;
-  border-radius: 8px;
-  font: 600 14px 'DM Sans', sans-serif;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background 0.2s;
 }
-
-.cta-card .btn-primary:hover {
-  background: var(--g100);
-}
+.cta-strip h3 { font-size: 19px; font-weight: 500; letter-spacing: -0.01em; margin: 0 0 6px; color: var(--text); }
+.cta-strip p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.55; max-width: 640px; }
+.cta-strip .btn-primary { padding: 12px 18px; }
 
 /* Caveats */
 .caveats {
-  font-size: 12px;
-  color: var(--text-muted);
-  line-height: 1.6;
-  margin-top: 16px;
+  margin-top: 24px;
+  padding: 18px 20px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-hover);
 }
-
-.caveats p {
-  margin-bottom: 6px;
-}
+.caveats-eyebrow { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.caveats p { font-size: 12.5px; color: var(--muted); line-height: 1.65; margin: 0; }
 
 /* Footer */
-.footer {
-  margin-top: 28px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-  font-size: 13px;
-  color: var(--text-muted);
-  display: flex;
-  justify-content: space-between;
+.page-footer { padding: 36px 0 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.12em; }
+.page-footer .left { color: var(--dim); }
+.page-footer .right { display: flex; gap: 20px; }
+.page-footer a { color: var(--muted); text-decoration: none; }
+.page-footer a:hover { color: var(--text); }
+
+@media (max-width: 820px) {
+  .wrap { padding: 20px 18px 8px; }
+  h1 { font-size: 22px; }
+  .header-row { flex-direction: column; }
+  .cta-group { justify-content: flex-start; }
+  .cta-strip { grid-template-columns: 1fr; }
 }
 
-.footer a { color: var(--text-muted); }
-
-@media (max-width: 700px) {
-  .page { padding: 20px 14px 36px; }
-  .header h1 { font-size: 20px; }
-  .cta-card { padding: 24px 20px; }
-  .cta-card h3 { font-size: 17px; }
-  .chart-insights { grid-template-columns: 1fr !important; }
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.chart-wrap, .card, .cta-card {
-  animation: fadeUp 0.4s ease both;
-}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.card, .chart-wrap, .cta-strip { animation: fadeUp 0.35s ease both; }
 </style>
 </head>
 <body>
-<div class="page">
+<div class="wrap">
 
-  <!-- Nav -->
   <div class="nav-bar">
-    <a class="back-link" href="../index.html">&larr; All Resources</a>
+    <a class="back-link" href="../index.html">← All Resources</a>
     <svg style="height: 28px; width: auto;"
-   width="201mm" height="65mm" viewBox="0 0 201 65" version="1.1" xml:space="preserve"
-   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lg16"><stop style="stop-color:#000000;stop-opacity:0.68644071;" offset="0"/><stop style="stop-color:#333344;stop-opacity:0;" offset="0.89759034"/></linearGradient><linearGradient id="lg11"><stop style="stop-color:#000000;stop-opacity:0.69491524;" offset="0"/><stop style="stop-color:#333344;stop-opacity:0;" offset="1"/></linearGradient><linearGradient id="lg3"><stop style="stop-color:#000000;stop-opacity:0.68644071;" offset="0"/><stop style="stop-color:#333344;stop-opacity:0;" offset="1"/></linearGradient><linearGradient id="sw2"><stop style="stop-color:#1c233c;stop-opacity:1;" offset="0"/></linearGradient><linearGradient id="a1g" x1="149.5" y1="149.5" x2="50.5" y2="50.5" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0,0.89869949,-0.89869949,0,-36.102721,12.157382)"><stop offset="0%" stop-color="#EC2BA6"/><stop offset="100%" stop-color="#F69068"/></linearGradient><linearGradient id="a2g" x1="50.5" y1="50.5" x2="149.5" y2="149.5" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0,0.89869949,-0.89869949,0,-36.102721,12.157382)"><stop offset="0%" stop-color="#762BB7"/><stop offset="100%" stop-color="#2FC2EF"/></linearGradient><linearGradient xlink:href="#sw2" id="lg2" x1="-2.833" y1="92.109" x2="416.863" y2="92.109" gradientUnits="userSpaceOnUse"/><linearGradient xlink:href="#lg11" id="lg5" gradientUnits="userSpaceOnUse" x1="-27.17" y1="-18.921" x2="21.284" y2="26.606" gradientTransform="matrix(3.7795276,0,0,3.7795276,65.969434,83.760759)"/><linearGradient xlink:href="#lg3" id="lg6" gradientUnits="userSpaceOnUse" gradientTransform="matrix(3.7795276,0,0,3.7795276,233.06248,147.61726)" x1="-32.25" y1="-37.501" x2="5.194" y2="-4.243"/><linearGradient xlink:href="#lg3" id="lg7" gradientUnits="userSpaceOnUse" gradientTransform="matrix(3.7795276,0,0,3.7795276,312.8453,207.36522)" x1="-46.659" y1="-53.04" x2="-2.537" y2="-12.747"/><linearGradient xlink:href="#lg3" id="lg8" gradientUnits="userSpaceOnUse" gradientTransform="matrix(3.7795276,0,0,3.7795276,311.02784,193.23495)" x1="-31.22" y1="-48.581" x2="21.058" y2="-2.541"/><linearGradient xlink:href="#lg3" id="lg9" gradientUnits="userSpaceOnUse" gradientTransform="matrix(3.7795276,0,0,3.7795276,28.97537,-41.67961)" x1="79.068" y1="13.262" x2="122.322" y2="29.682"/><linearGradient xlink:href="#lg16" id="lg12" gradientUnits="userSpaceOnUse" x1="2.065" y1="1.647" x2="49.387" y2="48.166"/></defs><g style="display:inline"><g transform="matrix(0.26458333,0,0,0.26458333,57.148859,-3.1761411)" style="display:inline"><path style="fill:url(#lg5);stroke-width:1.00157" d="M 23.117139,152.90878 132.19569,258.09166 242.51315,229.99668 39.977494,48.147816 -3.0887291,88.245002 14.412068,102.15302 Z"/><path style="fill:url(#lg12);stroke-width:0.265" d="M 9.5342283,40.19837 50.734283,77.970866 84.431227,50.453847 40.19837,7.4727738 14.565788,14.34826 Z" transform="matrix(3.7795276,0,0,3.7795276,-215.99569,12.004313)"/><path style="fill:url(#lg6);stroke-width:1.00157" d="M 86.97513,144.69552 198.00151,247.93057 261.57102,204.25294 146.44429,69.882457 81.221486,101.57097 Z"/><path style="fill:url(#lg7);stroke-width:1.00157" d="m 182.70582,157.69553 84.73065,81.8089 72.16766,-70.9186 L 255.67288,68.863833 227.43,74.863155 208.81837,64.134579 185.23046,68.309985 Z"/><path style="fill:url(#lg8);stroke-width:1.00157" d="m 290.94083,157.20008 72.06975,67.20016 86.7764,-61.17944 -81.43739,-98.699134 c -26.76816,0.539024 -47.94299,4.787227 -73.9102,4.02331 l -4.15021,19.896481 28.45065,22.392543 z"/><path style="fill:url(#lg9);stroke-width:1.00157" d="m 391.63723,156.9992 71.40976,62.39979 65.39079,-75.97554 -117.39677,-116.732874 -22.64459,23.2315 19.2757,14.842666 -16.68654,23.475841 z"/><path d="M -170.45829,146.51296 A 62.912174,62.912174 0 0 1 -81.487046,57.541706" fill="none" stroke-width="46.7324" style="stroke:url(#a1g)"/><path d="M -81.487046,57.541706 A 62.912174,62.912174 0 0 1 -170.45829,146.51296" fill="none" stroke-width="46.7324" style="stroke:url(#a2g)"/><path d="m 39.583,126.27798 c 0,3.584 0.82655,6.19256 2.381331,8.45273 2.900177,4.0254 7.716717,2.77592 9.41032,2.80066 0.937305,0.0137 4.473398,-0.64583 8.569739,-2.29026 l 8.499084,17.63907 c -6.312247,5.85502 -20.541608,7.83505 -24.596805,7.32864 -10.66913,-1.33235 -16.750013,-2.54016 -22.126013,-7.27616 -5.248,-4.864 -9.593656,-12.25468 -9.593656,-24.92668 V 88.837979 H -2.8328219 l 10e-8,-19.453551 c 0,0 9.8829521,0.242069 12.3588309,-2.51327 C 11.844938,64.290484 11.93455,62.376588 12.127,48.634171 L 39.339521,48.305151 39.583,67.862684 H 63.874974 V 88.837979 H 39.583 Z m 81.40821,-64.320001 c 9.344,0 17.664,2.24 24.96,6.72 7.424,4.48 13.184,10.56 17.28,18.24 4.096,7.680001 6.144,16.192001 6.144,25.536001 0,3.584 -0.256,5.38713 -0.768,8.33113 l -69.335648,-0.73044 c 2.431998,5.888 5.695998,10.304 9.791998,13.248 4.096,2.816 9.408,4.224 15.936,4.224 3.968,0 7.808,-0.832 11.52,-2.496 3.84,-1.664 10.98714,-6.09531 13.16314,-8.91131 l 14.40555,14.23583 c -5.69739,6.528 -10.304,11.52 -17.472,14.976 -7.04,3.456 -15.168,5.184 -24.384,5.184 -10.368,0 -19.52,-2.176 -27.455998,-6.528 -7.936,-4.48 -14.08,-10.56 -18.432,-18.24 -4.352,-7.68 -6.041042,-13.82121 -6.041042,-23.29321 0,-9.472 2.112,-18.048 6.336,-25.728001 4.352,-7.68 10.368,-13.696 18.048,-18.048 7.68,-4.48 16.448,-6.72 26.304,-6.72 z m 20.95165,42.384701 c -0.896,-4.863996 -3.456,-12.048701 -7.68,-14.736701 -4.096,-2.688 -7.44765,-4.032 -13.46365,-4.032 -6.272,0 -10.00765,1.536 -14.61565,4.608 -4.608,2.944 -7.039998,9.936701 -7.295998,14.160701 z m 95.00657,-39.898432 c 5.632,0 11.328,1.216 17.088,3.648 5.76,2.432 10.688,5.502605 14.784,11.646605 4.096,6.144 6.144,14.4 6.144,24.767997 l 0.73044,53.51234 h -27.456 l -0.73044,-53.51234 c -0.0839,-6.143425 -2.21496,-8.855645 -5.67096,-11.543645 -3.328,-2.688 -7.11652,-4.275478 -11.85252,-4.275478 -4.736,0 -11.38227,1.907478 -14.58227,5.235478 -3.072,3.328 -6.31235,5.474774 -6.31235,12.770775 l 0.97392,51.32521 h -27.456 l -0.97392,-93.565211 h 27.456 l 0.24348,9.206268 c 7.296,-6.144 19.42262,-9.215999 27.61462,-9.215999 z m 132.43751,17.673731 -43.17547,53.876871 h 46.42089 l 0.73044,22.02434 h -84.42423 l -0.97392,-14.88488 45.09462,-54.309821 h -43.27041 l 0.17217,-24.37051 79.42591,-0.344331 z m 31.15654,-27.311295 c -5.12,0 -9.152,-1.344 -12.096,-4.032 -2.816,-2.816 -4.224,-6.592 -4.224,-11.328 0,-4.864 1.408,-8.704 4.224,-11.52 2.944,-2.816 6.976,-4.224 12.096,-4.224 4.992,0 8.96,1.408 11.904,4.224 2.944,2.816 4.416,6.656 4.416,11.52 0,4.736 -1.472,8.512 -4.416,11.328 -2.944,2.688 -6.912,4.032 -11.904,4.032 z M 387.6934,158.01919 386.71948,64.453979 h 27.456 l 0.97392,93.565211 z" style="font-size:192px;fill:url(#lg2)" aria-label="tenzi"/></g></g></svg>
+   width="201mm"
+   height="65mm"
+   viewBox="0 0 201 65"
+   version="1.1"
+   xml:space="preserve"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"><defs><linearGradient
+       id="linearGradient16"
+       ><stop
+         style="stop-color:#000000;stop-opacity:0.68644071;"
+         offset="0"
+         /><stop
+         style="stop-color:#333344;stop-opacity:0;"
+         offset="0.89759034"
+         /></linearGradient><linearGradient
+       id="linearGradient11"
+       ><stop
+         style="stop-color:#000000;stop-opacity:0.69491524;"
+         offset="0"
+         /><stop
+         style="stop-color:#333344;stop-opacity:0;"
+         offset="1"
+         /></linearGradient><linearGradient
+       id="linearGradient3"
+       ><stop
+         style="stop-color:#000000;stop-opacity:0.68644071;"
+         offset="0"
+         /><stop
+         style="stop-color:#333344;stop-opacity:0;"
+         offset="1"
+         /></linearGradient><linearGradient
+       id="swatch2"
+       ><stop
+         style="stop-color:#1c233c;stop-opacity:1;"
+         offset="0"
+         /></linearGradient><linearGradient
+       id="arc1Gradient-0"
+       x1="149.5" y1="149.5" x2="50.5" y2="50.5"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0,0.89869949,-0.89869949,0,-36.102721,12.157382)"><stop offset="0%" stop-color="#EC2BA6"/><stop offset="100%" stop-color="#F69068"/></linearGradient><linearGradient
+       id="arc2Gradient-8"
+       x1="50.5" y1="50.5" x2="149.5" y2="149.5"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0,0.89869949,-0.89869949,0,-36.102721,12.157382)"><stop offset="0%" stop-color="#762BB7"/><stop offset="100%" stop-color="#2FC2EF"/></linearGradient><linearGradient
+       xlink:href="#swatch2"
+       id="linearGradient2"
+       x1="-2.8328218" y1="92.10894" x2="416.86349" y2="92.10894"
+       gradientUnits="userSpaceOnUse" /><linearGradient
+       xlink:href="#linearGradient11"
+       id="linearGradient5"
+       gradientUnits="userSpaceOnUse"
+       x1="-27.169992" y1="-18.921135" x2="21.284372" y2="26.60606"
+       gradientTransform="matrix(3.7795276,0,0,3.7795276,65.969434,83.760759)" /><linearGradient
+       xlink:href="#linearGradient3"
+       id="linearGradient6"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.7795276,0,0,3.7795276,233.06248,147.61726)"
+       x1="-32.250378" y1="-37.501045" x2="5.193779" y2="-4.243432" /><linearGradient
+       xlink:href="#linearGradient3"
+       id="linearGradient7"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.7795276,0,0,3.7795276,312.8453,207.36522)"
+       x1="-46.659107" y1="-53.039654" x2="-2.5366766" y2="-12.746933" /><linearGradient
+       xlink:href="#linearGradient3"
+       id="linearGradient8"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.7795276,0,0,3.7795276,311.02784,193.23495)"
+       x1="-31.21965" y1="-48.581367" x2="21.057957" y2="-2.5410306" /><linearGradient
+       xlink:href="#linearGradient3"
+       id="linearGradient9"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.7795276,0,0,3.7795276,28.97537,-41.67961)"
+       x1="79.068192" y1="13.262281" x2="122.32156" y2="29.68215" /><linearGradient
+       xlink:href="#linearGradient16"
+       id="linearGradient12"
+       gradientUnits="userSpaceOnUse"
+       x1="2.0645993" y1="1.6469805" x2="49.38686" y2="48.166054" /></defs><g
+     style="display:inline"><g
+       transform="matrix(0.26458333,0,0,0.26458333,57.148859,-3.1761411)"
+       style="display:inline"><path
+         style="display:inline;fill:url(#linearGradient5);stroke-width:1.00157;stroke-dasharray:none"
+         d="M 23.117139,152.90878 132.19569,258.09166 242.51315,229.99668 39.977494,48.147816 -3.0887291,88.245002 14.412068,102.15302 Z"
+         /><path
+         style="display:inline;fill:url(#linearGradient12);stroke-width:0.265;stroke-dasharray:none"
+         d="M 9.5342283,40.19837 50.734283,77.970866 84.431227,50.453847 40.19837,7.4727738 14.565788,14.34826 Z"
+         transform="matrix(3.7795276,0,0,3.7795276,-215.99569,12.004313)" /><path
+         style="display:inline;fill:url(#linearGradient6);stroke-width:1.00157;stroke-dasharray:none"
+         d="M 86.97513,144.69552 198.00151,247.93057 261.57102,204.25294 146.44429,69.882457 81.221486,101.57097 Z"
+         /><path
+         style="display:inline;fill:url(#linearGradient7);stroke-width:1.00157;stroke-dasharray:none"
+         d="m 182.70582,157.69553 84.73065,81.8089 72.16766,-70.9186 L 255.67288,68.863833 227.43,74.863155 208.81837,64.134579 185.23046,68.309985 Z"
+         /><path
+         style="display:inline;fill:url(#linearGradient8);stroke-width:1.00157;stroke-dasharray:none"
+         d="m 290.94083,157.20008 72.06975,67.20016 86.7764,-61.17944 -81.43739,-98.699134 c -26.76816,0.539024 -47.94299,4.787227 -73.9102,4.02331 l -4.15021,19.896481 28.45065,22.392543 z"
+         /><path
+         style="display:inline;fill:url(#linearGradient9);stroke-width:1.00157;stroke-dasharray:none"
+         d="m 391.63723,156.9992 71.40976,62.39979 65.39079,-75.97554 -117.39677,-116.732874 -22.64459,23.2315 19.2757,14.842666 -16.68654,23.475841 z"
+         /><path
+         d="M -170.45829,146.51296 A 62.912174,62.912174 0 0 1 -81.487046,57.541706"
+         fill="none"
+         stroke-width="46.7324"
+         style="display:inline;stroke:url(#arc1Gradient-0)" /><path
+         d="M -81.487046,57.541706 A 62.912174,62.912174 0 0 1 -170.45829,146.51296"
+         fill="none"
+         stroke-width="46.7324"
+         style="display:inline;stroke:url(#arc2Gradient-8)" /><path
+         d="m 39.583,126.27798 c 0,3.584 0.82655,6.19256 2.381331,8.45273 2.900177,4.0254 7.716717,2.77592 9.41032,2.80066 0.937305,0.0137 4.473398,-0.64583 8.569739,-2.29026 l 8.499084,17.63907 c -6.312247,5.85502 -20.541608,7.83505 -24.596805,7.32864 -10.66913,-1.33235 -16.750013,-2.54016 -22.126013,-7.27616 -5.248,-4.864 -9.593656,-12.25468 -9.593656,-24.92668 V 88.837979 H -2.8328219 l 10e-8,-19.453551 c 0,0 9.8829521,0.242069 12.3588309,-2.51327 C 11.844938,64.290484 11.93455,62.376588 12.127,48.634171 L 39.339521,48.305151 39.583,67.862684 H 63.874974 V 88.837979 H 39.583 Z m 81.40821,-64.320001 c 9.344,0 17.664,2.24 24.96,6.72 7.424,4.48 13.184,10.56 17.28,18.24 4.096,7.680001 6.144,16.192001 6.144,25.536001 0,3.584 -0.256,5.38713 -0.768,8.33113 l -69.335648,-0.73044 c 2.431998,5.888 5.695998,10.304 9.791998,13.248 4.096,2.816 9.408,4.224 15.936,4.224 3.968,0 7.808,-0.832 11.52,-2.496 3.84,-1.664 10.98714,-6.09531 13.16314,-8.91131 l 14.40555,14.23583 c -5.69739,6.528 -10.304,11.52 -17.472,14.976 -7.04,3.456 -15.168,5.184 -24.384,5.184 -10.368,0 -19.52,-2.176 -27.455998,-6.528 -7.936,-4.48 -14.08,-10.56 -18.432,-18.24 -4.352,-7.68 -6.041042,-13.82121 -6.041042,-23.29321 0,-9.472 2.112,-18.048 6.336,-25.728001 4.352,-7.68 10.368,-13.696 18.048,-18.048 7.68,-4.48 16.448,-6.72 26.304,-6.72 z m 20.95165,42.384701 c -0.896,-4.863996 -3.456,-12.048701 -7.68,-14.736701 -4.096,-2.688 -7.44765,-4.032 -13.46365,-4.032 -6.272,0 -10.00765,1.536 -14.61565,4.608 -4.608,2.944 -7.039998,9.936701 -7.295998,14.160701 z m 95.00657,-39.898432 c 5.632,0 11.328,1.216 17.088,3.648 5.76,2.432 10.688,5.502605 14.784,11.646605 4.096,6.144 6.144,14.4 6.144,24.767997 l 0.73044,53.51234 h -27.456 l -0.73044,-53.51234 c -0.0839,-6.143425 -2.21496,-8.855645 -5.67096,-11.543645 -3.328,-2.688 -7.11652,-4.275478 -11.85252,-4.275478 -4.736,0 -11.38227,1.907478 -14.58227,5.235478 -3.072,3.328 -6.31235,5.474774 -6.31235,12.770775 l 0.97392,51.32521 h -27.456 l -0.97392,-93.565211 h 27.456 l 0.24348,9.206268 c 7.296,-6.144 19.42262,-9.215999 27.61462,-9.215999 z m 132.43751,17.673731 -43.17547,53.876871 h 46.42089 l 0.73044,22.02434 h -84.42423 l -0.97392,-14.88488 45.09462,-54.309821 h -43.27041 l 0.17217,-24.37051 79.42591,-0.344331 z m 31.15654,-27.311295 c -5.12,0 -9.152,-1.344 -12.096,-4.032 -2.816,-2.816 -4.224,-6.592 -4.224,-11.328 0,-4.864 1.408,-8.704 4.224,-11.52 2.944,-2.816 6.976,-4.224 12.096,-4.224 4.992,0 8.96,1.408 11.904,4.224 2.944,2.816 4.416,6.656 4.416,11.52 0,4.736 -1.472,8.512 -4.416,11.328 -2.944,2.688 -6.912,4.032 -11.904,4.032 z M 387.6934,158.01919 386.71948,64.453979 h 27.456 l 0.97392,93.565211 z"
+         style="font-size:192px;fill:url(#linearGradient2)"
+         aria-label="tenzi"
+         /></g></g></svg>
   </div>
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-eyebrow">Premium Analytics</div>
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
-      <div>
-        <h1>Top 20 GI Broker AFSLs — Race Chart <span class="badge-sample">Sample</span></h1>
-        <div class="header-sub"><span>May 2024 &rarr; April 2026</span> &middot; 24 months of AR movement, animated</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">
-        <a href="https://www.linkedin.com/posts/roshan-khozouei_the-data-shows-resilium-lost-137-ars-over-activity-7448185928499507200-BVR8" target="_blank" rel="noopener" onclick="trackCta('PREMIUM_linkedin_click')" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:#0A66C2;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='#084d94'" onmouseout="this.style.background='#0A66C2'">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          Join the conversation
-        </a>
-        <a href="https://cal.com/roshan-khozouei/30min" target="_blank" onclick="trackCta('PREMIUM_get_full_report_click')" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:var(--g700);color:#fff;border:none;border-radius:8px;font:600 13px 'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--g900)'" onmouseout="this.style.background='var(--g700)'">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Get the full report
-        </a>
-      </div>
+  <div class="header-row">
+    <div>
+      <div class="eyebrow">Premium Analytics · Sample</div>
+      <h1>Top 20 GI Broker AFSLs — Race Chart <span class="badge-sample">Sample</span></h1>
+      <div class="subtitle"><strong>24 months of AR movement</strong> across Australia's 20 largest GI broker networks, animated.</div>
+      <div class="meta-line">PERIOD · MAY 2024 → APR 2026</div>
+    </div>
+    <div class="cta-group">
+      <a class="btn-linkedin" href="https://www.linkedin.com/posts/roshan-khozouei_the-data-shows-resilium-lost-137-ars-over-activity-7448185928499507200-BVR8" target="_blank" rel="noopener" onclick="trackCta('PREMIUM_linkedin_click')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        Join the conversation
+      </a>
+      <a class="btn-primary" href="https://cal.com/roshan-khozouei/30min" target="_blank" onclick="trackCta('PREMIUM_get_full_report_click')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Get the full report
+      </a>
     </div>
   </div>
 
-  <!-- Key insights -->
+  <div class="section-label"><span>Key findings</span><span class="section-num">01 / 03</span></div>
+
   <div class="card">
-    <h3>What the data shows</h3>
-    <ul>
-      <li><strong>Resilium is in sustained decline</strong> &mdash; down 137 ARs (-22%) over 24 months, falling in 14 of 23 months. McLardy McShane has overtaken them for #3.</li>
-      <li><strong>PSC Connect is shrinking at the same rate</strong> &mdash; down 82 (-26%), falling in 16 of 23 months. Both networks are being sold by Envest to Steadfast.</li>
-      <li><strong>The decline was visible long before the deal.</strong> PSC lost access to Steadfast&rsquo;s Client Trading Platform (SCTP) in mid-2023 after leaving the network. AR attrition at both Resilium and PSC Connect accelerated from there &mdash; well before the April 2026 Steadfast acquisition was announced.</li>
-      <li><strong>CBN dominates but may have peaked</strong> &mdash; grew from 879 to 1,115 (+27%), but has dropped 26 since hitting a high of 1,141 in Feb 2026.</li>
-      <li><strong>McLardy McShane is the steadiest grower</strong> &mdash; up 175 (+46%), positive in 19 of 23 months. Remarkably consistent.</li>
-    </ul>
+    <div class="card-head"><h3>What the data shows</h3><span class="card-index">5 FINDINGS</span></div>
+    <div class="card-sub">Movement patterns across the top 20 AFSLs over the 24-month window.</div>
+    <ol class="insights">
+      <li><strong>Resilium is in sustained decline</strong> — down 137 ARs (−22%) over 24 months, falling in 14 of 23 months. McLardy McShane has overtaken them for #3.</li>
+      <li><strong>PSC Connect is shrinking at the same rate</strong> — down 82 (−26%), falling in 16 of 23 months. Both networks are being sold by Envest to Steadfast.</li>
+      <li><strong>The decline was visible long before the deal.</strong> PSC lost access to Steadfast's Client Trading Platform (SCTP) in mid-2023 after leaving the network. AR attrition at both Resilium and PSC Connect accelerated from there — well before the April 2026 Steadfast acquisition was announced.</li>
+      <li><strong>CBN dominates but may have peaked</strong> — grew from 879 to 1,115 (+27%), but has dropped 26 since hitting a high of 1,141 in Feb 2026.</li>
+      <li><strong>McLardy McShane is the steadiest grower</strong> — up 175 (+46%), positive in 19 of 23 months. Remarkably consistent.</li>
+    </ol>
   </div>
 
-  <!-- Chart -->
+  <div class="section-label"><span>The race, animated</span><span class="section-num">02 / 03</span></div>
+
   <div class="chart-wrap">
     <img src="ar_race_chart.gif" alt="Animated race chart showing Top 20 GI Broker AFSLs by AR count from May 2024 to April 2026">
+    <div class="chart-caption">
+      <span>FIG 01 · TOP 20 GI AFSLS BY AR COUNT</span>
+      <span>MAY 2024 → APR 2026</span>
+    </div>
   </div>
 
-  <!-- CTA -->
-  <div class="cta-card">
-    <h3>Want the full report?</h3>
-    <p>The premium report includes detailed month-by-month data for a selected AFSL, individual AR movement logs, flow analysis between networks, and custom filtering by AR segment.</p>
+  <div class="section-label"><span>Source &amp; method</span><span class="section-num">03 / 03</span></div>
+
+  <div class="caveats">
+    <div class="caveats-eyebrow">Data notes</div>
+    <p>GI-primary AFSLs only (50%+ broker ARs). Ceased AR records have authorisation flags cleared by ASIC. Term-change cessations excluded by name + date matching. Source: ASIC Financial Advisers Register, April 2026 snapshot.</p>
+  </div>
+
+  <section class="cta-strip">
+    <div>
+      <h3>Want the full report?</h3>
+      <p>Month-by-month data for any selected AFSL, individual AR movement logs, flow analysis between networks, and custom filtering by AR segment.</p>
+    </div>
     <a class="btn-primary" href="https://cal.com/roshan-khozouei/30min" target="_blank" onclick="trackCta('PREMIUM_book_call_click')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Book a call to discuss
+      Book a call
     </a>
-  </div>
+  </section>
 
-  <!-- Caveats -->
-  <div class="caveats">
-    <p><strong>Data notes:</strong> GI-primary AFSLs only (50%+ broker ARs). Ceased AR records have authorisation flags cleared by ASIC. Term-change cessations excluded by name + date matching. Source: ASIC AFS Register, April 2026 snapshot.</p>
-  </div>
-
-  <!-- Footer -->
-  <div class="footer">
-    <span>Source: ASIC Financial Advisers Register &middot; Individual ARs, General Insurance</span>
-    <span>Apr 2026 &middot; <a href="https://tenzi.ai">Tenzi</a></span>
-  </div>
+  <footer class="page-footer">
+    <div class="left">© 2026 TENZI · RESOURCES.TENZI.AI</div>
+    <div class="right">
+      <a href="https://tenzi.ai">TENZI.AI</a>
+      <a href="https://www.linkedin.com/company/tenzi-ai" target="_blank" rel="noopener">LINKEDIN</a>
+      <a href="mailto:roshan@tenzi.ai">EMAIL</a>
+    </div>
+  </footer>
 
 </div>
 
@@ -326,9 +362,7 @@ function trackBeacon(eventName) {
   var url = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=' + encodeURIComponent(eventName) + '&page=' + encodeURIComponent(document.title);
   fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){
     new Image().src = url + '&ip=' + encodeURIComponent(d.ip) + '&ref=' + encodeURIComponent(document.referrer);
-  }).catch(function(){
-    new Image().src = url + '&ref=' + encodeURIComponent(document.referrer);
-  });
+  }).catch(function(){ new Image().src = url + '&ref=' + encodeURIComponent(document.referrer); });
 }
 function trackCta(action) { trackBeacon('(cta: ' + action + ')'); }
 trackBeacon('(page view)');
