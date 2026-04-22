@@ -30,7 +30,7 @@
   --radius: 6px;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font: 14px/1.7 'Inter Tight', Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+body { font: 14px/1.55 'Inter Tight', Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
 a { color: var(--accent); }
 .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 28px 8px; }
 
@@ -66,7 +66,7 @@ h1 { font-size: 28px; letter-spacing: -0.02em; line-height: 1.2; font-weight: 50
 .btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font: 500 11px 'IBM Plex Mono', ui-monospace, monospace; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; white-space: nowrap; text-decoration: none; transition: background 0.15s; }
 .btn-primary:hover { background: var(--accent-hover); }
 
-.section-label { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin: 36px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; justify-content: space-between; }
+.section-label { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; justify-content: space-between; }
 .section-label .section-num { color: var(--dim); }
 
 .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; transition: border-color 0.15s; }
@@ -74,7 +74,7 @@ h1 { font-size: 28px; letter-spacing: -0.02em; line-height: 1.2; font-weight: 50
 .card-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; gap: 12px; }
 .card h3 { font-size: 15px; font-weight: 500; letter-spacing: -0.01em; margin: 0; line-height: 1.35; color: var(--g900); }
 .card-index { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; color: var(--dim); letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; }
-.card-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 18px; line-height: 1.5; }
+.card-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
 
 /* Insights list */
 .insights { list-style: none; padding: 0; margin: 0; }
@@ -109,7 +109,7 @@ h1 { font-size: 28px; letter-spacing: -0.02em; line-height: 1.2; font-weight: 50
   border-radius: var(--radius);
   padding: 8px;
   overflow: hidden;
-  position: relative;
+  position: relative; max-width: 780px; margin-left: auto; margin-right: auto;
 }
 .chart-wrap img { display: block; max-width: 100%; width: 100%; height: auto; border-radius: 4px; }
 .chart-caption {
