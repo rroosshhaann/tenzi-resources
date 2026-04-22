@@ -76,7 +76,7 @@ Declare these verbatim at the top of every page's `<style>`. Do not introduce ne
 
 - **Display & body:** `'Inter Tight', Inter, system-ui, sans-serif`. Weights 400/500/600 only.
 - **Mono:** `'IBM Plex Mono', ui-monospace, monospace`. Weights 400/500 only.
-- **Body size:** `14px / 1.7`. Never go below 13px for paragraphs.
+- **Body size:** `14px / 1.55`. Never go below 13px for paragraphs.
 - **Letter-spacing:**
   - H1 / H2: `-0.02em`
   - Body: default
@@ -102,7 +102,7 @@ Declare these verbatim at the top of every page's `<style>`. Do not introduce ne
 
 - **Max width:** `1100px` (content wrapper). Narrower pages (900–960px) are acceptable for text-heavy runbooks.
 - **Gutter:** `28px` horizontal on desktop, `18–20px` on mobile.
-- **Vertical rhythm:** section-to-section `36px` top margin on the section band; card-to-card `10–12px`.
+- **Vertical rhythm:** section-to-section `24px` top margin on the section band; card-to-card `10–12px`; `.card-sub` description → content below is `10px`.
 - **Grid:** CSS grid with `gap: 10px` for card rows; KPI rows use `grid-template-columns: repeat(4, 1fr)`.
 - **Radius:** `6px` on cards, `4px` on inputs/buttons/bars. No pill shapes except the single stickiness progress bar.
 - **Shadows:** none. Depth is communicated with borders and cream→white contrast. The only exception is the modal (`0 20px 60px rgba(0,0,0,0.15)`).
@@ -193,6 +193,7 @@ Secondary line (mono, --dim)
 - Rows: 13px body, dashed bottom border (`1px dashed --border`).
 - Numeric cells right-aligned, mono, weight 600, `tnum`.
 - Positive values: `--pos`. Negative values: `--neg`.
+- **Alternating row wash:** `tr:nth-child(even) td { background: rgba(15,118,110,0.025); }` — keeps dense tables from feeling like floating digits without introducing a second colour.
 
 ### 5.3 Chart bars
 - Flat single-colour OR two-stop vertical gradient (`--g300 → --g700`), never horizontal gradients on containers.
@@ -208,6 +209,11 @@ Mono 9.5px, tracked `0.12em`, uppercase. 2px radius.
 
 ### 5.5 Runbook steps
 Five phase badges with the `--phase-*` hues; step cards carry a 4px left border keyed by actor (`broker`, `client`, `insurer`, `decision`). Decision steps also take a faint amber wash. No other uses of the phase palette.
+
+### 5.6 Embedded figures (GIFs, animations, static charts)
+- Wrap media in `.chart-wrap` — `background: var(--panel)`, `1px solid var(--border)`, `6px radius`, `8px padding`.
+- Cap container at `max-width: 780px; margin-left: auto; margin-right: auto;` so wide assets (flow diagrams at 1100px+) don't dominate the page and smaller assets don't upscale past their native resolution.
+- Captions below the image in `.chart-caption`: mono 10px uppercase, `--dim`, tracked `0.14em`, split label left / date-range right.
 
 ---
 
