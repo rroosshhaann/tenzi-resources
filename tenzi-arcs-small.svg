@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Save as something like arcs-gradients.svg -->
+
+<svg
+   width="200"
+   height="200"
+   viewBox="0 0 200 200"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="tenzi-arcs-small.svg"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview5"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="4.075"
+     inkscape:cx="100.1227"
+     inkscape:cy="100"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="3832"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg5" />
+  <!--
+      We’ll use a circle centered at (100,100) with radius = 70.
+      45% of 70 ≈ 31.5, so we'll use 32 as the stroke width.
+      The arcs span these angles:
+         1)  45° → 225°
+         2) 225° → 405°(=45°)
+  -->
+  <defs
+     id="defs4">
+    <!-- Gradient for arc 1 (orange → pink) -->
+    <linearGradient
+       id="arc1Gradient"
+       x1="149.5"
+       y1="149.5"
+       x2="50.5"
+       y2="50.5"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0%"
+         stop-color="#EC2BA6"
+         id="stop1" />
+      <stop
+         offset="100%"
+         stop-color="#F69068"
+         id="stop2" />
+    </linearGradient>
+    <!-- Gradient for arc 2 (skyblue → purple) -->
+    <linearGradient
+       id="arc2Gradient"
+       x1="50.5"
+       y1="50.5"
+       x2="149.5"
+       y2="149.5"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0%"
+         stop-color="#762BB7"
+         id="stop3" />
+      <stop
+         offset="100%"
+         stop-color="#2FC2EF"
+         id="stop4" />
+    </linearGradient>
+  </defs>
+  <!-- Group the two arcs and rotate them 90° clockwise by using rotate(-90). -->
+  <g
+     transform="rotate(90, 100, 100)"
+     id="g5">
+    <!-- 
+           Arc 1 path:
+             - Starts at angle 45°:   (100 + 70*cos(45°),   100 + 70*sin(45°))   ≈ (149.5,149.5)
+             - Ends   at angle 225°: (100 + 70*cos(225°),  100 + 70*sin(225°))  ≈ (50.5, 50.5)
+           A 70 70 0 0 1 => radius=70, large-arc-flag=0, sweep-flag=1
+      -->
+    <path
+       d="M 149.5,149.5               A 70 70 0 0 1 50.5,50.5"
+       fill="none"
+       stroke="url(#arc1Gradient)"
+       stroke-width="52"
+       id="path4" />
+    <!-- 
+           Arc 2 path (opposite arc):
+             - Starts at angle 225°:  (50.5, 50.5)
+             - Ends   at angle 405°(=45°):  (149.5,149.5)
+      -->
+    <path
+       d="M 50.5,50.5               A 70 70 0 0 1 149.5,149.5"
+       fill="none"
+       stroke="url(#arc2Gradient)"
+       stroke-width="52"
+       id="path5" />
+  </g>
+</svg>
