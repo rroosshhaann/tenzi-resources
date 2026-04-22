@@ -5,58 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
   <title>Renewals — Broker Workflow Runbook</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIFNhdmUgYXMgc29tZXRoaW5nIGxpa2UgYXJjcy1ncmFkaWVudHMuc3ZnIC0tPg0KDQo8c3ZnDQogICB3aWR0aD0iMjAwIg0KICAgaGVpZ2h0PSIyMDAiDQogICB2aWV3Qm94PSIwIDAgMjAwIDIwMCINCiAgIHZlcnNpb249IjEuMSINCiAgIGlkPSJzdmc1Ig0KICAgc29kaXBvZGk6ZG9jbmFtZT0idGVuemktYXJjcy1zbWFsbC5zdmciDQogICBpbmtzY2FwZTp2ZXJzaW9uPSIxLjQgKDg2YThhZDcsIDIwMjQtMTAtMTEpIg0KICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiDQogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiDQogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciDQogICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCiAgPHNvZGlwb2RpOm5hbWVkdmlldw0KICAgICBpZD0ibmFtZWR2aWV3NSINCiAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIg0KICAgICBib3JkZXJjb2xvcj0iIzExMTExMSINCiAgICAgYm9yZGVyb3BhY2l0eT0iMSINCiAgICAgaW5rc2NhcGU6c2hvd3BhZ2VzaGFkb3c9IjAiDQogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwIg0KICAgICBpbmtzY2FwZTpwYWdlY2hlY2tlcmJvYXJkPSIxIg0KICAgICBpbmtzY2FwZTpkZXNrY29sb3I9IiNkMWQxZDEiDQogICAgIGlua3NjYXBlOnpvb209IjQuMDc1Ig0KICAgICBpbmtzY2FwZTpjeD0iMTAwLjEyMjciDQogICAgIGlua3NjYXBlOmN5PSIxMDAiDQogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTkyMCINCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTAxNyINCiAgICAgaW5rc2NhcGU6d2luZG93LXg9IjM4MzIiDQogICAgIGlua3NjYXBlOndpbmRvdy15PSItOCINCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMSINCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnNSIgLz4NCiAgPCEtLQ0KICAgICAgV2XigJlsbCB1c2UgYSBjaXJjbGUgY2VudGVyZWQgYXQgKDEwMCwxMDApIHdpdGggcmFkaXVzID0gNzAuDQogICAgICA0NSUgb2YgNzAg4omIIDMxLjUsIHNvIHdlJ2xsIHVzZSAzMiBhcyB0aGUgc3Ryb2tlIHdpZHRoLg0KICAgICAgVGhlIGFyY3Mgc3BhbiB0aGVzZSBhbmdsZXM6DQogICAgICAgICAxKSAgNDXCsCDihpIgMjI1wrANCiAgICAgICAgIDIpIDIyNcKwIOKGkiA0MDXCsCg9NDXCsCkNCiAgLS0+DQogIDxkZWZzDQogICAgIGlkPSJkZWZzNCI+DQogICAgPCEtLSBHcmFkaWVudCBmb3IgYXJjIDEgKG9yYW5nZSDihpIgcGluaykgLS0+DQogICAgPGxpbmVhckdyYWRpZW50DQogICAgICAgaWQ9ImFyYzFHcmFkaWVudCINCiAgICAgICB4MT0iMTQ5LjUiDQogICAgICAgeTE9IjE0OS41Ig0KICAgICAgIHgyPSI1MC41Ig0KICAgICAgIHkyPSI1MC41Ig0KICAgICAgIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4NCiAgICAgIDxzdG9wDQogICAgICAgICBvZmZzZXQ9IjAlIg0KICAgICAgICAgc3RvcC1jb2xvcj0iI0VDMkJBNiINCiAgICAgICAgIGlkPSJzdG9wMSIgLz4NCiAgICAgIDxzdG9wDQogICAgICAgICBvZmZzZXQ9IjEwMCUiDQogICAgICAgICBzdG9wLWNvbG9yPSIjRjY5MDY4Ig0KICAgICAgICAgaWQ9InN0b3AyIiAvPg0KICAgIDwvbGluZWFyR3JhZGllbnQ+DQogICAgPCEtLSBHcmFkaWVudCBmb3IgYXJjIDIgKHNreWJsdWUg4oaSIHB1cnBsZSkgLS0+DQogICAgPGxpbmVhckdyYWRpZW50DQogICAgICAgaWQ9ImFyYzJHcmFkaWVudCINCiAgICAgICB4MT0iNTAuNSINCiAgICAgICB5MT0iNTAuNSINCiAgICAgICB4Mj0iMTQ5LjUiDQogICAgICAgeTI9IjE0OS41Ig0KICAgICAgIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4NCiAgICAgIDxzdG9wDQogICAgICAgICBvZmZzZXQ9IjAlIg0KICAgICAgICAgc3RvcC1jb2xvcj0iIzc2MkJCNyINCiAgICAgICAgIGlkPSJzdG9wMyIgLz4NCiAgICAgIDxzdG9wDQogICAgICAgICBvZmZzZXQ9IjEwMCUiDQogICAgICAgICBzdG9wLWNvbG9yPSIjMkZDMkVGIg0KICAgICAgICAgaWQ9InN0b3A0IiAvPg0KICAgIDwvbGluZWFyR3JhZGllbnQ+DQogIDwvZGVmcz4NCiAgPCEtLSBHcm91cCB0aGUgdHdvIGFyY3MgYW5kIHJvdGF0ZSB0aGVtIDkwwrAgY2xvY2t3aXNlIGJ5IHVzaW5nIHJvdGF0ZSgtOTApLiAtLT4NCiAgPGcNCiAgICAgdHJhbnNmb3JtPSJyb3RhdGUoOTAsIDEwMCwgMTAwKSINCiAgICAgaWQ9Imc1Ij4NCiAgICA8IS0tIA0KICAgICAgICAgICBBcmMgMSBwYXRoOg0KICAgICAgICAgICAgIC0gU3RhcnRzIGF0IGFuZ2xlIDQ1wrA6ICAgKDEwMCArIDcwKmNvcyg0NcKwKSwgICAxMDAgKyA3MCpzaW4oNDXCsCkpICAg4omIICgxNDkuNSwxNDkuNSkNCiAgICAgICAgICAgICAtIEVuZHMgICBhdCBhbmdsZSAyMjXCsDogKDEwMCArIDcwKmNvcygyMjXCsCksICAxMDAgKyA3MCpzaW4oMjI1wrApKSAg4omIICg1MC41LCA1MC41KQ0KICAgICAgICAgICBBIDcwIDcwIDAgMCAxID0+IHJhZGl1cz03MCwgbGFyZ2UtYXJjLWZsYWc9MCwgc3dlZXAtZmxhZz0xDQogICAgICAtLT4NCiAgICA8cGF0aA0KICAgICAgIGQ9Ik0gMTQ5LjUsMTQ5LjUgICAgICAgICAgICAgICBBIDcwIDcwIDAgMCAxIDUwLjUsNTAuNSINCiAgICAgICBmaWxsPSJub25lIg0KICAgICAgIHN0cm9rZT0idXJsKCNhcmMxR3JhZGllbnQpIg0KICAgICAgIHN0cm9rZS13aWR0aD0iNTIiDQogICAgICAgaWQ9InBhdGg0IiAvPg0KICAgIDwhLS0gDQogICAgICAgICAgIEFyYyAyIHBhdGggKG9wcG9zaXRlIGFyYyk6DQogICAgICAgICAgICAgLSBTdGFydHMgYXQgYW5nbGUgMjI1wrA6ICAoNTAuNSwgNTAuNSkNCiAgICAgICAgICAgICAtIEVuZHMgICBhdCBhbmdsZSA0MDXCsCg9NDXCsCk6ICAoMTQ5LjUsMTQ5LjUpDQogICAgICAtLT4NCiAgICA8cGF0aA0KICAgICAgIGQ9Ik0gNTAuNSw1MC41ICAgICAgICAgICAgICAgQSA3MCA3MCAwIDAgMSAxNDkuNSwxNDkuNSINCiAgICAgICBmaWxsPSJub25lIg0KICAgICAgIHN0cm9rZT0idXJsKCNhcmMyR3JhZGllbnQpIg0KICAgICAgIHN0cm9rZS13aWR0aD0iNTIiDQogICAgICAgaWQ9InBhdGg1IiAvPg0KICA8L2c+DQo8L3N2Zz4NCg==">
   <style>
     :root {
+      /* Terminal Grid — LIGHT theme */
       --bg: #faf8f4;
-      --panel: #fff;
-      --border: #e2ddd5;
+      --panel: #ffffff;
+      --panel-hover: #fafaf7;
+      --border: #e5e1d9;
+      --border-bright: #d3cec3;
       --text: #1a1a1a;
       --muted: #6b6560;
-      --phase-1: #dc6843;
-      --phase-2: #d97706;
-      --phase-3: #7c3aed;
-      --phase-4: #0891b2;
-      --phase-5: #059669;
-      --phase-6: #6366f1;
-      --broker: #fce4ec;
-      --client: #e3f2fd;
-      --insurer: #e8f5e9;
-      --decision: #fff3e0;
-      --shadow: 0 1px 3px rgba(0,0,0,.06);
-      --radius: 10px;
+      --dim: #a59f93;
+      --accent: #2ca471;
+
+      /* Phase hues — slightly deeper than dark theme for contrast on cream */
+      --phase-1: #d17149;   /* warm orange */
+      --phase-2: #b88330;   /* amber */
+      --phase-3: #7c5fbd;   /* muted violet */
+      --phase-4: #3d8aa8;   /* muted cyan */
+      --phase-5: #3f9b6c;   /* muted green */
+      --phase-6: #5a6fc4;   /* muted indigo */
+
+      --broker: rgba(201,105,90,0.06);
+      --client: rgba(90,156,204,0.06);
+      --insurer: rgba(111,175,122,0.07);
+      --decision: rgba(214,169,90,0.08);
+
+      --shadow: none;
+      --radius: 6px;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font: 13px/1.6 Inter, system-ui, -apple-system, sans-serif;
+      font: 14px/1.7 'Inter Tight', Inter, system-ui, -apple-system, sans-serif;
     }
+    a { color: var(--accent); }
     .wrap { max-width: 1100px; margin: 0 auto; padding: 28px; }
-    h1 { font-size: 24px; margin: 0 0 6px; }
-    h2 { font-size: 18px; margin: 40px 0 6px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
-    h3 { font-size: 14px; margin: 0; }
-    p { margin: 0 0 10px; color: var(--muted); }
-    .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+    h1 { font-size: 28px; margin: 0 0 8px; letter-spacing: -0.02em; font-weight: 500; line-height: 1.25; }
+    h2 { font-size: 26px; margin: 44px 0 8px; padding-bottom: 10px; border-bottom: 1px solid var(--border); letter-spacing: -0.02em; font-weight: 500; line-height: 1.25; }
+    h3 { font-size: 15px; margin: 0; font-weight: 500; color: var(--text); line-height: 1.5; }
+    p { margin: 0 0 10px; color: var(--muted); line-height: 1.7; }
+    .subtitle { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.65; max-width: 780px; }
 
     .phase { margin-bottom: 40px; }
     .phase-header {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 12px;
       margin-bottom: 6px;
     }
     .phase-badge {
-      font-size: 11px;
-      font-weight: 700;
+      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+      font-size: 10px;
+      font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: .05em;
-      color: #fff;
+      letter-spacing: 0.12em;
+      color: #ffffff;
       padding: 3px 10px;
-      border-radius: 999px;
+      border-radius: 2px;
     }
     .phase-1 .phase-badge { background: var(--phase-1); }
     .phase-2 .phase-badge { background: var(--phase-2); }
@@ -65,70 +76,82 @@
     .phase-5 .phase-badge { background: var(--phase-5); }
     .phase-6 .phase-badge { background: var(--phase-6); }
 
-    .phase-desc { color: var(--muted); margin-bottom: 16px; font-size: 13px; }
+    .phase-desc { color: var(--muted); margin-bottom: 16px; font-size: 14px; line-height: 1.7; max-width: 780px; }
 
     .steps { display: grid; gap: 8px; }
     .step {
       display: grid;
-      grid-template-columns: 50px 1fr;
-      gap: 12px;
-      padding: 10px 14px;
+      grid-template-columns: 40px 1fr;
+      gap: 4px;
+      padding: 14px 16px;
       border-radius: 0;
       border: 1px solid var(--border);
       background: var(--panel);
-      box-shadow: var(--shadow);
       align-items: start;
+      transition: border-color 0.15s, background 0.15s;
     }
+    .step:hover { border-color: var(--border-bright); background: var(--panel-hover); }
     .step-id {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--muted);
-      padding-top: 1px;
+      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--dim);
+      padding-top: 2px;
+      letter-spacing: 0.02em;
     }
-    .step-body h3 { margin-bottom: 3px; }
-    .step-body p { margin: 0; font-size: 12px; }
+    .step-body h3 { margin-bottom: 6px; }
+    .step-body p { margin: 0; font-size: 13px; line-height: 1.7; color: var(--muted); }
 
-    .step.broker { border-left: 3px solid #e57373; }
-    .step.client { border-left: 3px solid #64b5f6; }
-    .step.insurer { border-left: 3px solid #81c784; }
-    .step.decision { border-left: 3px solid #ffb74d; background: #fffcf7; }
+    .step.broker { border-left: 4px solid #c9695a; }
+    .step.client { border-left: 4px solid #5a9ccc; }
+    .step.insurer { border-left: 4px solid #6faf7a; }
+    .step.decision { border-left: 4px solid #d6a95a; background: rgba(214,169,90,0.05); }
 
     .channels {
       display: flex;
       gap: 6px;
-      margin-top: 4px;
+      margin-top: 6px;
       flex-wrap: wrap;
     }
     .ch {
-      font-size: 10px;
+      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+      font-size: 9.5px;
       padding: 2px 7px;
-      border-radius: 999px;
-      font-weight: 600;
+      border-radius: 2px;
+      font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: .03em;
+      letter-spacing: 0.08em;
+      border: 1px solid var(--border-bright);
+      background: transparent;
     }
-    .ch-phone { background: #fce4ec; color: #c62828; }
-    .ch-email { background: #e3f2fd; color: #1565c0; }
-    .ch-doc { background: #f3e5f5; color: #6a1b9a; }
-    .ch-search { background: #e8f5e9; color: #2e7d32; }
-    .ch-folder { background: #fff8e1; color: #f57f17; }
-    .ch-system { background: #e8eaf6; color: #283593; }
+    .ch-phone  { color: #d88585; border-color: rgba(216,133,133,0.25); }
+    .ch-email  { color: #7aa8d4; border-color: rgba(122,168,212,0.25); }
+    .ch-doc    { color: #b89ad6; border-color: rgba(184,154,214,0.25); }
+    .ch-search { color: #7cbd90; border-color: rgba(124,189,144,0.25); }
+    .ch-folder { color: #d6b86b; border-color: rgba(214,184,107,0.25); }
+    .ch-system { color: #8b94bd; border-color: rgba(139,148,189,0.25); }
 
     .branch {
-      margin-left: 62px;
+      margin-left: 48px;
       padding: 8px 0 8px 14px;
-      border-left: 2px dashed var(--border);
-      font-size: 12px;
+      border-left: 1px dashed var(--border-bright);
+      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+      font-size: 11px;
       color: var(--muted);
+      letter-spacing: 0.02em;
     }
-    .branch strong { color: var(--text); }
+    .branch strong { color: var(--text); font-weight: 500; }
 
     .legend {
       display: flex;
       gap: 16px;
       flex-wrap: wrap;
       margin-bottom: 24px;
-      font-size: 12px;
+      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
     }
     .legend-item {
       display: flex;
@@ -138,8 +161,9 @@
     .legend-swatch {
       width: 14px;
       height: 14px;
-      border-radius: 3px;
+      border-radius: 2px;
       border: 1px solid var(--border);
+      background: var(--panel);
     }
 
     .step-body { position: relative; }
@@ -147,73 +171,173 @@
     .modal-overlay {
       display: none;
       position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.35);
       z-index: 1000;
       align-items: center;
       justify-content: center;
     }
     .modal-overlay.open { display: flex; }
     .modal {
-      background: #fff;
-      border-radius: 12px;
+      background: var(--panel);
+      border: 1px solid var(--border-bright);
+      border-radius: var(--radius);
       padding: 32px;
       max-width: 420px;
       width: 90%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      color: var(--text);
     }
-    .modal h3 { font-size: 18px; margin-bottom: 8px; }
+    .modal h3 { font-size: 18px; margin-bottom: 8px; font-weight: 500; letter-spacing: -0.01em; }
     .modal p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
     .modal input[type="email"] {
       width: 100%;
       padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font: 14px Inter, system-ui, sans-serif;
+      border: 1px solid var(--border-bright);
+      background: #ffffff;
+      color: var(--text);
+      border-radius: var(--radius);
+      font: 14px 'Inter Tight', Inter, system-ui, sans-serif;
       margin-bottom: 12px;
     }
     .modal input[type="email"]:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
     .modal .btn-send {
       width: 100%;
       padding: 10px;
-      background: #2563eb;
-      color: #fff;
+      background: var(--accent);
+      color: #ffffff;
       border: none;
-      border-radius: 8px;
-      font: 600 14px Inter, system-ui, sans-serif;
+      border-radius: var(--radius);
+      font: 500 13px 'IBM Plex Mono', ui-monospace, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
       cursor: pointer;
+      transition: background 0.15s;
     }
-    .modal .btn-send:hover { background: #1d4ed8; }
+    .modal .btn-send:hover { background: #249765; }
+    .modal .btn-send:disabled { background: #3d5d4b; cursor: not-allowed; }
     .modal .close-link {
       display: block;
       text-align: center;
       margin-top: 12px;
-      font-size: 12px;
+      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
       color: var(--muted);
       cursor: pointer;
       text-decoration: none;
     }
+    .modal .form-view, .modal .success-view { }
     .modal .success-view { display: none; text-align: center; }
     .btn-request {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       cursor: pointer;
-      color: #fff;
-      font: 600 13px 'Inter', system-ui, sans-serif;
+      color: #ffffff;
+      font: 500 11px 'IBM Plex Mono', ui-monospace, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
       text-decoration: none;
-      background: #2563eb;
+      background: var(--accent);
       border: none;
-      border-radius: 8px;
-      padding: 10px 18px;
+      border-radius: var(--radius);
+      padding: 10px 16px;
       white-space: nowrap;
-      transition: background 0.2s;
+      transition: background 0.15s;
     }
-    .btn-request:hover { background: #1d4ed8; }
+    .btn-request:hover { background: #249765; }
 
     @media (max-width: 700px) {
-      .step { grid-template-columns: 40px 1fr; }
+      .step { grid-template-columns: 32px 1fr; }
     }
+
+    /* Subscribe block — matches landing page */
+    .subscribe {
+      margin-top: 64px;
+      padding: 32px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: radial-gradient(ellipse at 50% 0%, rgba(44,164,113,0.07), transparent 60%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .subscribe-eyebrow {
+      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .subscribe h2 {
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin: 0;
+      padding: 0;
+      border: none;
+      color: var(--text);
+    }
+    .subscribe p {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 6px 0 0;
+      line-height: 1.5;
+    }
+    .subscribe-form {
+      display: flex;
+      gap: 8px;
+      min-width: 340px;
+      flex: 0 1 380px;
+    }
+    .subscribe-form input[type="email"] {
+      flex: 1;
+      padding: 10px 12px;
+      background: var(--panel);
+      border: 1px solid var(--border-bright);
+      border-radius: 4px;
+      color: var(--text);
+      font: 13px 'Inter Tight', Inter, system-ui, sans-serif;
+      outline: none;
+    }
+    .subscribe-form input[type="email"]:focus { border-color: var(--accent); }
+    .subscribe-form button {
+      padding: 10px 16px;
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: background 0.15s;
+    }
+    .subscribe-form button:hover { background: #249765; }
+
+    .page-footer {
+      padding: 36px 0 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+    }
+    .page-footer .left { color: var(--dim); }
+    .page-footer .right { display: flex; gap: 20px; }
+    .page-footer a { color: var(--muted); text-decoration: none; }
+    .page-footer a:hover { color: var(--text); }
   </style>
 </head>
 <body>
@@ -221,217 +345,117 @@
 
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
     <a href="../index.html" style="display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;">&larr; All Resources</a>
-    <svg style="height: 32px; width: auto;"
+    <svg style="height: 28px; width: auto;"
    width="201mm"
    height="65mm"
    viewBox="0 0 201 65"
    version="1.1"
-   id="svg1"
    xml:space="preserve"
-   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
-   sodipodi:docname="tenzi blue.svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
-     id="namedview1"
-     pagecolor="#ffffff"
-     bordercolor="#111111"
-     borderopacity="1"
-     inkscape:showpageshadow="0"
-     inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="1"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:document-units="mm"
-     inkscape:zoom="1.0267829"
-     inkscape:cx="458.22734"
-     inkscape:cy="-36.521839"
-     inkscape:window-width="1920"
-     inkscape:window-height="1017"
-     inkscape:window-x="1912"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" /><defs
-     id="defs1"><linearGradient
+   xmlns="http://www.w3.org/2000/svg"><defs><linearGradient
        id="linearGradient16"
-       inkscape:collect="always"><stop
+       ><stop
          style="stop-color:#000000;stop-opacity:0.68644071;"
          offset="0"
-         id="stop15" /><stop
+         /><stop
          style="stop-color:#333344;stop-opacity:0;"
          offset="0.89759034"
-         id="stop16" /></linearGradient><linearGradient
+         /></linearGradient><linearGradient
        id="linearGradient11"
-       inkscape:collect="always"><stop
+       ><stop
          style="stop-color:#000000;stop-opacity:0.69491524;"
          offset="0"
-         id="stop10" /><stop
+         /><stop
          style="stop-color:#333344;stop-opacity:0;"
          offset="1"
-         id="stop11" /></linearGradient><linearGradient
+         /></linearGradient><linearGradient
        id="linearGradient3"
-       inkscape:collect="always"><stop
+       ><stop
          style="stop-color:#000000;stop-opacity:0.68644071;"
          offset="0"
-         id="stop3" /><stop
+         /><stop
          style="stop-color:#333344;stop-opacity:0;"
          offset="1"
-         id="stop4" /></linearGradient><color-profile
-       name="Agfa-:-Swop-Standard"
-       xlink:href="../../../../../../WINDOWS/system32/spool/drivers/color/RSWOP.icm"
-       id="color-profile1" /><color-profile
-       name="sRGB-IEC61966-2.1"
-       xlink:href="../../../../../../WINDOWS/system32/spool/drivers/color/sRGB%20Color%20Space%20Profile.icm"
-       id="color-profile2" /><linearGradient
+         /></linearGradient><linearGradient
        id="swatch2"
-       inkscape:swatch="solid"><stop
+       ><stop
          style="stop-color:#1c233c;stop-opacity:1;"
          offset="0"
-         id="stop2" /></linearGradient><linearGradient
+         /></linearGradient><linearGradient
        id="arc1Gradient-0"
-       x1="149.5"
-       y1="149.5"
-       x2="50.5"
-       y2="50.5"
+       x1="149.5" y1="149.5" x2="50.5" y2="50.5"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0,0.89869949,-0.89869949,0,-36.102721,12.157382)"><stop
-         offset="0%"
-         stop-color="#EC2BA6"
-         id="stop1-9" /><stop
-         offset="100%"
-         stop-color="#F69068"
-         id="stop2-4" /></linearGradient><linearGradient
+       gradientTransform="matrix(0,0.89869949,-0.89869949,0,-36.102721,12.157382)"><stop offset="0%" stop-color="#EC2BA6"/><stop offset="100%" stop-color="#F69068"/></linearGradient><linearGradient
        id="arc2Gradient-8"
-       x1="50.5"
-       y1="50.5"
-       x2="149.5"
-       y2="149.5"
+       x1="50.5" y1="50.5" x2="149.5" y2="149.5"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0,0.89869949,-0.89869949,0,-36.102721,12.157382)"><stop
-         offset="0%"
-         stop-color="#762BB7"
-         id="stop3-8" /><stop
-         offset="100%"
-         stop-color="#2FC2EF"
-         id="stop4-2" /></linearGradient><linearGradient
-       inkscape:collect="always"
+       gradientTransform="matrix(0,0.89869949,-0.89869949,0,-36.102721,12.157382)"><stop offset="0%" stop-color="#762BB7"/><stop offset="100%" stop-color="#2FC2EF"/></linearGradient><linearGradient
        xlink:href="#swatch2"
        id="linearGradient2"
-       x1="-2.8328218"
-       y1="92.10894"
-       x2="416.86349"
-       y2="92.10894"
+       x1="-2.8328218" y1="92.10894" x2="416.86349" y2="92.10894"
        gradientUnits="userSpaceOnUse" /><linearGradient
-       inkscape:collect="always"
        xlink:href="#linearGradient11"
        id="linearGradient5"
        gradientUnits="userSpaceOnUse"
-       x1="-27.169992"
-       y1="-18.921135"
-       x2="21.284372"
-       y2="26.60606"
+       x1="-27.169992" y1="-18.921135" x2="21.284372" y2="26.60606"
        gradientTransform="matrix(3.7795276,0,0,3.7795276,65.969434,83.760759)" /><linearGradient
-       inkscape:collect="always"
        xlink:href="#linearGradient3"
        id="linearGradient6"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(3.7795276,0,0,3.7795276,233.06248,147.61726)"
-       x1="-32.250378"
-       y1="-37.501045"
-       x2="5.193779"
-       y2="-4.243432" /><linearGradient
-       inkscape:collect="always"
+       x1="-32.250378" y1="-37.501045" x2="5.193779" y2="-4.243432" /><linearGradient
        xlink:href="#linearGradient3"
        id="linearGradient7"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(3.7795276,0,0,3.7795276,312.8453,207.36522)"
-       x1="-46.659107"
-       y1="-53.039654"
-       x2="-2.5366766"
-       y2="-12.746933" /><linearGradient
-       inkscape:collect="always"
+       x1="-46.659107" y1="-53.039654" x2="-2.5366766" y2="-12.746933" /><linearGradient
        xlink:href="#linearGradient3"
        id="linearGradient8"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(3.7795276,0,0,3.7795276,311.02784,193.23495)"
-       x1="-31.21965"
-       y1="-48.581367"
-       x2="21.057957"
-       y2="-2.5410306" /><linearGradient
-       inkscape:collect="always"
+       x1="-31.21965" y1="-48.581367" x2="21.057957" y2="-2.5410306" /><linearGradient
        xlink:href="#linearGradient3"
        id="linearGradient9"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(3.7795276,0,0,3.7795276,28.97537,-41.67961)"
-       x1="79.068192"
-       y1="13.262281"
-       x2="122.32156"
-       y2="29.68215" /><linearGradient
-       inkscape:collect="always"
+       x1="79.068192" y1="13.262281" x2="122.32156" y2="29.68215" /><linearGradient
        xlink:href="#linearGradient16"
        id="linearGradient12"
        gradientUnits="userSpaceOnUse"
-       x1="2.0645993"
-       y1="1.6469805"
-       x2="49.38686"
-       y2="48.166054" /></defs><g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
+       x1="2.0645993" y1="1.6469805" x2="49.38686" y2="48.166054" /></defs><g
      style="display:inline"><g
-       inkscape:groupmode="layer"
-       id="layer2"
-       inkscape:label="combined"
        transform="matrix(0.26458333,0,0,0.26458333,57.148859,-3.1761411)"
        style="display:inline"><path
          style="display:inline;fill:url(#linearGradient5);stroke-width:1.00157;stroke-dasharray:none"
          d="M 23.117139,152.90878 132.19569,258.09166 242.51315,229.99668 39.977494,48.147816 -3.0887291,88.245002 14.412068,102.15302 Z"
-         id="path3-9"
-         sodipodi:nodetypes="ccccccc"
-         transform="translate(2.4409449e-6)" /><path
+         /><path
          style="display:inline;fill:url(#linearGradient12);stroke-width:0.265;stroke-dasharray:none"
          d="M 9.5342283,40.19837 50.734283,77.970866 84.431227,50.453847 40.19837,7.4727738 14.565788,14.34826 Z"
-         id="path3"
-         sodipodi:nodetypes="cccccc"
          transform="matrix(3.7795276,0,0,3.7795276,-215.99569,12.004313)" /><path
          style="display:inline;fill:url(#linearGradient6);stroke-width:1.00157;stroke-dasharray:none"
          d="M 86.97513,144.69552 198.00151,247.93057 261.57102,204.25294 146.44429,69.882457 81.221486,101.57097 Z"
-         id="path3-9-3"
-         sodipodi:nodetypes="cccccc"
-         transform="translate(2.4409449e-6)" /><path
+         /><path
          style="display:inline;fill:url(#linearGradient7);stroke-width:1.00157;stroke-dasharray:none"
          d="m 182.70582,157.69553 84.73065,81.8089 72.16766,-70.9186 L 255.67288,68.863833 227.43,74.863155 208.81837,64.134579 185.23046,68.309985 Z"
-         id="path3-9-3-1"
-         sodipodi:nodetypes="cccccccc"
-         transform="translate(2.4409449e-6)" /><path
+         /><path
          style="display:inline;fill:url(#linearGradient8);stroke-width:1.00157;stroke-dasharray:none"
          d="m 290.94083,157.20008 72.06975,67.20016 86.7764,-61.17944 -81.43739,-98.699134 c -26.76816,0.539024 -47.94299,4.787227 -73.9102,4.02331 l -4.15021,19.896481 28.45065,22.392543 z"
-         id="path3-9-3-1-7"
-         sodipodi:nodetypes="cccccccc"
-         transform="translate(2.4409449e-6)" /><path
+         /><path
          style="display:inline;fill:url(#linearGradient9);stroke-width:1.00157;stroke-dasharray:none"
          d="m 391.63723,156.9992 71.40976,62.39979 65.39079,-75.97554 -117.39677,-116.732874 -22.64459,23.2315 19.2757,14.842666 -16.68654,23.475841 z"
-         id="path3-9-3-1-7-8"
-         sodipodi:nodetypes="cccccccc"
-         transform="translate(2.4409449e-6)" /><path
+         /><path
          d="M -170.45829,146.51296 A 62.912174,62.912174 0 0 1 -81.487046,57.541706"
          fill="none"
-         stroke="url(#arc1Gradient)"
          stroke-width="46.7324"
-         id="path4-4"
          style="display:inline;stroke:url(#arc1Gradient-0)" /><path
          d="M -81.487046,57.541706 A 62.912174,62.912174 0 0 1 -170.45829,146.51296"
          fill="none"
-         stroke="url(#arc2Gradient)"
          stroke-width="46.7324"
-         id="path5-5"
          style="display:inline;stroke:url(#arc2Gradient-8)" /><path
          d="m 39.583,126.27798 c 0,3.584 0.82655,6.19256 2.381331,8.45273 2.900177,4.0254 7.716717,2.77592 9.41032,2.80066 0.937305,0.0137 4.473398,-0.64583 8.569739,-2.29026 l 8.499084,17.63907 c -6.312247,5.85502 -20.541608,7.83505 -24.596805,7.32864 -10.66913,-1.33235 -16.750013,-2.54016 -22.126013,-7.27616 -5.248,-4.864 -9.593656,-12.25468 -9.593656,-24.92668 V 88.837979 H -2.8328219 l 10e-8,-19.453551 c 0,0 9.8829521,0.242069 12.3588309,-2.51327 C 11.844938,64.290484 11.93455,62.376588 12.127,48.634171 L 39.339521,48.305151 39.583,67.862684 H 63.874974 V 88.837979 H 39.583 Z m 81.40821,-64.320001 c 9.344,0 17.664,2.24 24.96,6.72 7.424,4.48 13.184,10.56 17.28,18.24 4.096,7.680001 6.144,16.192001 6.144,25.536001 0,3.584 -0.256,5.38713 -0.768,8.33113 l -69.335648,-0.73044 c 2.431998,5.888 5.695998,10.304 9.791998,13.248 4.096,2.816 9.408,4.224 15.936,4.224 3.968,0 7.808,-0.832 11.52,-2.496 3.84,-1.664 10.98714,-6.09531 13.16314,-8.91131 l 14.40555,14.23583 c -5.69739,6.528 -10.304,11.52 -17.472,14.976 -7.04,3.456 -15.168,5.184 -24.384,5.184 -10.368,0 -19.52,-2.176 -27.455998,-6.528 -7.936,-4.48 -14.08,-10.56 -18.432,-18.24 -4.352,-7.68 -6.041042,-13.82121 -6.041042,-23.29321 0,-9.472 2.112,-18.048 6.336,-25.728001 4.352,-7.68 10.368,-13.696 18.048,-18.048 7.68,-4.48 16.448,-6.72 26.304,-6.72 z m 20.95165,42.384701 c -0.896,-4.863996 -3.456,-12.048701 -7.68,-14.736701 -4.096,-2.688 -7.44765,-4.032 -13.46365,-4.032 -6.272,0 -10.00765,1.536 -14.61565,4.608 -4.608,2.944 -7.039998,9.936701 -7.295998,14.160701 z m 95.00657,-39.898432 c 5.632,0 11.328,1.216 17.088,3.648 5.76,2.432 10.688,5.502605 14.784,11.646605 4.096,6.144 6.144,14.4 6.144,24.767997 l 0.73044,53.51234 h -27.456 l -0.73044,-53.51234 c -0.0839,-6.143425 -2.21496,-8.855645 -5.67096,-11.543645 -3.328,-2.688 -7.11652,-4.275478 -11.85252,-4.275478 -4.736,0 -11.38227,1.907478 -14.58227,5.235478 -3.072,3.328 -6.31235,5.474774 -6.31235,12.770775 l 0.97392,51.32521 h -27.456 l -0.97392,-93.565211 h 27.456 l 0.24348,9.206268 c 7.296,-6.144 19.42262,-9.215999 27.61462,-9.215999 z m 132.43751,17.673731 -43.17547,53.876871 h 46.42089 l 0.73044,22.02434 h -84.42423 l -0.97392,-14.88488 45.09462,-54.309821 h -43.27041 l 0.17217,-24.37051 79.42591,-0.344331 z m 31.15654,-27.311295 c -5.12,0 -9.152,-1.344 -12.096,-4.032 -2.816,-2.816 -4.224,-6.592 -4.224,-11.328 0,-4.864 1.408,-8.704 4.224,-11.52 2.944,-2.816 6.976,-4.224 12.096,-4.224 4.992,0 8.96,1.408 11.904,4.224 2.944,2.816 4.416,6.656 4.416,11.52 0,4.736 -1.472,8.512 -4.416,11.328 -2.944,2.688 -6.912,4.032 -11.904,4.032 z M 387.6934,158.01919 386.71948,64.453979 h 27.456 l 0.97392,93.565211 z"
-         id="text7-5"
-         style="font-size:192px;font-family:THICCCBOI;-inkscape-font-specification:'THICCCBOI, Normal';fill:url(#linearGradient2)"
+         style="font-size:192px;fill:url(#linearGradient2)"
          aria-label="tenzi"
-         sodipodi:nodetypes="scsccscscccsccccccsscsscccsccccscssccsccscccssssccscscscccccscccccccccccscscssscsccccc" /></g></g></svg>
+         /></g></g></svg>
   </div>
 
   <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
@@ -440,17 +464,19 @@
       <p class="subtitle">End-to-end renewal process from identification through market review, recommendation, and binding. Version 1.0.</p>
       <p style="font-size:11px; color:var(--muted); margin:0;">Questions or feedback: <a href="mailto:roshan@tenzi.ai" style="color:var(--accent); text-decoration:none;">Roshan Khozouei</a> (roshan@tenzi.ai)</p>
     </div>
-    <button class="btn-request" onclick="trackCta('request_copy_click'); document.getElementById('copyModal').classList.add('open')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-      Request a Copy
-    </button>
+    <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">
+      <button class="btn-request" onclick="trackCta('request_copy_click'); document.getElementById('copyModal').classList.add('open')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Request a Copy
+      </button>
+    </div>
   </div>
 
   <div class="legend">
-    <div class="legend-item"><div class="legend-swatch" style="border-left:3px solid #e57373;"></div> Broker action</div>
-    <div class="legend-item"><div class="legend-swatch" style="border-left:3px solid #64b5f6;"></div> Client action</div>
-    <div class="legend-item"><div class="legend-swatch" style="border-left:3px solid #81c784;"></div> Insurer action</div>
-    <div class="legend-item"><div class="legend-swatch" style="border-left:3px solid #ffb74d; background:#fffcf7;"></div> Decision point</div>
+    <div class="legend-item"><div class="legend-swatch" style="border-left:4px solid #c9695a;"></div> Broker action</div>
+    <div class="legend-item"><div class="legend-swatch" style="border-left:4px solid #5a9ccc;"></div> Client action</div>
+    <div class="legend-item"><div class="legend-swatch" style="border-left:4px solid #6faf7a;"></div> Insurer action</div>
+    <div class="legend-item"><div class="legend-swatch" style="border-left:4px solid #d6a95a; background:rgba(214,169,90,0.05);"></div> Decision point</div>
   </div>
 
   <!-- PHASE 1 -->
@@ -1136,7 +1162,27 @@
 
     </div>
   </div>
+</div>
+<section class="subscribe">
+    <div>
+      <div class="subscribe-eyebrow">Monthly brief</div>
+      <h2>One email a month. New data, zero noise.</h2>
+      <p>The latest AR movement dashboard and any new resources.</p>
+    </div>
+    <form class="subscribe-form" onsubmit="return submitSubscribe(event)">
+      <input type="email" id="subscribeEmail" required placeholder="you@yourbrokerage.com.au">
+      <button type="submit">Subscribe</button>
+    </form>
+  </section>
 
+  <footer class="page-footer">
+    <div class="left">© 2026 TENZI · RESOURCES.TENZI.AI</div>
+    <div class="right">
+      <a href="https://tenzi.ai">TENZI.AI</a>
+      <a href="https://www.linkedin.com/company/tenzi-ai" target="_blank" rel="noopener">LINKEDIN</a>
+      <a href="mailto:roshan@tenzi.ai">EMAIL</a>
+    </div>
+  </footer>
 
 </div>
 <div id="copyModal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
@@ -1174,8 +1220,28 @@ function submitCopyRequest(e) {
     mode: 'no-cors'
   }).catch(function() {});
 
+  // Show success regardless (don't block UX on form service)
   document.querySelector('.form-view').style.display = 'none';
   document.querySelector('.success-view').style.display = 'block';
+  return false;
+}
+
+function submitSubscribe(e) {
+  e.preventDefault();
+  var input = document.getElementById('subscribeEmail');
+  var email = input.value;
+  var data = { email: email, page: document.title, source: 'subscribe', timestamp: new Date().toISOString(), ip: visitorIp, referrer: document.referrer };
+
+  fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    mode: 'no-cors'
+  }).catch(function() {});
+
+  if (typeof trackCta === 'function') trackCta('subscribe_submit');
+
+  var form = e.target;
+  form.innerHTML = '<div style="flex:1;padding:10px 0;font-family:\'IBM Plex Mono\',ui-monospace,monospace;font-size:12px;color:#2ca471;letter-spacing:0.08em;text-transform:uppercase;">✓ Subscribed — thanks.</div>';
   return false;
 }
 </script>
