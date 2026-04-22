@@ -4,225 +4,258 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GI Broker Movement Dashboard — April 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --g900: #0C3B2E;
-  --g700: #1A5E45;
-  --g500: #27805C;
-  --g300: #6BBF96;
-  --g100: #D4EDDF;
-  --g50: #EEF7F2;
-  --bg: #FFFFFF;
-  --surface: #F7FAF8;
-  --border: #E2EBE6;
-  --border-light: #EEF3F0;
-  --text: #1A2B23;
-  --text-secondary: #5A7268;
-  --text-muted: #8DA69A;
-  --radius: 10px;
-}
+  /* Terminal Grid — LIGHT theme (shared site tokens) */
+  --bg: #faf8f4;
+  --panel: #ffffff;
+  --panel-hover: #fafaf7;
+  --border: #e5e1d9;
+  --border-bright: #d3cec3;
+  --border-light: #ece8df;
+  --text: #1a1a1a;
+  --muted: #6b6560;
+  --dim: #a59f93;
+  --accent: #2ca471;
+  --accent-hover: #249765;
 
+  /* Primary teal — dashboards / data */
+  --g900: #0A4A45;
+  --g700: #0F766E;
+  --g500: #14A399;
+  --g300: #5EEAD4;
+  --g100: #CCFBF1;
+  --g50:  #F0FDFA;
+
+  --radius: 6px;
+}
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font: 14px/1.7 'Inter Tight', Inter, system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 28px 28px 8px; }
 
-.dashboard {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 28px 20px 48px;
-}
-
-/* Back link */
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
-  text-decoration: none;
-  margin-bottom: 20px;
-}
-.back-link:hover { color: var(--g700); }
-
-/* Header */
-.header { margin-bottom: 24px; }
-
-.header-eyebrow {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--g500);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.header-eyebrow::before {
-  content: '';
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--g500);
-}
-
-.header-top {
+/* Nav */
+.nav-bar {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-.header h1 {
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
-  line-height: 1.2;
-  margin-bottom: 4px;
-  color: var(--g900);
-}
-
-.header-sub {
-  color: var(--text-secondary);
-  font-size: 13px;
-}
-
-.header-sub span {
-  color: var(--text);
-  font-weight: 600;
-}
-
-/* Subscribe button */
-.btn-subscribe {
-  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 18px;
-  background: var(--g700);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font: 600 13px 'DM Sans', sans-serif;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: background 0.2s;
+  margin-bottom: 20px;
 }
-.btn-subscribe:hover { background: var(--g900); }
+.back-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 13px; font-weight: 500;
+  color: var(--muted); text-decoration: none;
+}
+.back-link:hover { color: var(--text); }
 
-/* KPI Row */
+/* Header */
+.header-row {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; gap: 16px;
+  margin-bottom: 20px;
+}
+.eyebrow {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.eyebrow::before {
+  content: '';
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  display: inline-block;
+}
+h1 {
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  font-weight: 500;
+  color: var(--g900);
+  margin-bottom: 6px;
+}
+.subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.subtitle strong { color: var(--text); font-weight: 500; }
+.meta-line {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* CTAs */
+.cta-group { display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0; justify-content: flex-end; }
+.btn-linkedin {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 16px;
+  background: transparent;
+  color: #3d8aa8;
+  border: 1px solid rgba(61,138,168,0.35);
+  border-radius: var(--radius);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  cursor: pointer; text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.15s, background 0.15s;
+}
+.btn-linkedin:hover { border-color: rgba(61,138,168,0.7); background: rgba(61,138,168,0.06); }
+.btn-subscribe {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 16px;
+  background: var(--accent);
+  color: #fff;
+  border: none; border-radius: var(--radius);
+  font: 500 11px 'IBM Plex Mono', ui-monospace, monospace;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  cursor: pointer; white-space: nowrap;
+  transition: background 0.15s;
+}
+.btn-subscribe:hover { background: var(--accent-hover); }
+
+/* Section label */
+.section-label {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 36px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: baseline; justify-content: space-between;
+}
+.section-label .section-num { color: var(--dim); }
+
+/* KPI row — separate cards */
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   margin-bottom: 16px;
 }
-
 .kpi-card {
-  background: var(--surface);
-  border: 1px solid var(--border-light);
+  background: var(--panel);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 14px 16px;
+  padding: 16px 18px;
   position: relative;
-  overflow: hidden;
+  transition: border-color 0.15s;
 }
-
+.kpi-card:hover { border-color: var(--border-bright); }
 .kpi-card.accent {
-  background: linear-gradient(135deg, var(--g50) 0%, #fff 100%);
+  background: linear-gradient(135deg, var(--g50) 0%, var(--panel) 100%);
+  border-color: rgba(20,163,153,0.25);
 }
-
 .kpi-label {
-  font-size: 13px;
-  font-weight: 600;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-muted);
-  margin-bottom: 6px;
+  color: var(--muted);
+  margin-bottom: 10px;
 }
-
 .kpi-value {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   line-height: 1;
-  margin-bottom: 6px;
   color: var(--g900);
+  margin-bottom: 8px;
+  font-feature-settings: "tnum";
 }
-
 .kpi-delta {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
   font-weight: 500;
   display: inline-flex;
   align-items: center;
   gap: 3px;
   padding: 2px 6px;
-  border-radius: 5px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
 }
-
 .kpi-delta.up { color: var(--g700); background: var(--g100); }
-.kpi-delta.down { color: var(--g900); background: rgba(12,59,46,0.08); }
+.kpi-delta.down { color: #9c3b3b; background: rgba(156,59,59,0.08); }
 .kpi-delta.neutral { color: var(--g700); background: var(--g100); }
-
 .kpi-secondary {
   margin-top: 6px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--dim);
+  letter-spacing: 0.02em;
 }
 
-/* Section headings */
-.section-title {
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-  margin-top: 24px;
-}
-
-/* Waterfall chart */
-.waterfall-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border-light);
+/* Card shell */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
-  margin-bottom: 16px;
+  transition: border-color 0.15s;
 }
-
-.waterfall-title {
+.card:hover { border-color: var(--border-bright); }
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  gap: 12px;
+}
+.card h3 {
   font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 2px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0;
+  line-height: 1.35;
   color: var(--g900);
 }
-
-.waterfall-subtitle {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-bottom: 20px;
+.card-index {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.card-sub {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  line-height: 1.5;
 }
 
+/* Waterfall */
 .waterfall-chart {
   display: flex;
   align-items: stretch;
   gap: 12px;
   height: 220px;
   position: relative;
+  margin-top: 8px;
 }
-
 .waterfall-chart::after {
   content: '';
   position: absolute;
@@ -231,7 +264,6 @@ body {
   height: 1px;
   background: var(--border);
 }
-
 .wf-col {
   flex: 1;
   display: flex;
@@ -240,55 +272,44 @@ body {
   position: relative;
   z-index: 1;
 }
-
 .wf-upper {
   height: 140px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
 }
-
 .wf-lower {
   height: 80px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
 }
-
 .wf-val {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 12px;
   font-weight: 600;
   margin: 4px 0;
   color: var(--g900);
+  font-feature-settings: "tnum";
 }
-
 .wf-bar {
   width: 48px;
-  border-radius: 5px;
+  border-radius: 4px;
   min-height: 4px;
 }
-
-.wf-bar.start, .wf-bar.end { border-radius: 5px 5px 0 0; }
-.wf-bar.negative { border-radius: 0 0 5px 5px; }
-
-.wf-bar.start { background: linear-gradient(180deg, var(--g300), var(--g700)); }
-.wf-bar.end { background: linear-gradient(180deg, var(--g300), var(--g700)); }
-.wf-bar.positive { background: linear-gradient(180deg, var(--g300), var(--g500)); border-radius: 5px 5px 0 0; }
-.wf-bar.negative { background: linear-gradient(180deg, var(--g900), var(--g700)); }
-
+.wf-bar.start, .wf-bar.end { background: linear-gradient(180deg, var(--g300), var(--g700)); border-radius: 4px 4px 0 0; }
+.wf-bar.positive { background: linear-gradient(180deg, var(--g300), var(--g500)); border-radius: 4px 4px 0 0; }
+.wf-bar.negative { background: linear-gradient(180deg, var(--g900), var(--g700)); border-radius: 0 0 4px 4px; }
 .wf-label {
-  font-size: 13px;
-  color: var(--text-secondary);
+  font-size: 12px;
+  color: var(--muted);
   text-align: center;
   margin-top: 4px;
   line-height: 1.3;
-  font-weight: 500;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-/* Two column */
+/* Two col */
 .two-col {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -296,356 +317,326 @@ body {
   margin-bottom: 10px;
 }
 
-/* Table cards */
-.table-card {
-  background: var(--surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  padding: 16px;
-  overflow: hidden;
-}
-
-.table-card h3 {
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 2px;
-  color: var(--g900);
-}
-
-.table-card .card-sub {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-bottom: 12px;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table th {
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text-muted);
-  text-align: left;
-  padding: 0 0 6px;
-  border-bottom: 1px solid var(--border);
-}
-
-.data-table th:last-child { text-align: right; }
-
-.data-table td {
-  padding: 7px 0;
-  font-size: 13px;
-  border-bottom: 1px solid var(--border-light);
-}
-
-.data-table tr:last-child td { border-bottom: none; }
-.data-table td:last-child { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
-
-.data-table td.pos { color: var(--g500); }
-.data-table td.neg { color: var(--g900); }
-
-.badge {
-  display: inline-block;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 1px 5px;
-  border-radius: 3px;
-  margin-left: 4px;
-  vertical-align: middle;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
-}
-
-.badge.new { background: var(--g100); color: var(--g700); }
-
-/* Flow card */
-.flow-card {
-  background: var(--surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 10px;
-}
-
-.flow-card h3 {
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 2px;
-  color: var(--g900);
-}
-
-.flow-card .card-sub {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-bottom: 14px;
-}
-
-.flow-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: var(--bg);
-  border: 1px solid var(--border-light);
-  margin-bottom: 6px;
-}
-
-.flow-count {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--g700);
-  min-width: 28px;
-}
-
-.flow-from, .flow-to {
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.flow-arrow {
-  color: var(--text-muted);
-  font-size: 16px;
-  flex-shrink: 0;
-}
-
-.flow-tag {
-  margin-left: auto;
-  font-size: 13px;
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-/* Sticky bar */
-.sticky-stat {
-  background: var(--surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.sticky-stat h3 {
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  color: var(--g900);
-}
-
+/* Stickiness progress bar */
 .progress-track {
   height: 18px;
-  background: var(--border);
+  background: var(--border-light);
   border-radius: 9px;
   overflow: hidden;
-  position: relative;
-  margin-bottom: 8px;
+  margin: 10px 0 10px;
 }
-
 .progress-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--g700), var(--g300));
   border-radius: 9px;
 }
-
 .progress-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
-  color: var(--text-secondary);
+  font-size: 12.5px;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  letter-spacing: 0.04em;
+}
+.progress-labels strong {
+  color: var(--g900);
+  font-weight: 600;
 }
 
-.progress-labels span strong {
-  color: var(--g900);
-  font-weight: 700;
+/* Data tables */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.data-table th {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  text-align: left;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+.data-table th:last-child { text-align: right; }
+.data-table td {
+  padding: 9px 0;
+  font-size: 13px;
+  border-bottom: 1px dashed var(--border);
+  color: var(--text);
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table td:last-child {
+  text-align: right;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-feature-settings: "tnum";
+}
+.data-table td.pos { color: var(--g700); }
+.data-table td.neg { color: #9c3b3b; }
+.data-table td .muted-inline {
+  color: var(--dim);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+/* Badge */
+.badge {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 2px;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.badge.new {
+  background: var(--g100);
+  color: var(--g700);
+  border: 1px solid rgba(15,118,110,0.2);
+}
+
+/* Flow rows */
+.flow-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+.flow-row:last-child { margin-bottom: 0; }
+.flow-count {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--g700);
+  min-width: 32px;
+  text-align: center;
+  font-feature-settings: "tnum";
+}
+.flow-from, .flow-to {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+}
+.flow-arrow {
+  color: var(--dim);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.flow-tag {
+  margin-left: auto;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 /* Net importers/exporters */
-.net-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.net-card {
-  background: var(--surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-}
-
-.net-card h4 {
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-}
-
 .net-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 6px 0;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
 }
-
-.net-item:not(:last-child) {
-  border-bottom: 1px solid var(--border-light);
-}
-
-.net-item .name { font-size: 13px; }
+.net-item:last-child { border-bottom: none; }
+.net-item .name { font-size: 13.5px; color: var(--text); }
 .net-item .val {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  font-weight: 700;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-feature-settings: "tnum";
 }
+.net-item .val.pos { color: var(--g700); }
+.net-item .val.neg { color: #9c3b3b; }
 
-.net-item .val.pos { color: var(--g500); }
-.net-item .val.neg { color: var(--g900); }
-
-/* CTA Banner */
-.cta-banner {
-  background: linear-gradient(135deg, var(--g900) 0%, var(--g700) 100%);
-  border-radius: var(--radius);
-  padding: 28px 28px;
-  color: #fff;
+/* Subscribe */
+.subscribe {
+  margin-top: 48px;
+  padding: 32px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: radial-gradient(ellipse at 50% 0%, rgba(44,164,113,0.07), transparent 60%);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  margin-top: 24px;
-  margin-bottom: 16px;
+  gap: 32px;
+  flex-wrap: wrap;
 }
-
-.cta-banner h3 {
-  font-size: 17px;
-  font-weight: 700;
-  margin-bottom: 4px;
+.subscribe-eyebrow {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
 }
-
-.cta-banner p {
+.subscribe h2 {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--text);
+}
+.subscribe p {
   font-size: 13px;
-  opacity: 0.8;
+  color: var(--muted);
+  margin: 6px 0 0;
   line-height: 1.5;
 }
-
-.cta-banner .btn-subscribe {
-  background: #fff;
-  color: var(--g900);
+.subscribe-form {
+  display: flex;
+  gap: 8px;
+  min-width: 340px;
+  flex: 0 1 380px;
 }
-
-.cta-banner .btn-subscribe:hover {
-  background: var(--g100);
+.subscribe-form input[type="email"] {
+  flex: 1;
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border-bright);
+  border-radius: 4px;
+  color: var(--text);
+  font: 13px 'Inter Tight', Inter, system-ui, sans-serif;
+  outline: none;
 }
+.subscribe-form input[type="email"]:focus { border-color: var(--accent); }
+.subscribe-form button {
+  padding: 10px 16px;
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: background 0.15s;
+}
+.subscribe-form button:hover { background: var(--accent-hover); }
 
 /* Footer */
-.footer {
-  margin-top: 28px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-  font-size: 13px;
-  color: var(--text-muted);
+.page-footer {
+  padding: 36px 0 48px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
 }
+.page-footer .left { color: var(--dim); }
+.page-footer .right { display: flex; gap: 20px; }
+.page-footer a { color: var(--muted); text-decoration: none; }
+.page-footer a:hover { color: var(--text); }
 
 /* Modal */
 .modal-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.35);
   z-index: 1000;
   align-items: center;
   justify-content: center;
 }
 .modal-overlay.open { display: flex; }
-
 .modal {
-  background: #fff;
-  border-radius: 12px;
+  background: var(--panel);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
   padding: 32px;
   max-width: 420px;
   width: 90%;
   box-shadow: 0 20px 60px rgba(0,0,0,0.15);
 }
-.modal h3 { font-size: 18px; margin-bottom: 8px; color: var(--g900); }
-.modal p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; }
+.modal h3 { font-size: 18px; margin-bottom: 8px; font-weight: 500; letter-spacing: -0.01em; color: var(--g900); }
+.modal p { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.55; }
 .modal input[type="email"] {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font: 14px 'DM Sans', sans-serif;
+  border: 1px solid var(--border-bright);
+  background: #fff;
+  color: var(--text);
+  border-radius: 4px;
+  font: 14px 'Inter Tight', Inter, system-ui, sans-serif;
   margin-bottom: 12px;
 }
-.modal input[type="email"]:focus { outline: 1px solid var(--g500); border-color: var(--g500); }
+.modal input[type="email"]:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
 .modal .btn-send {
   width: 100%;
   padding: 10px;
-  background: var(--g700);
+  background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  font: 600 14px 'DM Sans', sans-serif;
+  border-radius: 4px;
+  font: 500 11px 'IBM Plex Mono', ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   cursor: pointer;
+  transition: background 0.15s;
 }
-.modal .btn-send:hover { background: var(--g900); }
+.modal .btn-send:hover { background: var(--accent-hover); }
 .modal .close-link {
   display: block;
   text-align: center;
   margin-top: 12px;
-  font-size: 12px;
-  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
   cursor: pointer;
   text-decoration: none;
 }
 .modal .success-view { display: none; text-align: center; }
-.modal .no-spam { font-size: 11px; color: var(--text-muted); margin-top: 12px; margin-bottom: 0; }
+.modal .no-spam { font-size: 11px; color: var(--dim); margin-top: 12px; margin-bottom: 0; }
 
 /* Responsive */
-@media (max-width: 700px) {
+@media (max-width: 820px) {
   .kpi-row { grid-template-columns: repeat(2, 1fr); }
-  .two-col, .net-row { grid-template-columns: 1fr; }
-  .dashboard { padding: 20px 14px 36px; }
-  .header h1 { font-size: 20px; }
-  .header-top { flex-direction: column; }
-  .kpi-value { font-size: 24px; }
-  .flow-from, .flow-to { font-size: 13px; }
-  .flow-row { gap: 6px; padding: 8px 10px; }
+  .two-col { grid-template-columns: 1fr; }
+  .wrap { padding: 20px 18px 8px; }
+  h1 { font-size: 23px; }
+  .kpi-value { font-size: 26px; }
+  .header-row { flex-direction: column; }
+  .cta-group { justify-content: flex-start; }
   .wf-bar { width: 36px; }
-  .cta-banner { flex-direction: column; text-align: center; }
 }
 
-/* Animations */
+/* Entry */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-.kpi-card, .waterfall-wrap, .table-card, .flow-card, .sticky-stat, .net-card, .cta-banner {
-  animation: fadeUp 0.4s ease both;
-}
-
-.kpi-card:nth-child(1) { animation-delay: 0.03s; }
-.kpi-card:nth-child(2) { animation-delay: 0.06s; }
-.kpi-card:nth-child(3) { animation-delay: 0.09s; }
-.kpi-card:nth-child(4) { animation-delay: 0.12s; }
-.waterfall-wrap { animation-delay: 0.15s; }
+.kpi-card, .card { animation: fadeUp 0.35s ease both; }
 </style>
 </head>
 <body>
-<div class="dashboard">
+<div class="wrap">
 
-  <!-- Back link -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-    <a class="back-link" href="../index.html" style="margin-bottom:0">&larr; All Resources</a>
+  <!-- Nav -->
+  <div class="nav-bar">
+    <a class="back-link" href="../index.html">&larr; All Resources</a>
     <svg style="height: 28px; width: auto;"
    width="201mm"
    height="65mm"
@@ -760,32 +751,33 @@ body {
   </div>
 
   <!-- Header -->
-  <div class="header">
-    <div class="header-eyebrow">General Insurance — Authorised Representatives</div>
-    <div class="header-top">
-      <div>
-        <h1>AR Market Movement Dashboard</h1>
-        <div class="header-sub"><span>11 Jan 2026 → 8 Apr 2026</span> · Individual ARs only</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">
-        <a href="https://www.linkedin.com/posts/roshan-khozouei_where-are-australias-gi-ar-brokers-moving-activity-7447542771428597760-DTgu" target="_blank" rel="noopener" onclick="trackCta('linkedin_click')" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:#0A66C2;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='#084d94'" onmouseout="this.style.background='#0A66C2'">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          Join the conversation
-        </a>
-        <button class="btn-subscribe" onclick="trackCta('subscribe_click'); document.getElementById('subscribeModal').classList.add('open')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          Subscribe to updates
-        </button>
-      </div>
+  <div class="header-row">
+    <div>
+      <div class="eyebrow">GI &middot; Authorised Representatives</div>
+      <h1>AR Market Movement Dashboard</h1>
+      <div class="subtitle"><strong>ASIC Financial Advisers Register</strong> &middot; Individual ARs only</div>
+      <div class="meta-line">PERIOD · 11 JAN 2026 → 8 APR 2026</div>
+    </div>
+    <div class="cta-group">
+      <a class="btn-linkedin" href="https://www.linkedin.com/posts/roshan-khozouei_where-are-australias-gi-ar-brokers-moving-activity-7447542771428597760-DTgu" target="_blank" rel="noopener" onclick="trackCta('linkedin_click')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        Join the conversation
+      </a>
+      <button class="btn-subscribe" onclick="trackCta('subscribe_click'); document.getElementById('subscribeModal').classList.add('open')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Subscribe
+      </button>
     </div>
   </div>
 
-  <!-- KPIs -->
+  <!-- Section 01 — Headline -->
+  <div class="section-label"><span>Headline &middot; population</span><span class="section-num">01 / 05</span></div>
+
   <div class="kpi-row">
     <div class="kpi-card accent">
       <div class="kpi-label">Total Individual Broker ARs</div>
       <div class="kpi-value">4,259</div>
-      <span class="kpi-delta up">&#9650; +37 (+0.9%)</span>
+      <span class="kpi-delta up">▲ +37 (+0.9%)</span>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Stayed at Same AFSL</div>
@@ -796,46 +788,45 @@ body {
     <div class="kpi-card">
       <div class="kpi-label">New Entrants</div>
       <div class="kpi-value">214</div>
-      <span class="kpi-delta up">&#9650; new ARs in Apr</span>
-      <div class="kpi-secondary">172 new &middot; 31 re-entering &middot; 11 from other AFSLs</div>
+      <span class="kpi-delta up">▲ new ARs in Apr</span>
+      <div class="kpi-secondary">172 new · 31 re-entering · 11 transfers</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Ceased / Left</div>
       <div class="kpi-value">177</div>
-      <span class="kpi-delta down">&#9660; departed Jan&ndash;Apr</span>
+      <span class="kpi-delta down">▼ departed Jan–Apr</span>
     </div>
   </div>
 
-  <!-- Waterfall -->
-  <div class="waterfall-wrap">
-    <div class="waterfall-title">Population Bridge</div>
-    <div class="waterfall-subtitle">Net population change: +214 entered GI broker set, &minus;177 ceased or left</div>
+  <!-- Section 02 — Bridge -->
+  <div class="section-label"><span>Population bridge</span><span class="section-num">02 / 05</span></div>
+
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-head">
+      <h3>Jan → Apr 2026</h3>
+      <span class="card-index">WATERFALL</span>
+    </div>
+    <div class="card-sub">Net population change: +214 entered GI broker set, −177 ceased or left</div>
     <div class="waterfall-chart">
       <div class="wf-col">
         <div class="wf-upper">
           <div class="wf-val">4,222</div>
           <div class="wf-bar start" style="height:160px"></div>
         </div>
-        <div class="wf-lower">
-          <div class="wf-label">Jan 11<br>Baseline</div>
-        </div>
+        <div class="wf-lower"><div class="wf-label">Jan 11<br>Baseline</div></div>
       </div>
       <div class="wf-col">
         <div class="wf-upper">
           <div class="wf-val">+214</div>
           <div class="wf-bar positive" style="height:82px"></div>
         </div>
-        <div class="wf-lower">
-          <div class="wf-label">New<br>Entrants</div>
-        </div>
+        <div class="wf-lower"><div class="wf-label">New<br>Entrants</div></div>
       </div>
       <div class="wf-col">
-        <div class="wf-upper">
-          <div class="wf-label">Ceased /<br>Left</div>
-        </div>
+        <div class="wf-upper"><div class="wf-label">Ceased /<br>Left</div></div>
         <div class="wf-lower">
           <div class="wf-bar negative" style="height:68px"></div>
-          <div class="wf-val">&minus;177</div>
+          <div class="wf-val">−177</div>
         </div>
       </div>
       <div class="wf-col">
@@ -843,155 +834,177 @@ body {
           <div class="wf-val">4,259</div>
           <div class="wf-bar end" style="height:163px"></div>
         </div>
-        <div class="wf-lower">
-          <div class="wf-label">Apr 8<br>Result</div>
-        </div>
+        <div class="wf-lower"><div class="wf-label">Apr 8<br>Result</div></div>
       </div>
     </div>
   </div>
 
-  <!-- Stickiness -->
-  <div class="sticky-stat">
-    <h3>Market Stickiness</h3>
+  <div class="card">
+    <div class="card-head">
+      <h3>Market stickiness</h3>
+      <span class="card-index">RETENTION</span>
+    </div>
+    <div class="card-sub">How many ARs stayed put at the same AFSL across the period</div>
     <div class="progress-track">
       <div class="progress-fill" style="width:95%"></div>
     </div>
     <div class="progress-labels">
-      <span><strong>95%</strong> stayed at same AFSL</span>
-      <span><strong>1.1%</strong> switched AFSL</span>
+      <span><strong>95%</strong> STAYED AT SAME AFSL</span>
+      <span><strong>1.1%</strong> SWITCHED AFSL</span>
     </div>
   </div>
 
-  <!-- Growers / Shrinkers -->
-  <div class="section-title">AFSL Performance</div>
+  <!-- Section 03 — AFSL performance -->
+  <div class="section-label"><span>AFSL performance</span><span class="section-num">03 / 05</span></div>
+
   <div class="two-col">
-    <div class="table-card">
-      <h3>Biggest Growers</h3>
-      <div class="card-sub">Absolute net change</div>
+    <div class="card">
+      <div class="card-head"><h3>Biggest growers</h3><span class="card-index">ABSOLUTE</span></div>
+      <div class="card-sub">Absolute net change in AR count</div>
       <table class="data-table">
         <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
         <tbody>
           <tr><td>McLardy McShane</td><td class="pos">+15</td></tr>
           <tr><td>Bentleys QLD Advisory</td><td class="pos">+15</td></tr>
-          <tr><td>Austar Finance <span class="badge new">NEW</span></td><td class="pos">+11</td></tr>
+          <tr><td>Austar Finance <span class="badge new">New</span></td><td class="pos">+11</td></tr>
           <tr><td>Metrix Connect</td><td class="pos">+10</td></tr>
           <tr><td>Insurance Advisernet</td><td class="pos">+8</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="table-card">
-      <h3>Biggest Shrinkers</h3>
-      <div class="card-sub">Absolute net change</div>
+    <div class="card">
+      <div class="card-head"><h3>Biggest shrinkers</h3><span class="card-index">ABSOLUTE</span></div>
+      <div class="card-sub">Absolute net change in AR count</div>
       <table class="data-table">
         <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
         <tbody>
-          <tr><td>Peninsula Mutual</td><td class="neg">&minus;17</td></tr>
-          <tr><td>Ausure</td><td class="neg">&minus;13</td></tr>
-          <tr><td>SureInsure</td><td class="neg">&minus;7</td></tr>
-          <tr><td>PSC Connect</td><td class="neg">&minus;5</td></tr>
-          <tr><td>Community Broker Network</td><td class="neg">&minus;5</td></tr>
+          <tr><td>Peninsula Mutual</td><td class="neg">−17</td></tr>
+          <tr><td>Ausure</td><td class="neg">−13</td></tr>
+          <tr><td>SureInsure</td><td class="neg">−7</td></tr>
+          <tr><td>PSC Connect</td><td class="neg">−5</td></tr>
+          <tr><td>Community Broker Network</td><td class="neg">−5</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <div class="two-col">
-    <div class="table-card">
-      <h3>Fastest Growing</h3>
-      <div class="card-sub">Percentage change (min 5 ARs)</div>
+    <div class="card">
+      <div class="card-head"><h3>Fastest growing</h3><span class="card-index">%, MIN 5 ARS</span></div>
+      <div class="card-sub">Percentage change over the period</div>
       <table class="data-table">
         <thead><tr><th>AFSL</th><th>%</th></tr></thead>
         <tbody>
-          <tr><td>Bentleys QLD Advisory <span style="color:var(--text-muted);font-size:13px">12&rarr;27</span></td><td class="pos">+125%</td></tr>
+          <tr><td>Bentleys QLD Advisory <span class="muted-inline">12→27</span></td><td class="pos">+125%</td></tr>
           <tr><td>Red Star Insurance</td><td class="pos">+40%</td></tr>
           <tr><td>MPF Representatives</td><td class="pos">+31%</td></tr>
           <tr><td>BMIA Broker Network</td><td class="pos">+25%</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="table-card">
-      <h3>Fastest Shrinking</h3>
-      <div class="card-sub">Percentage change (min 5 ARs)</div>
+    <div class="card">
+      <div class="card-head"><h3>Fastest shrinking</h3><span class="card-index">%, MIN 5 ARS</span></div>
+      <div class="card-sub">Percentage change over the period</div>
       <table class="data-table">
         <thead><tr><th>AFSL</th><th>%</th></tr></thead>
         <tbody>
-          <tr><td>Eminence Global</td><td class="neg">&minus;43%</td></tr>
-          <tr><td>SureInsure</td><td class="neg">&minus;24%</td></tr>
-          <tr><td>Charter Group GI</td><td class="neg">&minus;20%</td></tr>
-          <tr><td>PSC Reliance</td><td class="neg">&minus;19%</td></tr>
+          <tr><td>Eminence Global</td><td class="neg">−43%</td></tr>
+          <tr><td>SureInsure</td><td class="neg">−24%</td></tr>
+          <tr><td>Charter Group GI</td><td class="neg">−20%</td></tr>
+          <tr><td>PSC Reliance</td><td class="neg">−19%</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Movement Flows -->
-  <div class="section-title">Movement Flows</div>
-  <div class="flow-card">
-    <h3>AFSL Transfers</h3>
-    <div class="card-sub">48 ARs switched AFSL (37 within GI + 11 from non-GI) &mdash; 15 were bulk transfers</div>
+  <!-- Section 04 — Movement flows -->
+  <div class="section-label"><span>Movement flows</span><span class="section-num">04 / 05</span></div>
+
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-head"><h3>AFSL transfers</h3><span class="card-index">TOP ROUTES</span></div>
+    <div class="card-sub">48 ARs switched AFSL (37 within GI + 11 from non-GI) — 15 were bulk transfers</div>
 
     <div class="flow-row">
       <div class="flow-count">6</div>
       <div class="flow-from">Community Broker Network</div>
-      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-arrow">→</div>
       <div class="flow-to">Metrix Connect</div>
-      <div class="flow-tag">transfer</div>
+      <div class="flow-tag">Transfer</div>
     </div>
     <div class="flow-row">
       <div class="flow-count">5</div>
       <div class="flow-from">Community Broker Network</div>
-      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-arrow">→</div>
       <div class="flow-to">McLardy McShane</div>
-      <div class="flow-tag">transfer</div>
+      <div class="flow-tag">Transfer</div>
     </div>
     <div class="flow-row">
       <div class="flow-count">4</div>
       <div class="flow-from">Ausure</div>
-      <div class="flow-arrow">&rarr;</div>
-      <div class="flow-to">Lavaro <span class="badge new">NEW AFSL</span></div>
-      <div class="flow-tag">transfer</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-to">Lavaro <span class="badge new">New AFSL</span></div>
+      <div class="flow-tag">Transfer</div>
     </div>
   </div>
 
-  <!-- Net importers / exporters -->
-  <div class="net-row">
-    <div class="net-card">
-      <h4>Top Net Importers (from moves)</h4>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-head"><h3>Top net importers</h3><span class="card-index">FROM MOVES</span></div>
+      <div class="card-sub">AFSLs that gained most from switches</div>
       <div class="net-item"><span class="name">Metrix Connect</span><span class="val pos">+10</span></div>
       <div class="net-item"><span class="name">McLardy McShane</span><span class="val pos">+8</span></div>
     </div>
-    <div class="net-card">
-      <h4>Top Net Exporter (from moves)</h4>
-      <div class="net-item"><span class="name">Community Broker Network</span><span class="val neg">&minus;10</span></div>
+    <div class="card">
+      <div class="card-head"><h3>Top net exporter</h3><span class="card-index">FROM MOVES</span></div>
+      <div class="card-sub">AFSLs that lost most to switches</div>
+      <div class="net-item"><span class="name">Community Broker Network</span><span class="val neg">−10</span></div>
     </div>
   </div>
 
-  <!-- CTA Banner -->
-  <div class="cta-banner">
+  <!-- Section 05 — Source -->
+  <div class="section-label"><span>Source &amp; method</span><span class="section-num">05 / 05</span></div>
+  <div class="card" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
     <div>
-      <h3>Get this dashboard every month</h3>
-      <p>Subscribe and we'll email you the latest GI broker movement data as soon as it's published. Free, no spam.</p>
+      <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:8px;">Dataset</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.6;margin:0;">ASIC Financial Advisers Register. Individual ARs with General Insurance authorisation. Corporate ARs excluded. Snapshots taken 11 Jan and 8 Apr 2026.</p>
     </div>
-    <button class="btn-subscribe" onclick="trackCta('subscribe_click'); document.getElementById('subscribeModal').classList.add('open')">
-      Subscribe free
-    </button>
+    <div>
+      <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:8px;">Cut</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.6;margin:0;">A "switch" = same AR appears under a different AFSL between snapshots. New entrants = first ever appearance. Ceased = present in Jan, absent in Apr.</p>
+    </div>
   </div>
 
-  <!-- Footer -->
-  <div class="footer">
-    <span>Source: ASIC Financial Advisers Register &middot; Individual ARs, General Insurance</span>
-    <span>Prepared Apr 2026 &middot; <a href="https://tenzi.ai" style="color:var(--text-muted)">Tenzi</a></span>
-  </div>
+  <!-- Subscribe -->
+  <section class="subscribe">
+    <div>
+      <div class="subscribe-eyebrow">Monthly brief</div>
+      <h2>One email a month. New data, zero noise.</h2>
+      <p>The latest AR movement dashboard and any new resources.</p>
+    </div>
+    <form class="subscribe-form" onsubmit="return submitSubscribe(event)">
+      <input type="email" id="subscribeEmail" required placeholder="you@yourbrokerage.com.au">
+      <button type="submit">Subscribe</button>
+    </form>
+  </section>
+
+  <footer class="page-footer">
+    <div class="left">© 2026 TENZI · RESOURCES.TENZI.AI</div>
+    <div class="right">
+      <a href="https://tenzi.ai">TENZI.AI</a>
+      <a href="https://www.linkedin.com/company/tenzi-ai" target="_blank" rel="noopener">LINKEDIN</a>
+      <a href="mailto:roshan@tenzi.ai">EMAIL</a>
+    </div>
+  </footer>
 
 </div>
 
-<!-- Subscribe Modal -->
+<!-- Subscribe modal -->
 <div id="subscribeModal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="modal">
     <div class="form-view">
       <h3>Subscribe to monthly updates</h3>
       <p>We publish this dashboard every month using the latest ASIC register data. Enter your email and we'll send it straight to your inbox.</p>
-      <form id="subscribeForm" onsubmit="return submitSubscription(event)">
+      <form onsubmit="return submitSubscription(event)">
         <input type="email" id="subEmail" placeholder="you@yourbrokerage.com.au" required>
         <button type="submit" class="btn-send">Subscribe</button>
       </form>
@@ -1014,19 +1027,28 @@ function submitSubscription(e) {
   e.preventDefault();
   var email = document.getElementById('subEmail').value;
   var data = { email: email, page: document.title, timestamp: new Date().toISOString(), ip: visitorIp, referrer: document.referrer };
-
   fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
-    method: 'POST',
-    body: JSON.stringify(data),
-    mode: 'no-cors'
+    method: 'POST', body: JSON.stringify(data), mode: 'no-cors'
   }).catch(function() {});
-
   document.querySelector('#subscribeModal .form-view').style.display = 'none';
   document.querySelector('#subscribeModal .success-view').style.display = 'block';
   return false;
 }
-</script>
-<script>
+
+function submitSubscribe(e) {
+  e.preventDefault();
+  var input = document.getElementById('subscribeEmail');
+  var email = input.value;
+  var data = { email: email, page: document.title, source: 'subscribe_inline', timestamp: new Date().toISOString(), ip: visitorIp, referrer: document.referrer };
+  fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
+    method: 'POST', body: JSON.stringify(data), mode: 'no-cors'
+  }).catch(function() {});
+  if (typeof trackCta === 'function') trackCta('subscribe_submit');
+  var form = e.target;
+  form.innerHTML = '<div style="flex:1;padding:10px 0;font-family:\'IBM Plex Mono\',ui-monospace,monospace;font-size:12px;color:#2ca471;letter-spacing:0.08em;text-transform:uppercase;">✓ Subscribed — thanks.</div>';
+  return false;
+}
+
 function trackBeacon(eventName) {
   var url = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=' + encodeURIComponent(eventName) + '&page=' + encodeURIComponent(document.title);
   fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){
