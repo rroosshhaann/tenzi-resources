@@ -82,22 +82,24 @@ Every page must have all of the following:
    - **Free reports** → "Subscribe to updates" modal, `trackCta('subscribe_click')`
    - **Premium samples** → Cal.com link, `trackCta('PREMIUM_get_full_report_click')` or `trackCta('PREMIUM_book_call_click')`
    - **LinkedIn "Join the conversation"** (when a post exists) → secondary button in the header paired with the primary CTA, `trackCta('linkedin_click')` or `trackCta('PREMIUM_linkedin_click')`
-5. Add a card linking to it in `index.html` with the appropriate theme:
-   - `theme-green` for free data/reports
-   - `theme-warm` for runbooks
-   - `theme-premium` for premium samples
+5. Add a tile linking to it in `index.html` inside the matching grid:
+   - `.tile-data` inside `.data-grid` — free reports/dashboards
+   - `.tile-runbook` inside `.runbook-grid` — runbooks
+   - `.tile-premium` inside `.premium-grid` — premium samples (green "Premium" pill in the tile foot)
 6. Push to `main`
 
-See `CLAUDE.md` for full code snippets.
+See `CLAUDE.md` for operational detail (tracking script, modal HTML, endpoint) and `DESIGN_STANDARD.md` for visual/layout rules.
 
 ## Design notes
 
-- No frameworks — each page is a single HTML file with inline styles
-- Fonts: DM Sans + JetBrains Mono (Google Fonts). Runbooks use Inter.
-- Primary accent: deep teal (`#0F766E`), chosen to complement the Tenzi logo
-- Movement dashboard uses forest green (`#1A5E45`)
+Visual/typographic/layout rules are codified in [`DESIGN_STANDARD.md`](./DESIGN_STANDARD.md) under the name **"Terminal Grid (Light)"**. Quick summary:
+
+- No frameworks — each page is a single self-contained HTML file with inline styles
+- Fonts: `Inter Tight` (body/display) + `IBM Plex Mono` (eyebrows, numerals, labels) via Google Fonts
+- Cream background (`#faf8f4`), white panels, single green accent (`#2ca471`) on CTAs and emphasis
+- Teal ramp (`#0F766E` → `#5EEAD4`) only inside data visualisations; phase hues only on runbook step cards
 - Premium pills use the Tenzi rainbow gradient (pink → orange → purple → cyan)
-- Responsive at 700px breakpoint
+- Responsive breakpoints: 820px (KPI rows collapse) and 700px (tighter padding)
 
 ## Data sources
 
