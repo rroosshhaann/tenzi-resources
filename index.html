@@ -3,186 +3,297 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resources — Tenzi</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<title>Tenzi Resources — Free tools, data &amp; runbooks for Australian GI brokers</title>
+<meta name="description" content="Free market-data dashboards, runbooks and analytics samples for Australian general insurance brokers and licensees.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0NCIgZmlsbD0iIzJjYTQ3MSIvPjwvc3ZnPg==">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #faf8f4;
-  --surface: #fff;
-  --border: #e2ddd5;
-  --text: #1a1a1a;
-  --muted: #6b6560;
-  --accent: #2563eb;
-  --radius: 12px;
-}
+  :root {
+    --bg: #faf8f4;
+    --panel: #ffffff;
+    --panel-hover: #fafaf7;
+    --border: #e5e1d9;
+    --border-bright: #d3cec3;
+    --text: #1a1a1a;
+    --muted: #6b6560;
+    --dim: #a59f93;
+    --accent: #2ca471;
+    --accent-hover: #249765;
+    --chart-bg: #f4f1ea;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.5 'Inter Tight', Inter, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  a { color: inherit; }
+  .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
 
-body {
-  font-family: 'DM Sans', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
+  /* ---- Nav ---- */
+  .nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 0; border-bottom: 1px solid var(--border);
+  }
+  .nav .brand { display: flex; align-items: center; gap: 12px; }
+  .nav .tag {
+    font-size: 11px; color: var(--dim); letter-spacing: 0.12em; text-transform: uppercase;
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+  .nav .actions { display: flex; gap: 10px; align-items: center; }
+  .btn-outline {
+    font-size: 13px; color: var(--text); text-decoration: none; padding: 8px 14px;
+    border: 1px solid var(--border-bright); border-radius: 4px;
+    font-family: 'Inter Tight', Inter, system-ui, sans-serif;
+    transition: border-color .2s, background .2s;
+  }
+  .btn-outline:hover { border-color: var(--text); background: var(--panel-hover); }
+  .btn-solid {
+    font-size: 13px; color: #ffffff; background: var(--accent); border: none;
+    padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: 500;
+    font-family: 'Inter Tight', Inter, system-ui, sans-serif;
+    transition: background .2s;
+  }
+  .btn-solid:hover { background: var(--accent-hover); }
 
-.page {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 24px 20px 48px;
-}
+  /* ---- Hero ---- */
+  .hero {
+    padding: 28px 0 24px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 32px;
+    flex-wrap: wrap;
+  }
+  .hero-eyebrow {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 11px; color: var(--muted); letter-spacing: 0.18em; text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .hero-eyebrow .dot {
+    display: inline-block; width: 6px; height: 6px; background: var(--accent);
+    margin-right: 8px; vertical-align: middle; border-radius: 1px;
+  }
+  .hero h1 {
+    font-size: 34px; font-weight: 500; letter-spacing: -0.025em; line-height: 1.1;
+    margin: 0; max-width: 640px;
+    font-family: 'Inter Tight', Inter, system-ui, sans-serif;
+  }
+  .hero h1 .muted { color: var(--muted); }
+  .hero-stats { display: flex; gap: 32px; font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+  .hero-stats .v { font-size: 18px; color: var(--text); letter-spacing: -0.02em; line-height: 1; }
+  .hero-stats .l { font-size: 9px; color: var(--dim); letter-spacing: 0.12em; margin-top: 5px; }
 
-.header {
-  text-align: center;
-  margin-bottom: 20px;
-}
+  /* ---- Section header ---- */
+  .sec-head {
+    display: grid; grid-template-columns: 60px 1fr auto; gap: 20px;
+    padding: 22px 0; border-top: 1px solid var(--border);
+    align-items: baseline;
+  }
+  .sec-num {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 10px; color: var(--dim); letter-spacing: 0.14em;
+  }
+  .sec-eyebrow {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 10px; color: var(--muted); letter-spacing: 0.16em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .sec-head h2 {
+    font-size: 26px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.15; margin: 0;
+    font-family: 'Inter Tight', Inter, system-ui, sans-serif;
+  }
+  .sec-blurb {
+    font-size: 13px; line-height: 1.5; color: var(--muted); margin: 0;
+    max-width: 420px; text-align: right;
+  }
 
-.header h1 {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
-  margin-bottom: 4px;
-}
+  /* ---- Tiles ---- */
+  .tile {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    color: var(--text); text-decoration: none; display: flex;
+    transition: border-color .2s, background .2s;
+  }
+  .tile:hover { border-color: var(--border-bright); background: var(--panel-hover); }
+  .tile .meta {
+    display: flex; gap: 8px; font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+  .tile .meta span {
+    font-size: 10px; color: var(--dim); letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .tile .title {
+    font-weight: 500; letter-spacing: -0.02em; line-height: 1.2; margin: 0;
+    font-family: 'Inter Tight', Inter, system-ui, sans-serif;
+  }
+  .tile .blurb {
+    font-size: 13.5px; line-height: 1.55; color: var(--muted); margin: 0; flex: 1;
+  }
+  .tile .cta {
+    display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent);
+    font-family: 'IBM Plex Mono', ui-monospace, monospace; letter-spacing: 0.05em;
+  }
+  .premium-badge {
+    font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 3px 7px; border-radius: 2px;
+    border: 1px solid var(--border-bright); color: var(--text);
+  }
+  .premium-badge.green { border-color: var(--accent); color: var(--accent); }
 
-.header p {
-  font-size: 13px;
-  color: var(--muted);
-  max-width: 480px;
-  margin: 0 auto;
-  line-height: 1.5;
-}
+  /* Premium row (3 tiles) */
+  .premium-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 8px;
+  }
+  .tile-premium {
+    flex-direction: column; padding: 24px; min-height: 240px;
+    position: relative; overflow: hidden;
+  }
+  .tile-premium:hover { border-color: #b8b2a5 !important; }
+  .tile-premium .head {
+    display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;
+  }
+  .tile-premium .title { font-size: 22px; margin: 12px 0 14px; }
+  .tile-premium .foot {
+    margin-top: 20px; display: flex; justify-content: space-between; align-items: center;
+  }
 
-.cards {
-  display: grid;
-  gap: 8px;
-}
+  /* Data row (2 tiles, 260px chart + text) */
+  .data-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 8px;
+  }
+  .tile-data {
+    display: grid; grid-template-columns: 260px 1fr; min-height: 240px; overflow: hidden;
+  }
+  .tile-data .chart {
+    border-right: 1px solid var(--border); background: var(--chart-bg);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tile-data .body {
+    padding: 24px; display: flex; flex-direction: column;
+  }
+  .tile-data .meta { margin-bottom: 14px; }
+  .tile-data .title { font-size: 20px; margin: 4px 0 10px; }
+  .tile-data .cta { margin-top: 20px; }
 
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 13px 18px 14px;
-  text-decoration: none;
-  color: var(--text);
-  display: block;
-  position: relative;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
+  /* Runbook row (3 tiles, list-preview + text) */
+  .runbook-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 8px;
+  }
+  .tile-runbook {
+    display: grid; grid-template-columns: 110px 1fr; min-height: 220px; overflow: hidden;
+  }
+  .tile-runbook .preview {
+    border-right: 1px solid var(--border); background: var(--chart-bg);
+    padding: 14px 10px; display: flex; align-items: stretch; justify-content: stretch;
+  }
+  .tile-runbook .preview svg { width: 100%; height: 100%; display: block; }
+  .tile-runbook .body {
+    padding: 22px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .tile-runbook .title { font-size: 18px; }
+  .tile-runbook .blurb { font-size: 13px; line-height: 1.5; }
+  .tile-runbook .cta { font-size: 11.5px; }
 
-.card:hover {
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-  border-color: #ccc;
-}
+  /* ---- About ---- */
+  .about {
+    padding: 64px 0; border-top: 1px solid var(--border);
+    display: grid; grid-template-columns: 80px 1fr 1fr; gap: 24px;
+  }
+  .about .num {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 11px; color: var(--dim); letter-spacing: 0.14em; padding-top: 4px;
+  }
+  .about-eyebrow {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 11px; color: var(--muted); letter-spacing: 0.18em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .about h2 {
+    font-size: 32px; font-weight: 500; letter-spacing: -0.025em; line-height: 1.05; margin: 0;
+    font-family: 'Inter Tight', Inter, system-ui, sans-serif;
+  }
+  .about .body { color: var(--muted); font-size: 14.5px; line-height: 1.6; padding-top: 26px; }
+  .about .body p { margin: 0 0 16px; }
+  .about .body p:last-of-type { margin-bottom: 0; }
+  .about .links { margin-top: 24px; display: flex; gap: 20px; }
+  .about .links a {
+    color: var(--text); text-decoration: none;
+    border-bottom: 1px solid var(--border-bright); padding-bottom: 2px; font-size: 14px;
+  }
 
-.card-eyebrow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 4px;
-}
+  /* ---- Subscribe ---- */
+  .subscribe {
+    padding: 32px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    background: radial-gradient(ellipse at 50% 0%, rgba(44,164,113,0.07), transparent 60%);
+    display: flex; align-items: center; justify-content: space-between; gap: 32px;
+    flex-wrap: wrap;
+  }
+  .subscribe-eyebrow {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 10px; color: var(--muted); letter-spacing: 0.18em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .subscribe h2 {
+    font-size: 22px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.15; margin: 0;
+    font-family: 'Inter Tight', Inter, system-ui, sans-serif;
+  }
+  .subscribe p { font-size: 13px; color: var(--muted); line-height: 1.5; margin: 6px 0 0; }
+  .subscribe form { display: flex; gap: 8px; min-width: 340px; flex: 0 1 380px; }
+  .subscribe input {
+    flex: 1; padding: 10px 12px; background: var(--panel);
+    border: 1px solid var(--border-bright); border-radius: 4px;
+    color: var(--text); font-size: 13px;
+    font-family: 'Inter Tight', Inter, system-ui, sans-serif; outline: none;
+  }
+  .subscribe input:focus { border-color: var(--accent); }
+  .subscribe button {
+    padding: 10px 16px; background: var(--accent); color: #ffffff; border: none;
+    border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500;
+    font-family: 'Inter Tight', Inter, system-ui, sans-serif;
+    transition: background .2s;
+  }
+  .subscribe button:hover { background: var(--accent-hover); }
+  .subscribe .confirm {
+    flex: 1; padding: 10px 0; font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 12px; color: var(--accent); letter-spacing: 0.05em;
+  }
 
-.card h2 {
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.15px;
-  color: var(--text);
-  line-height: 1.3;
-  flex: 1;
-  min-width: 0;
-}
+  /* ---- Footer ---- */
+  footer {
+    padding: 36px 0 48px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px;
+    font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px;
+    color: var(--dim); letter-spacing: 0.12em;
+  }
+  footer .right { display: flex; gap: 20px; color: var(--muted); }
+  footer a { color: inherit; text-decoration: none; }
+  footer a:hover { color: var(--text); }
 
-.card p {
-  font-size: 12.5px;
-  color: var(--muted);
-  line-height: 1.45;
-  margin-bottom: 0;
-}
-
-.card-tag {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  flex-shrink: 0;
-}
-
-.card-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.card-category {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.9px;
-}
-
-/* Theme: green for AFSL data */
-.card.theme-green .card-category { color: #27805C; }
-.card.theme-green .card-tag { background: #D4EDDF; color: #1A5E45; }
-
-/* Theme: warm for operations */
-.card.theme-warm .card-category { color: #b45309; }
-.card.theme-warm .card-tag { background: #fef3c7; color: #92400e; }
-
-/* Theme: premium */
-.card.theme-premium { background: linear-gradient(135deg, #FFFBEB 0%, #FFF 60%); border-color: #E5D5A0; }
-.card.theme-premium:hover { border-color: #C9A84C; }
-.card.theme-premium .card-category { color: #92400E; }
-.card.theme-premium .card-tag { background: linear-gradient(135deg, #EC2BA6, #F69068, #762BB7, #2FC2EF); color: #fff; }
-
-.badge-premium {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 4px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  background: linear-gradient(135deg, #EC2BA6, #F69068, #762BB7, #2FC2EF);
-  color: #fff;
-  flex-shrink: 0;
-}
-
-.footer {
-  text-align: center;
-  margin-top: 24px;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.footer a { color: var(--muted); }
-
-@media (max-width: 600px) {
-  .page { padding: 32px 16px 48px; }
-  .header h1 { font-size: 24px; }
-  .card { padding: 14px 16px; }
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.card { animation: fadeUp 0.4s ease both; }
-.card:nth-child(1) { animation-delay: 0.05s; }
-.card:nth-child(2) { animation-delay: 0.1s; }
-.card:nth-child(3) { animation-delay: 0.15s; }
+  /* Responsive */
+  @media (max-width: 900px) {
+    .premium-grid, .data-grid, .runbook-grid { grid-template-columns: 1fr; }
+    .tile-data, .tile-runbook { grid-template-columns: 1fr; }
+    .tile-data .chart, .tile-runbook .preview { border-right: none; border-bottom: 1px solid var(--border); min-height: 160px; }
+    .about { grid-template-columns: 1fr; }
+    .sec-head { grid-template-columns: 1fr; }
+    .sec-blurb { text-align: left; }
+    .hero-stats { gap: 20px; }
+  }
 </style>
 </head>
 <body>
-<div class="page">
 
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-    <svg style="height: 32px; width: auto;"
+<div class="wrap">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="brand">
+      <svg style="height: 24px; width: auto; display: block;"
    width="201mm"
    height="65mm"
    viewBox="0 0 201 65"
@@ -293,173 +404,417 @@ body {
          style="font-size:192px;fill:url(#linearGradient2)"
          aria-label="tenzi"
          /></g></g></svg>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <a href="https://cal.com/roshan-khozouei/30min" target="_blank" onclick="trackCta('book_chat_click')" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:none;color:#1A5E45;border:1px solid #1A5E45;border-radius:8px;font:600 13px 'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none;transition:background 0.2s,color 0.2s;" onmouseover="this.style.background='#1A5E45';this.style.color='#fff'" onmouseout="this.style.background='none';this.style.color='#1A5E45'">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Book a chat
-      </a>
-      <button onclick="trackCta('subscribe_click'); document.getElementById('subscribeModal').classList.add('open')" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:#1A5E45;color:#fff;border:none;border-radius:8px;font:600 13px 'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='#0C3B2E'" onmouseout="this.style.background='#1A5E45'">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        Subscribe
-      </button>
+      <span class="tag">/ resources</span>
     </div>
+    <div class="actions">
+      <a href="https://cal.com/roshan-khozouei/30min" class="btn-outline" onclick="trackCta('book_chat_click')">Book a chat</a>
+      <button class="btn-solid" onclick="trackCta('subscribe_click'); document.getElementById('subscribeEmail').focus(); document.querySelector('.subscribe').scrollIntoView({behavior:'smooth',block:'center'});">Subscribe</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <div class="hero-eyebrow"><span class="dot"></span>Live · Updated monthly</div>
+      <h1>Free tools, data and runbooks for Australian <span class="muted">general insurance brokers.</span></h1>
+    </div>
+    <div class="hero-stats">
+      <div><div class="v">1,180</div><div class="l">ARs TRACKED</div></div>
+      <div><div class="v">48mo</div><div class="l">HISTORY</div></div>
+      <div><div class="v">monthly</div><div class="l">NEW DATA</div></div>
+    </div>
+  </section>
+
+  <!-- PREMIUM SECTION -->
+  <div class="sec-head">
+    <div class="sec-num">01</div>
+    <div>
+      <div class="sec-eyebrow">Premium Samples</div>
+      <h2>Deep-dive analytics.</h2>
+    </div>
+    <p class="sec-blurb">Samples from our paid data products — full AR flow and licensee-level movement analysis, refreshed monthly.</p>
   </div>
 
-  <div class="header">
-    <h1>Resources</h1>
-    <p>Free tools, data, and runbooks for Australian general insurance brokers and licensees.</p>
-  </div>
+  <div class="premium-grid">
 
-  <div class="cards">
-
-    <a class="card theme-premium" href="premium-samples/gi-broker-race-chart.html">
-      <div class="card-eyebrow">
-        <h2>GI Broker AFSL Race Chart</h2>
-        <div class="card-meta">
-          <span class="card-category">Premium Analytics</span>
-          <span class="badge-premium"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Sample</span>
-        </div>
+    <a href="premium-samples/gi-broker-race-chart.html" class="tile tile-premium" onclick="trackCta('premium_race_click')">
+      <div class="head">
+        <div class="meta"><span>24 MO</span><span>1,180 ARs</span></div>
+        <!-- race icon -->
+        <svg width="44" height="44" viewBox="0 0 56 56" fill="none" stroke="#2ca471" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="12" x2="48" y2="12" stroke-width="3" stroke="#2ca471"/>
+          <line x1="8" y1="22" x2="40" y2="22" stroke-width="3" stroke="#2ca471" opacity="0.75"/>
+          <line x1="8" y1="32" x2="30" y2="32" stroke-width="3" stroke="#2ca471" opacity="0.55"/>
+          <line x1="8" y1="42" x2="20" y2="42" stroke-width="3" stroke="#2ca471" opacity="0.35"/>
+        </svg>
       </div>
-      <p>Animated 24-month view of the Top 20 GI broker networks. See who's growing, shrinking, and how the Envest/Steadfast story played out in real-time AR data.</p>
+      <h3 class="title">GI Broker AFSL Race Chart</h3>
+      <p class="blurb">Animated 24-month view of the Top 20 GI broker networks. See who's growing, shrinking, and how the Envest/Steadfast story played out in real-time AR data.</p>
+      <div class="foot">
+        <div class="cta">VIEW SAMPLE →</div>
+        <span class="premium-badge green">Premium</span>
+      </div>
     </a>
 
-    <a class="card theme-premium" href="premium-samples/resilium-ar-flow.html">
-      <div class="card-eyebrow">
-        <h2>Resilium AR Flow Analysis</h2>
-        <div class="card-meta">
-          <span class="card-category">Premium Analytics</span>
-          <span class="badge-premium"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Sample</span>
-        </div>
+    <a href="premium-samples/resilium-ar-flow.html" class="tile tile-premium" onclick="trackCta('premium_resilium_click')">
+      <div class="head">
+        <div class="meta"><span>48 MO</span><span>123 ARs</span></div>
+        <!-- flow icon -->
+        <svg width="44" height="44" viewBox="0 0 56 56" fill="none" stroke="#2ca471" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="28" y1="6" x2="28" y2="50" opacity="0.4"/>
+          <line x1="28" y1="14" x2="46" y2="14" stroke-width="3" stroke="#2ca471"/>
+          <line x1="28" y1="22" x2="40" y2="22" stroke-width="3" stroke="#2ca471" opacity="0.75"/>
+          <line x1="28" y1="30" x2="14" y2="30" stroke-width="3" stroke="#2ca471" opacity="0.75"/>
+          <line x1="28" y1="38" x2="8" y2="38" stroke-width="3" stroke="#2ca471"/>
+          <line x1="28" y1="46" x2="20" y2="46" stroke-width="3" stroke="#2ca471" opacity="0.55"/>
+        </svg>
       </div>
-      <p>Where did Resilium's 123 departing ARs go? 48 months of inbound and outbound AR movement, with the Steadfast ecosystem dominating the destinations before the deal was even announced.</p>
+      <h3 class="title">Resilium AR Flow Analysis</h3>
+      <p class="blurb">123 departing ARs, 48 months, mapped to every destination. The Steadfast ecosystem dominated before the deal was announced.</p>
+      <div class="foot">
+        <div class="cta">VIEW SAMPLE →</div>
+        <span class="premium-badge green">Premium</span>
+      </div>
     </a>
 
-    <a class="card theme-premium" href="premium-samples/psc-connect-ar-flow.html">
-      <div class="card-eyebrow">
-        <h2>PSC Connect AR Flow Analysis</h2>
-        <div class="card-meta">
-          <span class="card-category">Premium Analytics</span>
-          <span class="badge-premium"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Sample</span>
-        </div>
+    <a href="premium-samples/psc-connect-ar-flow.html" class="tile tile-premium" onclick="trackCta('premium_psc_click')">
+      <div class="head">
+        <div class="meta"><span>48 MO</span><span>134 ARs</span></div>
+        <!-- slice icon (dominant capture) -->
+        <svg width="44" height="44" viewBox="0 0 56 56" fill="none" stroke="#2ca471" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="28" y1="6" x2="28" y2="50" opacity="0.4"/>
+          <line x1="28" y1="14" x2="50" y2="14" stroke-width="3" stroke="#2ca471"/>
+          <line x1="28" y1="22" x2="44" y2="22" stroke-width="3" stroke="#2ca471" opacity="0.8"/>
+          <line x1="28" y1="30" x2="36" y2="30" stroke-width="3" stroke="#2ca471" opacity="0.6"/>
+          <line x1="28" y1="38" x2="20" y2="38" stroke-width="3" stroke="#2ca471" opacity="0.5"/>
+          <line x1="28" y1="46" x2="22" y2="46" stroke-width="3" stroke="#2ca471" opacity="0.35"/>
+        </svg>
       </div>
-      <p>Where did PSC Connect's 134 net departures go? 48 months of flow data shows McLardy McShane &mdash; not Ausure &mdash; quietly capturing 57% of traceable leavers well before the Steadfast deal was announced.</p>
-    </a>
-
-    <a class="card theme-green" href="reports/gi-broker-movement-dashboard.html">
-      <div class="card-eyebrow">
-        <h2>GI Broker Movement Dashboard</h2>
-        <div class="card-meta">
-          <span class="card-category">Market Data</span>
-          <span class="card-tag">April 2026</span>
-        </div>
+      <h3 class="title">PSC Connect AR Flow Analysis</h3>
+      <p class="blurb">McLardy McShane — not Ausure — quietly captured 57% of traceable leavers well before the Steadfast deal was announced.</p>
+      <div class="foot">
+        <div class="cta">VIEW SAMPLE →</div>
+        <span class="premium-badge green">Premium</span>
       </div>
-      <p>Who's growing, who's shrinking, and where brokers are moving. Monthly analysis of Authorised Representative movements across AFS Licensees, sourced from the ASIC register.</p>
-    </a>
-
-    <a class="card theme-green" href="reports/gi-broker-ar-profile.html">
-      <div class="card-eyebrow">
-        <h2>Profile of the Average GI Broker AR</h2>
-        <div class="card-meta">
-          <span class="card-category">Market Data</span>
-          <span class="card-tag">Jan 2026</span>
-        </div>
-      </div>
-      <p>Where they work, how long they stay, and how often they move. A data-driven profile of Australia's GI broker Authorised Representatives using ASIC and ABS data.</p>
-    </a>
-
-    <a class="card theme-warm" href="runbooks/new-business-quoting-runbook.html">
-      <div class="card-eyebrow">
-        <h2>New Business / Quotes Runbook</h2>
-        <div class="card-meta">
-          <span class="card-category">Operations</span>
-          <span class="card-tag">v2.0</span>
-        </div>
-      </div>
-      <p>End-to-end broker workflow from initial enquiry through to binding and onboarding. A step-by-step reference for your team.</p>
-    </a>
-
-    <a class="card theme-warm" href="runbooks/renewals-runbook.html">
-      <div class="card-eyebrow">
-        <h2>Renewals Runbook</h2>
-        <div class="card-meta">
-          <span class="card-category">Operations</span>
-          <span class="card-tag">v1.0</span>
-        </div>
-      </div>
-      <p>End-to-end renewal process from identification through market review, recommendation, and binding.</p>
-    </a>
-
-    <a class="card theme-warm" href="runbooks/claims-management-runbook.html">
-      <div class="card-eyebrow">
-        <h2>Claims Management Runbook</h2>
-        <div class="card-meta">
-          <span class="card-category">Operations</span>
-          <span class="card-tag">v2.0</span>
-        </div>
-      </div>
-      <p>End-to-end claims process from first notice of loss through to resolution and file closure.</p>
     </a>
 
   </div>
 
-  <div class="footer">
-    <p>Built by <a href="https://tenzi.ai">Tenzi</a></p>
+  <!-- DATA SECTION -->
+  <div class="sec-head">
+    <div class="sec-num">02</div>
+    <div>
+      <div class="sec-eyebrow">Market Data</div>
+      <h2>Free, monthly dashboards.</h2>
+    </div>
+    <p class="sec-blurb">Sourced from the ASIC Financial Advisers Register and ABS population data. No email required.</p>
   </div>
+
+  <div class="data-grid">
+
+    <a href="reports/gi-broker-movement-dashboard.html" class="tile tile-data" onclick="trackCta('data_movement_click')">
+      <div class="chart">
+        <!-- netbars chart: monthly AR movement, bars above/below zero -->
+        <svg width="260" height="220" viewBox="0 0 260 220" style="display:block; background:#f4f1ea;">
+          <!-- gridlines -->
+          <line x1="26" y1="67.5" x2="246" y2="67.5" stroke="#d3cec3" stroke-width="1" stroke-dasharray="2 3"/>
+          <line x1="26" y1="117"  x2="246" y2="117"  stroke="#d3cec3" stroke-width="1" stroke-dasharray="2 3"/>
+          <line x1="26" y1="166.5" x2="246" y2="166.5" stroke="#d3cec3" stroke-width="1" stroke-dasharray="2 3"/>
+          <!-- axes -->
+          <line x1="26" y1="18" x2="26" y2="196" stroke="#b8b2a5" stroke-width="1"/>
+          <line x1="26" y1="196" x2="246" y2="196" stroke="#b8b2a5" stroke-width="1"/>
+          <!-- zero line -->
+          <line x1="26" y1="107" x2="246" y2="107" stroke="#b8b2a5" stroke-width="1"/>
+          <!-- bars: +6,+10,-4,+12,-3,+8,+14,-6,+4,+11,-2,+15 (normalized to 85px amplitude per half) -->
+          <rect x="32"  y="75.13" width="11.92" height="31.88" fill="#2ca471"/>
+          <rect x="50.33" y="53.88" width="11.92" height="53.13" fill="#2ca471"/>
+          <rect x="68.67" y="107" width="11.92" height="21.25" fill="#c0b7aa" opacity="0.8"/>
+          <rect x="87"   y="43.25" width="11.92" height="63.75" fill="#2ca471"/>
+          <rect x="105.33" y="107" width="11.92" height="15.94" fill="#c0b7aa" opacity="0.8"/>
+          <rect x="123.67" y="64.5" width="11.92" height="42.5" fill="#2ca471"/>
+          <rect x="142"  y="32.63" width="11.92" height="74.38" fill="#2ca471"/>
+          <rect x="160.33" y="107" width="11.92" height="31.88" fill="#c0b7aa" opacity="0.8"/>
+          <rect x="178.67" y="85.75" width="11.92" height="21.25" fill="#2ca471"/>
+          <rect x="197"  y="48.56" width="11.92" height="58.44" fill="#2ca471"/>
+          <rect x="215.33" y="107" width="11.92" height="10.63" fill="#c0b7aa" opacity="0.8"/>
+          <rect x="233.67" y="27.31" width="11.92" height="79.69" fill="#2ca471"/>
+          <!-- tick labels -->
+          <text x="20" y="24" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="#a59f93" letter-spacing="0.08em">+</text>
+          <text x="20" y="110" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="#a59f93" letter-spacing="0.08em">0</text>
+          <text x="20" y="194" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="#a59f93" letter-spacing="0.08em">−</text>
+        </svg>
+      </div>
+      <div class="body">
+        <div class="meta"><span>MONTHLY</span><span>APR 2026</span></div>
+        <h3 class="title">GI Broker Movement Dashboard</h3>
+        <p class="blurb">Who's growing, who's shrinking, and where brokers are moving. Monthly AR movements across AFS Licensees.</p>
+        <div class="cta">OPEN DASHBOARD →</div>
+      </div>
+    </a>
+
+    <a href="reports/gi-broker-ar-profile.html" class="tile tile-data" onclick="trackCta('data_profile_click')">
+      <div class="chart">
+        <!-- distribution chart: bell-ish histogram + smooth curve -->
+        <svg width="260" height="220" viewBox="0 0 260 220" style="display:block; background:#f4f1ea;">
+          <!-- gridlines -->
+          <line x1="26" y1="67.5" x2="246" y2="67.5" stroke="#d3cec3" stroke-width="1" stroke-dasharray="2 3"/>
+          <line x1="26" y1="117"  x2="246" y2="117"  stroke="#d3cec3" stroke-width="1" stroke-dasharray="2 3"/>
+          <line x1="26" y1="166.5" x2="246" y2="166.5" stroke="#d3cec3" stroke-width="1" stroke-dasharray="2 3"/>
+          <!-- axes -->
+          <line x1="26" y1="18" x2="26" y2="196" stroke="#b8b2a5" stroke-width="1"/>
+          <line x1="26" y1="196" x2="246" y2="196" stroke="#b8b2a5" stroke-width="1"/>
+          <!-- bins: 2,5,9,14,18,20,17,12,7,3 / 22 * 178 -->
+          <rect x="28.42"  y="179.82" width="17.16" height="16.18" fill="#2ca471" opacity="0.22"/>
+          <rect x="50.42"  y="155.55" width="17.16" height="40.45" fill="#2ca471" opacity="0.22"/>
+          <rect x="72.42"  y="123.18" width="17.16" height="72.82" fill="#2ca471" opacity="0.22"/>
+          <rect x="94.42"  y="82.73"  width="17.16" height="113.27" fill="#2ca471" opacity="0.22"/>
+          <rect x="116.42" y="50.36"  width="17.16" height="145.64" fill="#2ca471" opacity="0.22"/>
+          <rect x="138.42" y="34.18"  width="17.16" height="161.82" fill="#2ca471" opacity="0.22"/>
+          <rect x="160.42" y="58.45"  width="17.16" height="137.55" fill="#2ca471" opacity="0.22"/>
+          <rect x="182.42" y="98.91"  width="17.16" height="97.09" fill="#2ca471" opacity="0.22"/>
+          <rect x="204.42" y="139.36" width="17.16" height="56.64" fill="#2ca471" opacity="0.22"/>
+          <rect x="226.42" y="171.73" width="17.16" height="24.27" fill="#2ca471" opacity="0.22"/>
+          <!-- smooth curve over bin midpoints -->
+          <path d="M37.0,179.8 L59.0,155.5 L81.0,123.2 L103.0,82.7 L125.0,50.4 L147.0,34.2 L169.0,58.5 L191.0,98.9 L213.0,139.4 L235.0,171.7"
+                stroke="#2ca471" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="20" y="24" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="#a59f93" letter-spacing="0.08em">MAX</text>
+          <text x="20" y="194" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="#a59f93" letter-spacing="0.08em">0</text>
+        </svg>
+      </div>
+      <div class="body">
+        <div class="meta"><span>QUARTERLY</span><span>JAN 2026</span></div>
+        <h3 class="title">Profile of the Average GI Broker AR</h3>
+        <p class="blurb">Where they work, how long they stay, and how often they move. A data-driven profile from ASIC and ABS data.</p>
+        <div class="cta">OPEN DASHBOARD →</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- RUNBOOKS SECTION -->
+  <div class="sec-head">
+    <div class="sec-num">03</div>
+    <div>
+      <div class="sec-eyebrow">Runbooks</div>
+      <h2>Operational playbooks.</h2>
+    </div>
+    <p class="sec-blurb">Step-by-step references for your team. Request a copy and we'll email it through.</p>
+  </div>
+
+  <div class="runbook-grid">
+
+    <a href="runbooks/new-business-quoting-runbook.html" class="tile tile-runbook" onclick="trackCta('runbook_newbusiness_click')">
+      <div class="preview">
+        <svg viewBox="0 0 120 147" preserveAspectRatio="none">
+          <g>
+            <rect x="0" y="0"   width="120" height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="6.5" width="100"  height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="10"  width="78"   height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="19"  width="120" height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="25.5" width="108" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="29" width="68"    height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="38" width="120"   height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="44.5" width="94"  height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="48" width="86"    height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="57" width="120"   height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="63.5" width="104" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="67" width="72"    height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="76" width="120"   height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="82.5" width="96"  height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="86" width="80"    height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="95" width="120"   height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="101.5" width="110" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="105" width="66"   height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="114" width="120"  height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="120.5" width="90" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="124" width="82"   height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="133" width="120"  height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="139.5" width="102" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="143" width="74"   height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+          </g>
+        </svg>
+      </div>
+      <div class="body">
+        <div class="meta"><span>v2.0</span><span>14 STEPS</span></div>
+        <h3 class="title">New Business &amp; Quoting</h3>
+        <p class="blurb">End-to-end broker workflow from initial enquiry through to binding and onboarding.</p>
+        <div class="cta">OPEN RUNBOOK →</div>
+      </div>
+    </a>
+
+    <a href="runbooks/renewals-runbook.html" class="tile tile-runbook" onclick="trackCta('runbook_renewals_click')">
+      <div class="preview">
+        <svg viewBox="0 0 120 147" preserveAspectRatio="none">
+          <g>
+            <rect x="0" y="0"   width="120" height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="6.5" width="100"  height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="10"  width="78"   height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="19"  width="120" height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="25.5" width="108" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="29" width="68"    height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="38" width="120"   height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="44.5" width="94"  height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="48" width="86"    height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="57" width="120"   height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="63.5" width="104" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="67" width="72"    height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="76" width="120"   height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="82.5" width="96"  height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="86" width="80"    height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="95" width="120"   height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="101.5" width="110" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="105" width="66"   height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="114" width="120"  height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="120.5" width="90" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="124" width="82"   height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="133" width="120"  height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="139.5" width="102" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="143" width="74"   height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+          </g>
+        </svg>
+      </div>
+      <div class="body">
+        <div class="meta"><span>v1.0</span><span>11 STEPS</span></div>
+        <h3 class="title">Renewals</h3>
+        <p class="blurb">Identification through market review, recommendation, and binding.</p>
+        <div class="cta">OPEN RUNBOOK →</div>
+      </div>
+    </a>
+
+    <a href="runbooks/claims-management-runbook.html" class="tile tile-runbook" onclick="trackCta('runbook_claims_click')">
+      <div class="preview">
+        <svg viewBox="0 0 120 147" preserveAspectRatio="none">
+          <g>
+            <rect x="0" y="0"   width="120" height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="6.5" width="100"  height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="10"  width="78"   height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="19"  width="120" height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="25.5" width="108" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="29" width="68"    height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="38" width="120"   height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="44.5" width="94"  height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="48" width="86"    height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="57" width="120"   height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="63.5" width="104" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="67" width="72"    height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="76" width="120"   height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="82.5" width="96"  height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="86" width="80"    height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="95" width="120"   height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="101.5" width="110" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="105" width="66"   height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="114" width="120"  height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="120.5" width="90" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="124" width="82"   height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="133" width="120"  height="4" rx="0.5" fill="#2ca471" opacity="0.9"/>
+            <rect x="0" y="139.5" width="102" height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+            <rect x="0" y="143" width="74"   height="1.5" rx="0.5" fill="#2ca471" opacity="0.28"/>
+          </g>
+        </svg>
+      </div>
+      <div class="body">
+        <div class="meta"><span>v2.0</span><span>9 STEPS</span></div>
+        <h3 class="title">Claims Management</h3>
+        <p class="blurb">First notice of loss through to resolution and file closure.</p>
+        <div class="cta">OPEN RUNBOOK →</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ABOUT -->
+  <section class="about">
+    <div class="num">04</div>
+    <div>
+      <div class="about-eyebrow">About Tenzi</div>
+      <h2>We help insurance brokers run better businesses.</h2>
+    </div>
+    <div class="body">
+      <p>Tenzi provides automation, analytics, and advisory support to Australian insurance brokers and licensees. These resources are a public window into the market data we work with every day.</p>
+      <p>Everything here is free. Premium samples link to deeper, continuously-updated analyses available by subscription.</p>
+      <div class="links">
+        <a href="https://tenzi.ai" onclick="trackCta('about_tenzi_click')">tenzi.ai →</a>
+        <a href="https://cal.com/roshan-khozouei/30min" onclick="trackCta('about_book_click')">Book a 30-min chat →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBSCRIBE -->
+  <section class="subscribe">
+    <div>
+      <div class="subscribe-eyebrow">Monthly brief</div>
+      <h2>One email a month. New data, zero noise.</h2>
+      <p>The latest AR movement dashboard and any new resources.</p>
+    </div>
+    <form onsubmit="return submitSubscribe(event)">
+      <input type="email" id="subscribeEmail" required placeholder="you@yourbrokerage.com.au">
+      <button type="submit">Subscribe</button>
+    </form>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="left">© 2026 TENZI · RESOURCES.TENZI.AI</div>
+    <div class="right">
+      <a href="https://tenzi.ai">TENZI.AI</a>
+      <a href="https://www.linkedin.com/company/tenzi-ai" target="_blank" rel="noopener">LINKEDIN</a>
+      <a href="mailto:roshan@tenzi.ai">EMAIL</a>
+    </div>
+  </footer>
 
 </div>
 
-<div id="subscribeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;" onclick="if(event.target===this)this.classList.remove('open')">
-  <div style="background:#fff;border-radius:12px;padding:32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.15);">
-    <div class="form-view">
-      <h3 style="font-size:18px;margin-bottom:8px;">Subscribe to monthly updates</h3>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5;">We share free data insights and resources for GI brokers each month. Enter your email and we'll keep you in the loop.</p>
-      <form onsubmit="return submitSubscription(event)">
-        <input type="email" id="subEmail" placeholder="you@yourbrokerage.com.au" required style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:14px 'DM Sans',sans-serif;margin-bottom:12px;">
-        <button type="submit" style="width:100%;padding:10px;background:#1A5E45;color:#fff;border:none;border-radius:8px;font:600 14px 'DM Sans',sans-serif;cursor:pointer;">Subscribe</button>
-      </form>
-      <p style="font-size:11px;color:var(--muted);margin-top:12px;margin-bottom:0;">No spam, no marketing. Unsubscribe anytime.</p>
-      <a onclick="document.getElementById('subscribeModal').classList.remove('open')" style="display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--muted);cursor:pointer;">No thanks</a>
-    </div>
-    <div class="success-view" style="display:none;text-align:center;">
-      <h3 style="font-size:18px;margin-bottom:8px;">You're in!</h3>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">We'll send you the next dashboard as soon as it's ready.</p>
-      <a onclick="document.getElementById('subscribeModal').classList.remove('open')" style="display:block;text-align:center;font-size:12px;color:var(--muted);cursor:pointer;">Close</a>
-    </div>
-  </div>
-</div>
-
-<style>#subscribeModal.open { display:flex !important; }</style>
-
 <script>
-var visitorIp = '';
-fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){ visitorIp = d.ip; }).catch(function(){});
+  // ── Visitor IP (best-effort) ──────────────────────────────────────────
+  var visitorIp = '';
+  fetch('https://api.ipify.org?format=json')
+    .then(function(r) { return r.json(); })
+    .then(function(d) { visitorIp = d.ip; })
+    .catch(function() {});
 
-function submitSubscription(e) {
-  e.preventDefault();
-  var email = document.getElementById('subEmail').value;
-  var data = { email: email, page: document.title, timestamp: new Date().toISOString(), ip: visitorIp, referrer: document.referrer };
-  fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
-    method: 'POST',
-    body: JSON.stringify(data),
-    mode: 'no-cors'
-  }).catch(function() {});
-  document.querySelector('#subscribeModal .form-view').style.display = 'none';
-  document.querySelector('#subscribeModal .success-view').style.display = 'block';
-  return false;
-}
+  // ── Subscribe (posts to the same Apps Script as the runbooks) ─────────
+  function submitSubscribe(e) {
+    e.preventDefault();
+    var input = document.getElementById('subscribeEmail');
+    var email = input.value;
+    var data = {
+      email: email,
+      page: document.title,
+      source: 'subscribe',
+      timestamp: new Date().toISOString(),
+      ip: visitorIp,
+      referrer: document.referrer
+    };
+    fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      mode: 'no-cors'
+    }).catch(function() {});
+
+    trackCta('subscribe_submit');
+
+    var form = e.target;
+    form.innerHTML = '<div class="confirm">✓ Subscribed — check your inbox.</div>';
+    return false;
+  }
+
+  // ── Lightweight analytics beacon ──────────────────────────────────────
+  function trackBeacon(eventName) {
+    var url = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec'
+      + '?email=' + encodeURIComponent(eventName)
+      + '&page=' + encodeURIComponent(document.title);
+    fetch('https://api.ipify.org?format=json')
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        new Image().src = url + '&ip=' + encodeURIComponent(d.ip) + '&ref=' + encodeURIComponent(document.referrer);
+      })
+      .catch(function() {
+        new Image().src = url + '&ref=' + encodeURIComponent(document.referrer);
+      });
+  }
+  function trackCta(action) { trackBeacon('(cta: ' + action + ')'); }
+  trackBeacon('(page view)');
 </script>
 
-<script>
-function trackBeacon(eventName) {
-  var url = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=' + encodeURIComponent(eventName) + '&page=' + encodeURIComponent(document.title);
-  fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){
-    new Image().src = url + '&ip=' + encodeURIComponent(d.ip) + '&ref=' + encodeURIComponent(document.referrer);
-  }).catch(function(){
-    new Image().src = url + '&ref=' + encodeURIComponent(document.referrer);
-  });
-}
-function trackCta(action) { trackBeacon('(cta: ' + action + ')'); }
-trackBeacon('(page view)');
-</script>
 </body>
 </html>
