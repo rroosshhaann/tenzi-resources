@@ -128,7 +128,7 @@ Every page ships these regions in this order:
 
 ### 4.1 Nav bar
 - Left: `← All Resources` linking to `../index.html`, in `--muted`.
-- Right: Tenzi SVG logo, 28px tall. Use the approved inline SVG (present in existing pages — copy verbatim, do not redraw).
+- Right: Tenzi SVG logo, 34px tall on content pages (29px on the index nav). Use the approved inline SVG (present in existing pages — copy verbatim, do not redraw).
 
 ### 4.2 Header
 ```
