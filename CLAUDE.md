@@ -21,25 +21,27 @@ tenzi-resources/
     *.gif                                 # Embedded chart assets
 ```
 
-| Page type | Theme | CTA pattern |
-|-|-|-|
-| Index landing | Warm beige | "Subscribe to updates" modal + "Book a chat" → Cal.com |
-| Free reports | Forest green / Deep teal | "Subscribe to updates" modal |
-| Runbooks | Warm beige | "Request a Copy" modal |
-| Premium samples | Tenzi rainbow gradient pill | "Get the full report" / "Book a call" → Cal.com |
+| Page type | CTA pattern |
+|-|-|
+| Index landing | Header "Subscribe" scrolls to inline subscribe strip + "Book a chat" → Cal.com |
+| Free reports | Header "Subscribe to updates" opens `subscribeModal` + inline subscribe strip at bottom |
+| Runbooks | "Request a Copy" opens `copyModal` |
+| Premium samples | "Get the full report" / "Book a call" → Cal.com |
 
 Every page has: back-link to index, Tenzi logo in nav bar, page view tracking, CTA click tracking.
 
 ## Design system
 
+Visual, typographic, and layout rules live in [`DESIGN_STANDARD.md`](./DESIGN_STANDARD.md) — that's the source of truth for colours, fonts, grid, components, and page structure. The standard is named **"Terminal Grid (Light)"**: cream background, green accent, Inter Tight + IBM Plex Mono.
+
+Operational constants worth knowing at a glance:
+
 - Self-contained HTML files — no build step, no external CSS/JS frameworks
-- Fonts: DM Sans (body) + JetBrains Mono (data values) via Google Fonts. Runbooks use Inter.
-- Tenzi logo: inline SVG (exported from Inkscape). Gradient arcs: pink (#EC2BA6) → orange (#F69068) and purple (#762BB7) → cyan (#2FC2EF). Wordmark: dark navy (#1C233C).
-- Primary accent: deep teal (#0F766E) — chosen to complement logo and convey insurance trust. Used on AR profile page.
-- Movement dashboard uses forest green (#1A5E45). Runbooks use blue (#2563EB) for CTA.
-- Premium pills use the Tenzi rainbow gradient: `linear-gradient(135deg, #EC2BA6, #F69068, #762BB7, #2FC2EF)`
-- Responsive: breakpoint at 700px.
-- Card layout: eyebrow row contains category text on left + tag/pill right-aligned. Arrow `→` is a CSS `::after` pseudo-element bottom-right (no extra HTML row needed).
+- Fonts: `Inter Tight` (display/body) + `IBM Plex Mono` (eyebrows, numerals, labels) via Google Fonts
+- Primary accent: green `#2ca471` — the only saturated colour on CTAs and emphasis
+- Tenzi logo: inline SVG copied verbatim from an existing page — pink→orange and purple→cyan gradient arcs, navy `#1C233C` wordmark. Do not regenerate.
+- Premium pills still use the Tenzi rainbow gradient: `linear-gradient(135deg, #EC2BA6, #F69068, #762BB7, #2FC2EF)`
+- Responsive breakpoints: `820px` (KPI rows → 2 col) and `700px` (tighter padding)
 
 ## Analytics and tracking
 
@@ -99,13 +101,13 @@ Every CTA button needs `onclick="trackCta('action_name'); ..."` prepended to its
 
 ### LinkedIn conversation button
 
-When a LinkedIn post exists for a page, add a "Join the conversation" secondary button in the header, paired with the primary CTA inside a flex wrapper so both buttons sit on the same row and wrap on narrow screens. Use LinkedIn blue (`#0A66C2`) and the LinkedIn "in" icon so the brand read is immediate.
+When a LinkedIn post exists for a page, add a "Join the conversation" secondary button in the header, paired with the primary CTA inside a flex wrapper so both buttons sit on the same row and wrap on narrow screens. In the current design it's rendered as an outlined cyan button (`#7aa8d4` text, `rgba(122,168,212,0.35)` border) with the LinkedIn "in" icon and an IBM Plex Mono uppercase label.
 
 - Tracking: `trackCta('linkedin_click')` on free reports and runbooks, `trackCta('PREMIUM_linkedin_click')` on premium samples (PREMIUM_ prefix is mandatory for filtering).
 - Placement: to the left of the primary CTA, inside `<div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">`.
 - External link safety: always `target="_blank" rel="noopener"`.
 - Strip LinkedIn's `?utm_source=share&utm_medium=...&rcm=...` tracking params from the URL before committing — they bloat the link without benefit.
-- Font size matches the primary CTA on the page (13px on DM Sans pages, 14px on the Inter-based runbook).
+- Label font: `IBM Plex Mono` 11px 500, uppercase, letter-spacing `0.1em`. Matches the mono-eyebrow treatment defined in the design standard.
 - Copy the full button markup from an existing page rather than retyping the SVG path.
 
 ### Apps Script (for reference, lives in the linked Google Sheet)
@@ -167,9 +169,9 @@ Every page on the site MUST have all of the following. No exceptions.
    - **Index page Book a chat**: `trackCta('book_chat_click')`.
    - **LinkedIn "Join the conversation"** (when a post exists for the page): secondary button in the header paired with the primary CTA inside a flex wrapper. Use `trackCta('linkedin_click')` on free pages, `trackCta('PREMIUM_linkedin_click')` on premium samples. See the "LinkedIn conversation button" section above for placement and styling rules.
 4. **Email modal (for subscribe/copy CTAs)** — copy modal HTML and form submission script from an existing page. Form data must include `email`, `page`, `timestamp`, `ip`, `referrer`. Use `mode: 'no-cors'` and show success view immediately.
-5. **Card on index.html** — add a card linking to the new page with appropriate theme class:
-   - `theme-green` — free data/reports
-   - `theme-warm` — operational runbooks
-   - `theme-premium` — premium samples (uses Tenzi rainbow gradient pill)
-6. **Self-contained HTML** — inline CSS, no build step, no external frameworks
+5. **Card on index.html** — add a tile linking to the new page using the matching grid class:
+   - `.tile-data` inside `.data-grid` — free reports/dashboards
+   - `.tile-runbook` inside `.runbook-grid` — operational runbooks
+   - `.tile-premium` inside `.premium-grid` — premium samples (green "Premium" pill in the tile foot)
+6. **Self-contained HTML** — inline CSS, no build step, no external frameworks. Follow [`DESIGN_STANDARD.md`](./DESIGN_STANDARD.md) for tokens, type scale, and component patterns.
 7. Commit and push to `main` — GitHub Pages deploys automatically
