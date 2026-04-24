@@ -24,6 +24,7 @@ tenzi-resources/
 - **Claims Management** — First notice of loss through to resolution and file closure
 
 **Premium samples** (`premium-samples/`)
+- **GI Broker Network Health Score** — Composite 0–100 score across seven signals, ranked within peer size segment. Metrix Connect tops every Dominant; size isn't health
 - **GI Broker AFSL Race Chart** — Animated 24-month view of the Top 20 GI broker networks
 - **Resilium AR Flow Analysis** — 48 months of inbound/outbound AR movement for a single AFSL
 - **PSC Connect AR Flow Analysis** — 48 months of AR movement showing McLardy McShane capturing 57% of traceable departures
