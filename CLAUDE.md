@@ -36,7 +36,7 @@ Visual, typographic, and layout rules live in [`DESIGN_STANDARD.md`](./DESIGN_ST
 
 Operational constants worth knowing at a glance:
 
-- Self-contained HTML files — no build step, no external CSS/JS frameworks
+- Self-contained HTML files for layout — no build step, no external CSS frameworks. The only external JS dependency is `https://tenzi.ai/track.js` (shared analytics tracker — source lives in the `tenzi-homepage` repo)
 - Fonts: `Inter Tight` (display/body) + `IBM Plex Mono` (eyebrows, numerals, labels) via Google Fonts
 - Primary accent: green `#2ca471` — the only saturated colour on CTAs and emphasis
 - Tenzi logo: inline SVG copied verbatim from an existing page — pink→orange and purple→cyan gradient arcs, navy `#1C233C` wordmark. Do not regenerate.
@@ -45,21 +45,22 @@ Operational constants worth knowing at a glance:
 
 ## Analytics and tracking
 
-All pages track via a Google Apps Script endpoint that writes to a Google Sheet.
+All client-side tracking is handled by the shared **`track.js`** library (lives in the sibling `tenzi-homepage` repo, served at `https://tenzi.ai/track.js`). Both `resources.tenzi.ai` and `tenzi.ai` load the same file — single source of truth for page views, CTA clicks, dwell time, and form POSTs.
 
-**Endpoint:** `https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec`
+**Endpoint (still the Apps Script):** `https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec`
 
 **Sheets:**
-- `Events` — A=email, B=page, C=timestamp (Melbourne time), D=ip, E=referrer. All page views, CTA clicks, and resources-site form submissions land here.
-- `Contacts` — Timestamp, Name, Email, Organisation, Role, Interest, Message, Page, IP, Referrer. Driven by the `tenzi.ai` holding-page contact form (POSTs with `source: 'holding_page_contact'`). Resources pages do not write here. Each row also fires a notification email to `roshan@tenzi.ai` via `MailApp.sendEmail`.
+- `Events` — A=event, B=page, C=timestamp (Melbourne time), D=ip, E=referrer, F=site (`marketing` / `resources`). All page views, CTA clicks, dwell events, and resources-site form submissions land here. Rows written before `track.js` shipped have an empty F.
+- `Contacts` — Timestamp, Name, Email, Organisation, Role, Interest, Message, Page, IP, Referrer, Site. Driven by the `tenzi.ai` holding-page contact form (POSTs with `source: 'holding_page_contact'`). Resources pages do not write here. Each row also fires a notification email to `roshan@tenzi.ai` via `MailApp.sendEmail`.
 
-The Apps Script branches on `data.source` and auto-creates either sheet on first write.
+The Apps Script (`apps-script.gs` in this repo — deploy via Apps Script editor) branches on `data.source` and auto-creates either sheet on first write.
 
 ### Event types in the email column
 
 | Email value | What it means |
 |-|-|
-| `(page view)` | Visitor loaded the page |
+| `(page view)` | Visitor loaded the page (fires on `tenziTrack.init()`) |
+| `(dwell: N)` | Page dwell time in whole seconds — fires on `pagehide`, visibility-aware (paused when tab hidden), skipped below 2s, capped at 3600s |
 | `(cta: subscribe_click)` | Clicked Subscribe button (modal opened — may not have submitted) |
 | `(cta: request_copy_click)` | Clicked Request a Copy button on a runbook |
 | `(cta: book_chat_click)` | Clicked Book a chat (Cal.com link) |
@@ -69,24 +70,28 @@ The Apps Script branches on `data.source` and auto-creates either sheet on first
 | `(cta: PREMIUM_linkedin_click)` | Clicked "Join the conversation" LinkedIn button on a premium sample |
 | Real email address | Form submission (subscribe or request copy) |
 
-Compare CTA click counts vs actual form submissions to measure drop-off.
+Compare CTA click counts vs actual form submissions to measure drop-off. Column F lets Looker Studio slice by origin site.
 
-### Standard tracking script (copy into every new page)
+### Standard tracking block (copy into every new page)
 
 ```html
-<script>
-function trackBeacon(eventName) {
-  var url = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=' + encodeURIComponent(eventName) + '&page=' + encodeURIComponent(document.title);
-  fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){
-    new Image().src = url + '&ip=' + encodeURIComponent(d.ip) + '&ref=' + encodeURIComponent(document.referrer);
-  }).catch(function(){
-    new Image().src = url + '&ref=' + encodeURIComponent(document.referrer);
-  });
-}
-function trackCta(action) { trackBeacon('(cta: ' + action + ')'); }
-trackBeacon('(page view)');
-</script>
+<script src="https://tenzi.ai/track.js"></script>
+<script>tenziTrack.init({ site: 'resources' });</script>
 ```
+
+Place at the very bottom of `<body>` (before `</body>`). `init` fires `(page view)` and starts the dwell timer.
+
+### `tenziTrack` API (from `track.js`)
+
+| Call | Purpose |
+|-|-|
+| `tenziTrack.init({ site })` | Fire page view, start dwell timer, warm visitor-IP cache |
+| `tenziTrack.trackCta(action)` | Fire `(cta: action)` beacon |
+| `tenziTrack.trackBeacon(event)` | Fire arbitrary-named beacon |
+| `tenziTrack.postForm(data)` | POST JSON to the Apps Script with `page`, `timestamp`, `referrer`, `site`, `ip` auto-added |
+| `tenziTrack.getVisitorIp()` | Cached IP (best-effort, may be empty) |
+
+`window.trackCta` and `window.trackBeacon` are defined as back-compat globals so every existing inline `onclick="trackCta('...')"` keeps working. New code should prefer the namespaced `tenziTrack.trackCta()`.
 
 ### Wiring CTA buttons
 
@@ -114,102 +119,16 @@ When a LinkedIn post exists for a page, add a "Join the conversation" secondary 
 - Label font: `IBM Plex Mono` 11px 500, uppercase, letter-spacing `0.1em`. Matches the mono-eyebrow treatment defined in the design standard.
 - Copy the full button markup from an existing page rather than retyping the SVG path.
 
-### Apps Script (for reference, lives in the linked Google Sheet)
+### Apps Script (source of truth: `apps-script.gs` in this repo)
 
-```javascript
-var EVENTS_SHEET = 'Events';
-var CONTACTS_SHEET = 'Contacts';
-var NOTIFY_EMAIL = 'roshan@tenzi.ai';
-var CONTACT_RATE_LIMIT = 5;             // contact submissions per IP per window
-var CONTACT_RATE_WINDOW_MS = 3600000;   // 1 hour
-var EXCLUDED_IPS = [];                  // IPs silently dropped from all sheets — populate with your own (find via the Events sheet IP column)
+Canonical source is [`apps-script.gs`](./apps-script.gs). The deployed script lives in the linked Google Sheet — after editing the file, paste it into the Apps Script editor and Deploy > Manage deployments > New version. Summary:
 
-function doPost(e) {
-  var data = JSON.parse(e.postData.contents);
-  if (isExcludedIp_(data.ip)) return ContentService.createTextOutput('ok');
-  var melbTime = Utilities.formatDate(new Date(), 'Australia/Melbourne', 'yyyy-MM-dd HH:mm:ss');
-
-  if (data.source === 'holding_page_contact') {
-    // Honeypot — silently drop bots that filled the hidden `website` field
-    if (data.website) return ContentService.createTextOutput('ok');
-    // Rate limit per IP — silently drop excess
-    if (!withinRateLimit_(data.ip, CONTACT_RATE_LIMIT, CONTACT_RATE_WINDOW_MS)) {
-      return ContentService.createTextOutput('ok');
-    }
-    writeContact_(data, melbTime);
-    notifyContact_(data);
-  } else {
-    writeEvent_(data.email, data.page, melbTime, data.ip, data.referrer);
-  }
-  return ContentService.createTextOutput('ok');
-}
-
-function doGet(e) {
-  if (isExcludedIp_(e.parameter.ip)) return ContentService.createTextOutput('ok');
-  var melbTime = Utilities.formatDate(new Date(), 'Australia/Melbourne', 'yyyy-MM-dd HH:mm:ss');
-  writeEvent_(e.parameter.email || '(page view)', e.parameter.page || '', melbTime, e.parameter.ip, e.parameter.ref);
-  return ContentService.createTextOutput('ok');
-}
-
-function isExcludedIp_(ip) {
-  return ip && EXCLUDED_IPS.indexOf(ip) !== -1;
-}
-
-function writeEvent_(email, page, melbTime, ip, referrer) {
-  getOrCreate_(EVENTS_SHEET).appendRow([email || '', page || '', melbTime, ip || '', referrer || '']);
-}
-
-function writeContact_(data, melbTime) {
-  var sheet = getOrCreate_(CONTACTS_SHEET);
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Timestamp','Name','Email','Organisation','Role','Interest','Message','Page','IP','Referrer']);
-  }
-  sheet.appendRow([melbTime, data.name||'', data.email||'', data.organisation||'', data.role||'', data.interest||'', data.message||'', data.page||'', data.ip||'', data.referrer||'']);
-}
-
-function notifyContact_(data) {
-  // Wrapped in try/catch so MailApp quota exhaustion doesn't break the row save.
-  try {
-    MailApp.sendEmail({
-      to: NOTIFY_EMAIL,
-      replyTo: data.email || NOTIFY_EMAIL,
-      subject: '[tenzi.ai] New contact: ' + (data.name || data.email || 'unknown'),
-      body:
-        'From: ' + (data.name||'') + ' <' + (data.email||'') + '>\n' +
-        'Organisation: ' + (data.organisation||'') + '\n' +
-        'Role: ' + (data.role||'') + '\n' +
-        'Interest: ' + (data.interest||'') + '\n\n' +
-        (data.message||'') + '\n\n---\n' +
-        'Page: ' + (data.page||'') + '\n' +
-        'IP: ' + (data.ip||'') + '\n' +
-        'Referrer: ' + (data.referrer||'')
-    });
-  } catch (err) {
-    console.log('MailApp.sendEmail failed:', err);
-  }
-}
-
-function withinRateLimit_(ip, limit, windowMs) {
-  if (!ip) return true;  // no IP info — allow rather than reject genuine users
-  var props = PropertiesService.getScriptProperties();
-  var key = 'rl:' + ip;
-  var now = Date.now();
-  var raw = props.getProperty(key);
-  var entry = raw ? JSON.parse(raw) : null;
-  if (!entry || now > entry.reset) {
-    entry = { count: 1, reset: now + windowMs };
-  } else {
-    entry.count++;
-  }
-  props.setProperty(key, JSON.stringify(entry));
-  return entry.count <= limit;
-}
-
-function getOrCreate_(name) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  return ss.getSheetByName(name) || ss.insertSheet(name);
-}
-```
+- `doPost(e)` — branches on `data.source === 'holding_page_contact'` (Contacts sheet + honeypot + rate limit + notify email) vs everything else (Events sheet).
+- `doGet(e)` — always writes an Events row. Used by `Image()` beacons for page views, CTA clicks, and dwell events.
+- `writeEvent_(email, page, melbTime, ip, referrer, site)` — appends to Events. Column F = site tag.
+- `writeContact_(data, melbTime)` — appends to Contacts (11 cols including site).
+- `isExcludedIp_` / `EXCLUDED_IPS` — silently drop rows from listed IPs.
+- `withinRateLimit_` — PropertiesService-backed per-IP cap on contact submissions (5/hour).
 
 **Hardening notes:**
 
@@ -222,13 +141,22 @@ After editing the script: Deploy > Manage deployments > edit > New version > Dep
 
 ### Form submissions
 
-Form POSTs include the same fields plus the actual email:
-```javascript
-var data = { email: email, page: document.title, timestamp: new Date().toISOString(), ip: visitorIp, referrer: document.referrer };
-fetch(endpoint, { method: 'POST', body: JSON.stringify(data), mode: 'no-cors' }).catch(function(){});
+Forms call `tenziTrack.postForm({ email, source })`. The shared tracker auto-adds `page`, `timestamp`, `referrer`, `site: 'resources'`, and cached `ip` before POSTing with `mode: 'no-cors'`:
+
+```html
+<form onsubmit="return submitSubscribe(event)">…</form>
+<script>
+  function submitSubscribe(e) {
+    e.preventDefault();
+    tenziTrack.postForm({ email: document.getElementById('subscribeEmail').value, source: 'subscribe' });
+    tenziTrack.trackCta('subscribe_submit');
+    e.target.innerHTML = '<div class="confirm">✓ Subscribed — check your inbox.</div>';
+    return false;
+  }
+</script>
 ```
 
-Note: server-side `melbTime` overrides `data.timestamp` for consistency. Show success view immediately without waiting for response.
+Server-side `melbTime` overrides `data.timestamp` for consistency. Show the success view immediately without waiting for a response.
 
 ## Hosting
 
@@ -250,17 +178,17 @@ Dashboard data comes from the `ar-dataset/` project in the `python-scrapbook` re
 Every page on the site MUST have all of the following. No exceptions.
 
 1. **Nav bar** — back-link on left, Tenzi logo SVG on right. Copy from an existing page. Back-link href should use `../index.html` for pages in subfolders.
-2. **Page view tracking + CTA tracking helper** — paste the standard tracking script block (see Analytics section above) at the bottom of the page. Includes `trackBeacon`, `trackCta`, and the page view fire.
+2. **Page view tracking + CTA tracking helper** — paste the standard shared-tracker block (see Analytics section above: two `<script>` tags — load `https://tenzi.ai/track.js`, then call `tenziTrack.init({ site: 'resources' })`) at the bottom of the page.
 3. **CTA buttons** — every page must have a call-to-action. Each CTA button must have `trackCta('action_name')` in its `onclick`:
    - **Runbooks**: "Request a Copy" button in header → opens `copyModal` with email form. Use `trackCta('request_copy_click')`.
    - **Free reports/dashboards**: "Subscribe to updates" button in header → opens `subscribeModal`. Use `trackCta('subscribe_click')`.
    - **Premium samples**: "Get the full report" + "Book a call" → links to Cal.com. Use `trackCta('PREMIUM_get_full_report_click')` and `trackCta('PREMIUM_book_call_click')`. PREMIUM_ prefix is mandatory for filtering.
    - **Index page Book a chat**: `trackCta('book_chat_click')`.
    - **LinkedIn "Join the conversation"** (when a post exists for the page): secondary button in the header paired with the primary CTA inside a flex wrapper. Use `trackCta('linkedin_click')` on free pages, `trackCta('PREMIUM_linkedin_click')` on premium samples. See the "LinkedIn conversation button" section above for placement and styling rules.
-4. **Email modal (for subscribe/copy CTAs)** — copy modal HTML and form submission script from an existing page. Form data must include `email`, `page`, `timestamp`, `ip`, `referrer`. Use `mode: 'no-cors'` and show success view immediately.
+4. **Email modal (for subscribe/copy CTAs)** — copy modal HTML and form submission script from an existing page. Form handlers call `tenziTrack.postForm({ email, source })`; the tracker auto-adds `page`, `timestamp`, `referrer`, `site`, `ip`. Show the success view immediately.
 5. **Card on index.html** — add a tile linking to the new page using the matching grid class:
    - `.tile-data` inside `.data-grid` — free reports/dashboards
    - `.tile-runbook` inside `.runbook-grid` — operational runbooks
    - `.tile-premium` inside `.premium-grid` — premium samples (green "Premium" pill in the tile foot)
-6. **Self-contained HTML** — inline CSS, no build step, no external frameworks. Follow [`DESIGN_STANDARD.md`](./DESIGN_STANDARD.md) for tokens, type scale, and component patterns.
+6. **Self-contained HTML for layout** — inline CSS, no build step, no external CSS frameworks. The one external JS dependency is `https://tenzi.ai/track.js` (shared analytics); everything else is inline. Follow [`DESIGN_STANDARD.md`](./DESIGN_STANDARD.md) for tokens, type scale, and component patterns.
 7. Commit and push to `main` — GitHub Pages deploys automatically

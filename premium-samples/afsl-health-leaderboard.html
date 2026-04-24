@@ -282,15 +282,7 @@ h1 { font-size: 28px; letter-spacing: -0.02em; line-height: 1.2; font-weight: 50
 
 </div>
 
-<script>
-function trackBeacon(eventName) {
-  var url = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=' + encodeURIComponent(eventName) + '&page=' + encodeURIComponent(document.title);
-  fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){
-    new Image().src = url + '&ip=' + encodeURIComponent(d.ip) + '&ref=' + encodeURIComponent(document.referrer);
-  }).catch(function(){ new Image().src = url + '&ref=' + encodeURIComponent(document.referrer); });
-}
-function trackCta(action) { trackBeacon('(cta: ' + action + ')'); }
-trackBeacon('(page view)');
-</script>
+<script src="https://tenzi.ai/track.js"></script>
+<script>tenziTrack.init({ site: 'resources' });</script>
 </body>
 </html>

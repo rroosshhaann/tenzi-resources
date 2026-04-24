@@ -25,7 +25,7 @@ function doPost(e) {
     writeContact_(data, melbTime);
     notifyContact_(data);
   } else {
-    writeEvent_(data.email, data.page, melbTime, data.ip, data.referrer);
+    writeEvent_(data.email, data.page, melbTime, data.ip, data.referrer, data.site);
   }
   return ContentService.createTextOutput('ok');
 }
@@ -33,7 +33,7 @@ function doPost(e) {
 function doGet(e) {
   if (isExcludedIp_(e.parameter.ip)) return ContentService.createTextOutput('ok');
   var melbTime = Utilities.formatDate(new Date(), 'Australia/Melbourne', 'yyyy-MM-dd HH:mm:ss');
-  writeEvent_(e.parameter.email || '(page view)', e.parameter.page || '', melbTime, e.parameter.ip, e.parameter.ref);
+  writeEvent_(e.parameter.email || '(page view)', e.parameter.page || '', melbTime, e.parameter.ip, e.parameter.ref, e.parameter.site);
   return ContentService.createTextOutput('ok');
 }
 
@@ -41,16 +41,18 @@ function isExcludedIp_(ip) {
   return ip && EXCLUDED_IPS.indexOf(ip) !== -1;
 }
 
-function writeEvent_(email, page, melbTime, ip, referrer) {
-  getOrCreate_(EVENTS_SHEET).appendRow([email || '', page || '', melbTime, ip || '', referrer || '']);
+// Column F holds the originating site tag ('marketing' / 'resources'). Existing
+// rows written before track.js was introduced have an empty F cell — that's fine.
+function writeEvent_(email, page, melbTime, ip, referrer, site) {
+  getOrCreate_(EVENTS_SHEET).appendRow([email || '', page || '', melbTime, ip || '', referrer || '', site || '']);
 }
 
 function writeContact_(data, melbTime) {
   var sheet = getOrCreate_(CONTACTS_SHEET);
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Timestamp','Name','Email','Organisation','Role','Interest','Message','Page','IP','Referrer']);
+    sheet.appendRow(['Timestamp','Name','Email','Organisation','Role','Interest','Message','Page','IP','Referrer','Site']);
   }
-  sheet.appendRow([melbTime, data.name||'', data.email||'', data.organisation||'', data.role||'', data.interest||'', data.message||'', data.page||'', data.ip||'', data.referrer||'']);
+  sheet.appendRow([melbTime, data.name||'', data.email||'', data.organisation||'', data.role||'', data.interest||'', data.message||'', data.page||'', data.ip||'', data.referrer||'', data.site||'']);
 }
 
 function notifyContact_(data) {

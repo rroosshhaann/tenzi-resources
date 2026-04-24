@@ -1205,22 +1205,13 @@
   </div>
 </div>
 
+<script src="https://tenzi.ai/track.js"></script>
 <script>
-var visitorIp = '';
-fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){ visitorIp = d.ip; }).catch(function(){});
+tenziTrack.init({ site: 'resources' });
 
 function submitCopyRequest(e) {
   e.preventDefault();
-  var email = document.getElementById('copyEmail').value;
-  var data = { email: email, page: document.title, timestamp: new Date().toISOString(), ip: visitorIp, referrer: document.referrer };
-
-  fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
-    method: 'POST',
-    body: JSON.stringify(data),
-    mode: 'no-cors'
-  }).catch(function() {});
-
-  // Show success regardless (don't block UX on form service)
+  tenziTrack.postForm({ email: document.getElementById('copyEmail').value });
   document.querySelector('.form-view').style.display = 'none';
   document.querySelector('.success-view').style.display = 'block';
   return false;
@@ -1228,34 +1219,11 @@ function submitCopyRequest(e) {
 
 function submitSubscribe(e) {
   e.preventDefault();
-  var input = document.getElementById('subscribeEmail');
-  var email = input.value;
-  var data = { email: email, page: document.title, source: 'subscribe', timestamp: new Date().toISOString(), ip: visitorIp, referrer: document.referrer };
-
-  fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
-    method: 'POST',
-    body: JSON.stringify(data),
-    mode: 'no-cors'
-  }).catch(function() {});
-
-  if (typeof trackCta === 'function') trackCta('subscribe_submit');
-
-  var form = e.target;
-  form.innerHTML = '<div style="flex:1;padding:10px 0;font-family:\'IBM Plex Mono\',ui-monospace,monospace;font-size:12px;color:#2ca471;letter-spacing:0.08em;text-transform:uppercase;">✓ Subscribed — thanks.</div>';
+  tenziTrack.postForm({ email: document.getElementById('subscribeEmail').value, source: 'subscribe' });
+  tenziTrack.trackCta('subscribe_submit');
+  e.target.innerHTML = '<div style="flex:1;padding:10px 0;font-family:\'IBM Plex Mono\',ui-monospace,monospace;font-size:12px;color:#2ca471;letter-spacing:0.08em;text-transform:uppercase;">✓ Subscribed — thanks.</div>';
   return false;
 }
-</script>
-<script>
-function trackBeacon(eventName) {
-  var url = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec?email=' + encodeURIComponent(eventName) + '&page=' + encodeURIComponent(document.title);
-  fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(function(d){
-    new Image().src = url + '&ip=' + encodeURIComponent(d.ip) + '&ref=' + encodeURIComponent(document.referrer);
-  }).catch(function(){
-    new Image().src = url + '&ref=' + encodeURIComponent(document.referrer);
-  });
-}
-function trackCta(action) { trackBeacon('(cta: ' + action + ')'); }
-trackBeacon('(page view)');
 </script>
 </body>
 </html>

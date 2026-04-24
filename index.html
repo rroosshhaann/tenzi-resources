@@ -840,56 +840,17 @@
 
 </div>
 
+<script src="https://tenzi.ai/track.js"></script>
 <script>
-  // ── Visitor IP (best-effort) ──────────────────────────────────────────
-  var visitorIp = '';
-  fetch('https://api.ipify.org?format=json')
-    .then(function(r) { return r.json(); })
-    .then(function(d) { visitorIp = d.ip; })
-    .catch(function() {});
+  tenziTrack.init({ site: 'resources' });
 
-  // ── Subscribe (posts to the same Apps Script as the runbooks) ─────────
   function submitSubscribe(e) {
     e.preventDefault();
-    var input = document.getElementById('subscribeEmail');
-    var email = input.value;
-    var data = {
-      email: email,
-      page: document.title,
-      source: 'subscribe',
-      timestamp: new Date().toISOString(),
-      ip: visitorIp,
-      referrer: document.referrer
-    };
-    fetch('https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      mode: 'no-cors'
-    }).catch(function() {});
-
-    trackCta('subscribe_submit');
-
-    var form = e.target;
-    form.innerHTML = '<div class="confirm">✓ Subscribed — check your inbox.</div>';
+    tenziTrack.postForm({ email: document.getElementById('subscribeEmail').value, source: 'subscribe' });
+    tenziTrack.trackCta('subscribe_submit');
+    e.target.innerHTML = '<div class="confirm">✓ Subscribed — check your inbox.</div>';
     return false;
   }
-
-  // ── Lightweight analytics beacon ──────────────────────────────────────
-  function trackBeacon(eventName) {
-    var url = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec'
-      + '?email=' + encodeURIComponent(eventName)
-      + '&page=' + encodeURIComponent(document.title);
-    fetch('https://api.ipify.org?format=json')
-      .then(function(r) { return r.json(); })
-      .then(function(d) {
-        new Image().src = url + '&ip=' + encodeURIComponent(d.ip) + '&ref=' + encodeURIComponent(document.referrer);
-      })
-      .catch(function() {
-        new Image().src = url + '&ref=' + encodeURIComponent(document.referrer);
-      });
-  }
-  function trackCta(action) { trackBeacon('(cta: ' + action + ')'); }
-  trackBeacon('(page view)');
 
   // ── Premium carousel: dots + arrows + scroll sync ─────────────────────
   (function() {

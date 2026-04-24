@@ -35,20 +35,22 @@ GitHub Pages from `main` branch with custom domain (`resources.tenzi.ai`). HTTPS
 
 ## Analytics
 
-Every page tracks page views, CTA clicks, and email signups via a Google Apps Script endpoint that writes to a Google Sheet.
+Every page loads the shared **`track.js`** (served from `https://tenzi.ai/track.js` — source in the `tenzi-homepage` repo) which fires events to a Google Apps Script endpoint that writes to a Google Sheet. `tenzi.ai` uses the same file, so Events rows are tagged by `site` (column F).
 
 **Sheet columns:**
 
 | Column | Field | Source |
 |-|-|-|
-| A | Email | Form input, `(page view)`, or `(cta: action_name)` |
+| A | Event / email | `(page view)`, `(cta: action_name)`, `(dwell: N)`, or real form-submission email |
 | B | Page | `document.title` |
 | C | Timestamp | Server-side Melbourne time (`Australia/Melbourne`, formatted in Apps Script) |
 | D | IP | Client-side lookup via `api.ipify.org` |
 | E | Referrer | `document.referrer` |
+| F | Site | `marketing` or `resources` (empty for rows written before `track.js` shipped) |
 
-**Event types** (in the email column):
-- `(page view)` — visitor loaded the page
+**Event types** (in column A):
+- `(page view)` — fires on `tenziTrack.init()`
+- `(dwell: N)` — seconds the tab was visible; fires on `pagehide`, visibility-aware, skipped below 2s, capped at 3600s
 - `(cta: subscribe_click)` — clicked Subscribe (modal opened, may not have submitted)
 - `(cta: request_copy_click)` — clicked Request a Copy on a runbook
 - `(cta: book_chat_click)` — clicked Book a chat (Cal.com)
@@ -56,20 +58,21 @@ Every page tracks page views, CTA clicks, and email signups via a Google Apps Sc
 - `(cta: PREMIUM_book_call_click)` — clicked premium "Book a call to discuss"
 - `(cta: linkedin_click)` — clicked "Join the conversation" on a free report/runbook
 - `(cta: PREMIUM_linkedin_click)` — clicked "Join the conversation" on a premium sample
-- Real email — form submission
+- Real email — form submission (Events sheet) or contact form (Contacts sheet)
 
-Compare CTA click counts vs actual form submissions to measure drop-off per page.
+Compare CTA click counts vs actual form submissions to measure drop-off per page. Column F lets Looker Studio slice by origin site.
 
 **How it works:**
-- Page views and CTA clicks fire a GET request via an `Image()` beacon
-- Form submissions use `fetch()` POST with `mode: 'no-cors'`
-- Success is shown immediately without waiting for a response
-- IP lookup is best-effort — tracking still fires if it fails
+- `tenziTrack.init({ site: 'resources' })` fires `(page view)` and starts a visibility-aware dwell timer.
+- `tenziTrack.trackCta(action)` — GET beacon via `Image()`; global alias `window.trackCta` is defined for inline `onclick` attributes.
+- `tenziTrack.postForm({ email, source })` — POST with `mode: 'no-cors'`; auto-adds page/timestamp/referrer/site/ip.
+- Dwell on `pagehide` uses `fetch({ keepalive: true })` so the request survives unload. Falls back to an `Image()` beacon where unsupported.
+- Success UI shows immediately without waiting for a response. IP lookup is best-effort.
 
 **Updating the Apps Script:**
-1. Open the linked Google Sheet > Extensions > Apps Script
-2. Edit `doGet(e)` and/or `doPost(e)`
-3. Deploy > Manage deployments > edit existing > set version to "New version" > Deploy
+1. Edit [`apps-script.gs`](./apps-script.gs) in this repo (source of truth) and commit the change.
+2. Paste the new contents into the Apps Script editor (linked Google Sheet > Extensions > Apps Script).
+3. Deploy > Manage deployments > edit existing > set version to "New version" > Deploy.
 
 ## Adding a new page
 
@@ -77,7 +80,11 @@ Every page must have all of the following:
 
 1. Create a self-contained HTML file (inline CSS, no build step)
 2. Copy the nav bar (back-link + Tenzi logo SVG) from an existing page
-3. Add the standard tracking script block (with `trackBeacon`, `trackCta`, and page view fire) — copy from any existing page
+3. Add the shared-tracker block at the bottom of `<body>`:
+   ```html
+   <script src="https://tenzi.ai/track.js"></script>
+   <script>tenziTrack.init({ site: 'resources' });</script>
+   ```
 4. Add a CTA appropriate to the page type:
    - **Runbooks** → "Request a Copy" modal, `trackCta('request_copy_click')`
    - **Free reports** → "Subscribe to updates" modal, `trackCta('subscribe_click')`
