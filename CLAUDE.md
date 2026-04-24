@@ -49,7 +49,11 @@ All pages track via a Google Apps Script endpoint that writes to a Google Sheet.
 
 **Endpoint:** `https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec`
 
-**Sheet columns:** A=email, B=page, C=timestamp (Melbourne time), D=ip, E=referrer
+**Sheets:**
+- `Events` — A=email, B=page, C=timestamp (Melbourne time), D=ip, E=referrer. All page views, CTA clicks, and resources-site form submissions land here.
+- `Contacts` — Timestamp, Name, Email, Organisation, Role, Interest, Message, Page, IP, Referrer. Driven by the `tenzi.ai` holding-page contact form (POSTs with `source: 'holding_page_contact'`). Resources pages do not write here. Each row also fires a notification email to `roshan@tenzi.ai` via `MailApp.sendEmail`.
+
+The Apps Script branches on `data.source` and auto-creates either sheet on first write.
 
 ### Event types in the email column
 
@@ -113,21 +117,98 @@ When a LinkedIn post exists for a page, add a "Join the conversation" secondary 
 ### Apps Script (for reference, lives in the linked Google Sheet)
 
 ```javascript
+var EVENTS_SHEET = 'Events';
+var CONTACTS_SHEET = 'Contacts';
+var NOTIFY_EMAIL = 'roshan@tenzi.ai';
+var CONTACT_RATE_LIMIT = 5;             // contact submissions per IP per window
+var CONTACT_RATE_WINDOW_MS = 3600000;   // 1 hour
+
 function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var data = JSON.parse(e.postData.contents);
   var melbTime = Utilities.formatDate(new Date(), 'Australia/Melbourne', 'yyyy-MM-dd HH:mm:ss');
-  sheet.appendRow([data.email, data.page, melbTime, data.ip || '', data.referrer || '']);
+
+  if (data.source === 'holding_page_contact') {
+    // Honeypot — silently drop bots that filled the hidden `website` field
+    if (data.website) return ContentService.createTextOutput('ok');
+    // Rate limit per IP — silently drop excess
+    if (!withinRateLimit_(data.ip, CONTACT_RATE_LIMIT, CONTACT_RATE_WINDOW_MS)) {
+      return ContentService.createTextOutput('ok');
+    }
+    writeContact_(data, melbTime);
+    notifyContact_(data);
+  } else {
+    writeEvent_(data.email, data.page, melbTime, data.ip, data.referrer);
+  }
   return ContentService.createTextOutput('ok');
 }
 
 function doGet(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var melbTime = Utilities.formatDate(new Date(), 'Australia/Melbourne', 'yyyy-MM-dd HH:mm:ss');
-  sheet.appendRow([e.parameter.email || '(page view)', e.parameter.page || '', melbTime, e.parameter.ip || '', e.parameter.ref || '']);
+  writeEvent_(e.parameter.email || '(page view)', e.parameter.page || '', melbTime, e.parameter.ip, e.parameter.ref);
   return ContentService.createTextOutput('ok');
 }
+
+function writeEvent_(email, page, melbTime, ip, referrer) {
+  getOrCreate_(EVENTS_SHEET).appendRow([email || '', page || '', melbTime, ip || '', referrer || '']);
+}
+
+function writeContact_(data, melbTime) {
+  var sheet = getOrCreate_(CONTACTS_SHEET);
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['Timestamp','Name','Email','Organisation','Role','Interest','Message','Page','IP','Referrer']);
+  }
+  sheet.appendRow([melbTime, data.name||'', data.email||'', data.organisation||'', data.role||'', data.interest||'', data.message||'', data.page||'', data.ip||'', data.referrer||'']);
+}
+
+function notifyContact_(data) {
+  // Wrapped in try/catch so MailApp quota exhaustion doesn't break the row save.
+  try {
+    MailApp.sendEmail({
+      to: NOTIFY_EMAIL,
+      replyTo: data.email || NOTIFY_EMAIL,
+      subject: '[tenzi.ai] New contact: ' + (data.name || data.email || 'unknown'),
+      body:
+        'From: ' + (data.name||'') + ' <' + (data.email||'') + '>\n' +
+        'Organisation: ' + (data.organisation||'') + '\n' +
+        'Role: ' + (data.role||'') + '\n' +
+        'Interest: ' + (data.interest||'') + '\n\n' +
+        (data.message||'') + '\n\n---\n' +
+        'Page: ' + (data.page||'') + '\n' +
+        'IP: ' + (data.ip||'') + '\n' +
+        'Referrer: ' + (data.referrer||'')
+    });
+  } catch (err) {
+    console.log('MailApp.sendEmail failed:', err);
+  }
+}
+
+function withinRateLimit_(ip, limit, windowMs) {
+  if (!ip) return true;  // no IP info — allow rather than reject genuine users
+  var props = PropertiesService.getScriptProperties();
+  var key = 'rl:' + ip;
+  var now = Date.now();
+  var raw = props.getProperty(key);
+  var entry = raw ? JSON.parse(raw) : null;
+  if (!entry || now > entry.reset) {
+    entry = { count: 1, reset: now + windowMs };
+  } else {
+    entry.count++;
+  }
+  props.setProperty(key, JSON.stringify(entry));
+  return entry.count <= limit;
+}
+
+function getOrCreate_(name) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  return ss.getSheetByName(name) || ss.insertSheet(name);
+}
 ```
+
+**Hardening notes:**
+
+- **Honeypot:** The contact form on `tenzi.ai` includes a hidden `website` field. Real users never see it; bots auto-filling all fields will populate it. Submissions where `data.website` is non-empty are silently dropped (return `ok` so bots don't retry).
+- **Rate limit:** Contact submissions are capped at 5 per IP per hour using `PropertiesService`. Excess submissions silently drop. Page views and CTA tracking are not rate-limited.
+- **MailApp try/catch:** Notification emails are best-effort. If `MailApp` quota is exhausted (1,500/day on Workspace), the contact row still saves — only the email notification is lost. Errors land in the Apps Script Executions log.
 
 After editing the script: Deploy > Manage deployments > edit > New version > Deploy (keeps same URL).
 
