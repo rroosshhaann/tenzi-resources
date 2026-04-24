@@ -8,9 +8,11 @@ var CONTACTS_SHEET = 'Contacts';
 var NOTIFY_EMAIL = 'roshan@tenzi.ai';
 var CONTACT_RATE_LIMIT = 5;             // contact submissions per IP per window
 var CONTACT_RATE_WINDOW_MS = 3600000;   // 1 hour
+var EXCLUDED_IPS = [];                  // IPs silently dropped from all sheets — populate with your own (find via the Events sheet IP column)
 
 function doPost(e) {
   var data = JSON.parse(e.postData.contents);
+  if (isExcludedIp_(data.ip)) return ContentService.createTextOutput('ok');
   var melbTime = Utilities.formatDate(new Date(), 'Australia/Melbourne', 'yyyy-MM-dd HH:mm:ss');
 
   if (data.source === 'holding_page_contact') {
@@ -29,9 +31,14 @@ function doPost(e) {
 }
 
 function doGet(e) {
+  if (isExcludedIp_(e.parameter.ip)) return ContentService.createTextOutput('ok');
   var melbTime = Utilities.formatDate(new Date(), 'Australia/Melbourne', 'yyyy-MM-dd HH:mm:ss');
   writeEvent_(e.parameter.email || '(page view)', e.parameter.page || '', melbTime, e.parameter.ip, e.parameter.ref);
   return ContentService.createTextOutput('ok');
+}
+
+function isExcludedIp_(ip) {
+  return ip && EXCLUDED_IPS.indexOf(ip) !== -1;
 }
 
 function writeEvent_(email, page, melbTime, ip, referrer) {

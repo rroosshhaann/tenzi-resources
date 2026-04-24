@@ -122,9 +122,11 @@ var CONTACTS_SHEET = 'Contacts';
 var NOTIFY_EMAIL = 'roshan@tenzi.ai';
 var CONTACT_RATE_LIMIT = 5;             // contact submissions per IP per window
 var CONTACT_RATE_WINDOW_MS = 3600000;   // 1 hour
+var EXCLUDED_IPS = [];                  // IPs silently dropped from all sheets — populate with your own (find via the Events sheet IP column)
 
 function doPost(e) {
   var data = JSON.parse(e.postData.contents);
+  if (isExcludedIp_(data.ip)) return ContentService.createTextOutput('ok');
   var melbTime = Utilities.formatDate(new Date(), 'Australia/Melbourne', 'yyyy-MM-dd HH:mm:ss');
 
   if (data.source === 'holding_page_contact') {
@@ -143,9 +145,14 @@ function doPost(e) {
 }
 
 function doGet(e) {
+  if (isExcludedIp_(e.parameter.ip)) return ContentService.createTextOutput('ok');
   var melbTime = Utilities.formatDate(new Date(), 'Australia/Melbourne', 'yyyy-MM-dd HH:mm:ss');
   writeEvent_(e.parameter.email || '(page view)', e.parameter.page || '', melbTime, e.parameter.ip, e.parameter.ref);
   return ContentService.createTextOutput('ok');
+}
+
+function isExcludedIp_(ip) {
+  return ip && EXCLUDED_IPS.indexOf(ip) !== -1;
 }
 
 function writeEvent_(email, page, melbTime, ip, referrer) {
@@ -209,6 +216,7 @@ function getOrCreate_(name) {
 - **Honeypot:** The contact form on `tenzi.ai` includes a hidden `website` field. Real users never see it; bots auto-filling all fields will populate it. Submissions where `data.website` is non-empty are silently dropped (return `ok` so bots don't retry).
 - **Rate limit:** Contact submissions are capped at 5 per IP per hour using `PropertiesService`. Excess submissions silently drop. Page views and CTA tracking are not rate-limited.
 - **MailApp try/catch:** Notification emails are best-effort. If `MailApp` quota is exhausted (1,500/day on Workspace), the contact row still saves — only the email notification is lost. Errors land in the Apps Script Executions log.
+- **IP exclusion:** Add IPs to `EXCLUDED_IPS` to silently drop all events from those addresses (page views, CTAs, contact submissions). Useful for keeping personal/internal testing out of the sheets. Find your current IP in the existing Events sheet IP column, or visit `https://api.ipify.org` in your browser. Note that home ISPs often rotate IPs — re-check periodically.
 
 After editing the script: Deploy > Manage deployments > edit > New version > Deploy (keeps same URL).
 
