@@ -124,11 +124,26 @@ When a LinkedIn post exists for a page, add a "Join the conversation" secondary 
 Canonical source is [`apps-script.gs`](./apps-script.gs). The deployed script lives in the linked Google Sheet — after editing the file, paste it into the Apps Script editor and Deploy > Manage deployments > New version. Summary:
 
 - `doPost(e)` — branches on `data.source === 'holding_page_contact'` (Contacts sheet + honeypot + rate limit + notify email) vs everything else (Events sheet).
-- `doGet(e)` — always writes an Events row. Used by `Image()` beacons for page views, CTA clicks, and dwell events.
+- `doGet(e)` — branches on `e.parameter.view === 'dashboard'` (renders the analytics dashboard) vs the default tracking-beacon path (writes an Events row). Both paths share the same web-app deployment.
 - `writeEvent_(email, page, melbTime, ip, referrer, site)` — appends to Events. Column F = site tag.
 - `writeContact_(data, melbTime)` — appends to Contacts (11 cols including site).
 - `isExcludedIp_` / `EXCLUDED_IPS` — silently drop rows from listed IPs.
 - `withinRateLimit_` — PropertiesService-backed per-IP cap on contact submissions (5/hour).
+- `renderDashboard_` and helpers — server-rendered HTML analytics built from Events + Contacts. Auth = secret token in URL (`DASHBOARD_TOKEN` constant). Hit at `<web-app-url>?view=dashboard&token=<TOKEN>&days=30&site=all`. See "Dashboard" section below.
+
+### Dashboard
+
+The deployed web app doubles as a private analytics dashboard for `roshan@tenzi.ai`. It reads the Events + Contacts sheets, aggregates server-side, and returns a single HTML page with KPIs, a daily activity line chart, top pages, CTA breakdown, dwell stats per page, and recent subscribers/contacts.
+
+**Auth:** the script constant `DASHBOARD_TOKEN` is a secret. Append `&token=<value>` to the URL to access. Token must NOT appear in `track.js`, page HTML, or commits — only in the bookmark.
+
+**URL params:**
+- `view=dashboard` (required)
+- `token=<TOKEN>` (required, must match `DASHBOARD_TOKEN`)
+- `days=N` (1–365, default 30)
+- `site=all|marketing|resources` (default `all`)
+
+**Setup:** open the Apps Script editor, replace `DASHBOARD_TOKEN` with a long random string (e.g. `openssl rand -hex 24`), Deploy > Manage deployments > New version. Bookmark the URL. Same web-app URL as the tracking beacon — branching is on the `view` param.
 
 **Hardening notes:**
 

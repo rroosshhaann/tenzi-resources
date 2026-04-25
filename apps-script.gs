@@ -1,4 +1,4 @@
-// Tenzi tracking + contact-form endpoint.
+// Tenzi tracking + contact-form endpoint + analytics dashboard.
 // Lives in the Google Sheet linked to resources.tenzi.ai and tenzi.ai.
 // Canonical source-of-truth: this file. Paste into Apps Script after edits,
 // then Deploy > Manage deployments > New version > Deploy.
@@ -10,10 +10,17 @@ var CONTACT_RATE_LIMIT = 5;             // contact submissions per IP per window
 var CONTACT_RATE_WINDOW_MS = 3600000;   // 1 hour
 var EXCLUDED_IPS = [];                  // IPs silently dropped from all sheets — populate with your own (find via the Events sheet IP column)
 
+// Dashboard auth — token in the URL is the simplest gate. Generate a long
+// random string and replace the placeholder. Bookmark the dashboard URL with
+// ?view=dashboard&token=<TOKEN>. The token must NOT appear anywhere public
+// (track.js, page HTML, commits) — it's only ever in your bookmark.
+var DASHBOARD_TOKEN = 'REPLACE_WITH_A_LONG_RANDOM_STRING';
+var DASHBOARD_TIMEZONE = 'Australia/Melbourne';
+
 function doPost(e) {
   var data = JSON.parse(e.postData.contents);
   if (isExcludedIp_(data.ip)) return ContentService.createTextOutput('ok');
-  var melbTime = Utilities.formatDate(new Date(), 'Australia/Melbourne', 'yyyy-MM-dd HH:mm:ss');
+  var melbTime = Utilities.formatDate(new Date(), DASHBOARD_TIMEZONE, 'yyyy-MM-dd HH:mm:ss');
 
   if (data.source === 'holding_page_contact') {
     // Honeypot — silently drop bots that filled the hidden `website` field
@@ -31,8 +38,11 @@ function doPost(e) {
 }
 
 function doGet(e) {
+  if (e && e.parameter && e.parameter.view === 'dashboard') {
+    return renderDashboard_(e);
+  }
   if (isExcludedIp_(e.parameter.ip)) return ContentService.createTextOutput('ok');
-  var melbTime = Utilities.formatDate(new Date(), 'Australia/Melbourne', 'yyyy-MM-dd HH:mm:ss');
+  var melbTime = Utilities.formatDate(new Date(), DASHBOARD_TIMEZONE, 'yyyy-MM-dd HH:mm:ss');
   writeEvent_(e.parameter.email || '(page view)', e.parameter.page || '', melbTime, e.parameter.ip, e.parameter.ref, e.parameter.site);
   return ContentService.createTextOutput('ok');
 }
@@ -96,4 +106,487 @@ function withinRateLimit_(ip, limit, windowMs) {
 function getOrCreate_(name) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   return ss.getSheetByName(name) || ss.insertSheet(name);
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────
+// Server-rendered HTML. Read Events + Contacts, aggregate, return a single
+// page with KPIs, a daily activity chart, top pages, CTA breakdown, dwell
+// stats, and recent subscribers/contacts. URL params:
+//   ?view=dashboard       — required
+//   &token=<TOKEN>        — required (must match DASHBOARD_TOKEN)
+//   &days=N               — window length, 1..365 (default 30)
+//   &site=all|marketing|resources  — site filter (default all)
+
+function renderDashboard_(e) {
+  if (!isAuthorizedForDashboard_(e)) {
+    return HtmlService.createHtmlOutput(buildAccessDeniedHtml_()).setTitle('Access denied');
+  }
+  var days = parseInt(e.parameter.days || '30', 10);
+  if (isNaN(days) || days < 1) days = 30;
+  if (days > 365) days = 365;
+  var siteFilter = e.parameter.site || 'all';
+  if (['all','marketing','resources'].indexOf(siteFilter) === -1) siteFilter = 'all';
+
+  var stats = computeStats_(days, siteFilter);
+  var html = buildDashboardHtml_(stats, days, siteFilter, e.parameter.token);
+  return HtmlService.createHtmlOutput(html)
+    .setTitle('Tenzi · Analytics')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function isAuthorizedForDashboard_(e) {
+  if (!DASHBOARD_TOKEN || DASHBOARD_TOKEN === 'REPLACE_WITH_A_LONG_RANDOM_STRING') return false;
+  return !!(e.parameter.token && e.parameter.token === DASHBOARD_TOKEN);
+}
+
+function computeStats_(days, siteFilter) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var events = readSheetWithHeaders_(ss.getSheetByName(EVENTS_SHEET),
+    ['Event','Page','Timestamp','IP','Referrer','Site']);
+  var contacts = readSheetWithHeaders_(ss.getSheetByName(CONTACTS_SHEET),
+    ['Timestamp','Name','Email','Organisation','Role','Interest','Message','Page','IP','Referrer','Site']);
+
+  var cutoff = new Date();
+  cutoff.setHours(0, 0, 0, 0);
+  cutoff.setDate(cutoff.getDate() - days + 1);
+
+  var byDate = {};
+  var viewsByPage = {}, ctaByAction = {}, dwellByPage = {};
+  var allSubscribers = [], allContacts = [];
+  var totalPv = 0, totalCta = 0;
+  var ipsAllTime = {};
+
+  events.forEach(function(row) {
+    var ev = String(row.Event || '');
+    if (!ev) return;
+    var page = String(row.Page || '');
+    var ts = parseTs_(row.Timestamp);
+    if (!ts || ts < cutoff) return;
+    var ip = String(row.IP || '');
+    var site = String(row.Site || '');
+    if (siteFilter !== 'all' && site !== siteFilter) return;
+
+    var key = dateKey_(ts);
+    var entry = byDate[key] || (byDate[key] = { pageViews:0, ips:{}, ctaClicks:0, subscribers:0 });
+
+    if (ev === '(page view)') {
+      totalPv++;
+      entry.pageViews++;
+      if (ip) { entry.ips[ip] = true; ipsAllTime[ip] = true; }
+      viewsByPage[page] = (viewsByPage[page] || 0) + 1;
+    } else if (ev.indexOf('(cta: ') === 0 && ev.charAt(ev.length - 1) === ')') {
+      totalCta++;
+      entry.ctaClicks++;
+      var action = ev.substring(6, ev.length - 1);
+      ctaByAction[action] = (ctaByAction[action] || 0) + 1;
+    } else if (ev.indexOf('(dwell: ') === 0 && ev.charAt(ev.length - 1) === ')') {
+      var sec = parseInt(ev.substring(8, ev.length - 1), 10);
+      if (!isNaN(sec) && sec > 0) {
+        (dwellByPage[page] = dwellByPage[page] || []).push(sec);
+      }
+    } else if (ev.indexOf('@') !== -1 && ev.charAt(0) !== '(') {
+      entry.subscribers++;
+      allSubscribers.push({ email: ev, page: page, ts: ts, site: site });
+    }
+  });
+
+  contacts.forEach(function(row) {
+    var ts = parseTs_(row.Timestamp);
+    if (!ts || ts < cutoff) return;
+    var site = String(row.Site || '');
+    if (siteFilter !== 'all' && site !== siteFilter) return;
+    allContacts.push({
+      ts: ts,
+      name: String(row.Name||''),
+      email: String(row.Email||''),
+      organisation: String(row.Organisation||''),
+      role: String(row.Role||''),
+      interest: String(row.Interest||''),
+      page: String(row.Page||'')
+    });
+  });
+
+  // Gap-fill the daily series so empty days still render
+  var daily = [];
+  for (var i = 0; i < days; i++) {
+    var d = new Date(cutoff);
+    d.setDate(cutoff.getDate() + i);
+    var k = dateKey_(d);
+    var entry = byDate[k] || { pageViews:0, ips:{}, ctaClicks:0, subscribers:0 };
+    daily.push({
+      date: k,
+      pageViews: entry.pageViews,
+      uniqueVisitors: Object.keys(entry.ips).length,
+      ctaClicks: entry.ctaClicks,
+      subscribers: entry.subscribers
+    });
+  }
+
+  var topPages = mapToList_(viewsByPage, 'page', 'views').slice(0, 20);
+  var topCtas = mapToList_(ctaByAction, 'action', 'clicks');
+
+  var dwellRows = [];
+  Object.keys(dwellByPage).forEach(function(p) {
+    var arr = dwellByPage[p].slice().sort(function(a,b){return a-b});
+    dwellRows.push({ page: p, samples: arr.length, median: median_(arr), p90: percentile_(arr, 90) });
+  });
+  dwellRows.sort(function(a, b) { return b.median - a.median; });
+  dwellRows = dwellRows.slice(0, 20);
+
+  var allDwell = [];
+  Object.keys(dwellByPage).forEach(function(p) {
+    allDwell = allDwell.concat(dwellByPage[p]);
+  });
+  allDwell.sort(function(a, b) { return a - b; });
+
+  return {
+    totals: {
+      pageViews: totalPv,
+      uniqueVisitors: Object.keys(ipsAllTime).length,
+      ctaClicks: totalCta,
+      subscribers: allSubscribers.length,
+      contacts: allContacts.length,
+      medianDwell: median_(allDwell)
+    },
+    daily: daily,
+    topPages: topPages,
+    topCtas: topCtas,
+    dwellRows: dwellRows,
+    subscribers: allSubscribers.sort(function(a,b){return b.ts-a.ts}).slice(0, 50),
+    contacts: allContacts.sort(function(a,b){return b.ts-a.ts}).slice(0, 20)
+  };
+}
+
+function readSheetWithHeaders_(sheet, defaultHeaders) {
+  if (!sheet) return [];
+  var data = sheet.getDataRange().getValues();
+  if (!data.length) return [];
+  var firstCellLc = String(data[0][0] || '').trim().toLowerCase();
+  var hasHeader = defaultHeaders.some(function(h) { return h.toLowerCase() === firstCellLc; });
+  var headers = hasHeader ? data[0].map(function(h) { return String(h).trim(); }) : defaultHeaders;
+  var rows = hasHeader ? data.slice(1) : data;
+  return rows.map(function(row) {
+    var obj = {};
+    headers.forEach(function(h, i) { obj[h] = row[i]; });
+    return obj;
+  });
+}
+
+function parseTs_(value) {
+  if (!value) return null;
+  if (value instanceof Date) return value;
+  var s = String(value);
+  var m = s.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})$/);
+  if (m) return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+  var d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function pad2_(n) { n = String(n); return n.length < 2 ? '0' + n : n; }
+
+function dateKey_(d) {
+  return d.getFullYear() + '-' + pad2_(d.getMonth() + 1) + '-' + pad2_(d.getDate());
+}
+
+function mapToList_(map, nameKey, valueKey) {
+  var out = [];
+  Object.keys(map).forEach(function(k) {
+    var o = {}; o[nameKey] = k; o[valueKey] = map[k]; out.push(o);
+  });
+  out.sort(function(a, b) { return b[valueKey] - a[valueKey]; });
+  return out;
+}
+
+function median_(arr) {
+  if (!arr || !arr.length) return 0;
+  var sorted = arr.slice().sort(function(a,b){return a-b});
+  var mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
+}
+
+function percentile_(sorted, p) {
+  if (!sorted || !sorted.length) return 0;
+  var idx = Math.floor(sorted.length * p / 100);
+  return sorted[Math.min(idx, sorted.length - 1)];
+}
+
+function escapeHtml_(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function formatNumber_(n) {
+  return String(n || 0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function formatDuration_(secs) {
+  secs = Math.round(secs || 0);
+  if (secs === 0) return '—';
+  if (secs < 60) return secs + 's';
+  var m = Math.floor(secs / 60), s = secs % 60;
+  return m + 'm ' + (s < 10 ? '0' : '') + s + 's';
+}
+
+function formatTs_(d) {
+  return d.getFullYear() + '-' + pad2_(d.getMonth() + 1) + '-' + pad2_(d.getDate())
+    + ' ' + pad2_(d.getHours()) + ':' + pad2_(d.getMinutes());
+}
+
+function buildAccessDeniedHtml_() {
+  return '<!doctype html><html><head><meta charset="utf-8"><title>Access denied</title>' +
+    '<style>body{font-family:Inter,system-ui,sans-serif;background:#faf8f4;color:#1a1a1a;padding:60px 24px;max-width:600px;margin:0 auto;line-height:1.6}h1{font-size:24px;margin-bottom:14px;font-weight:500}p{color:#6b6560}code{background:#fff;padding:2px 6px;border:1px solid #e5e1d9;border-radius:4px;font-size:12px}</style>' +
+    '</head><body><h1>Access denied</h1>' +
+    '<p>The Tenzi analytics dashboard is restricted. Open it via <code>?view=dashboard&amp;token=&lt;your-token&gt;</code> with the right token. ' +
+    'If <code>DASHBOARD_TOKEN</code> still says <code>REPLACE_WITH_A_LONG_RANDOM_STRING</code> in the script, set it to something secret first and redeploy.</p></body></html>';
+}
+
+function buildDashboardHtml_(stats, days, siteFilter, token) {
+  var t = stats.totals;
+  var qs = function(d, s) { return '?view=dashboard&token=' + encodeURIComponent(token) + '&days=' + d + '&site=' + s; };
+
+  var rangeBtn = function(label, d) {
+    return '<a href="' + qs(d, siteFilter) + '" class="' + (days === d ? 'active' : '') + '">' + label + '</a>';
+  };
+  var siteBtn = function(label, s) {
+    return '<a href="' + qs(days, s) + '" class="' + (siteFilter === s ? 'active' : '') + '">' + label + '</a>';
+  };
+
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>Tenzi · Analytics</title>' +
+    '<base target="_top">' +
+    '<link rel="preconnect" href="https://fonts.googleapis.com">' +
+    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
+    '<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">' +
+    '<style>' + dashboardCss_() + '</style>' +
+    '</head><body><div class="wrap">' +
+      '<nav class="nav">' +
+        '<div class="brand">tenzi · <strong>analytics</strong></div>' +
+        '<div class="user">window: ' + days + 'd · site: ' + siteFilter + '</div>' +
+      '</nav>' +
+      '<h1>Site analytics</h1>' +
+      '<div class="subtitle">Page views, CTA clicks, dwell, and signups across tenzi.ai and resources.tenzi.ai. Server-rendered from the linked Google Sheet.</div>' +
+
+      '<div class="filters">' +
+        '<span class="label">Range</span>' +
+        '<div class="range">' + rangeBtn('7D', 7) + rangeBtn('30D', 30) + rangeBtn('90D', 90) + rangeBtn('1Y', 365) + '</div>' +
+        '<span class="label">Site</span>' +
+        '<div class="site-tabs">' + siteBtn('All', 'all') + siteBtn('Marketing', 'marketing') + siteBtn('Resources', 'resources') + '</div>' +
+      '</div>' +
+
+      '<div class="kpi-row">' +
+        kpi_('Page views', formatNumber_(t.pageViews), true) +
+        kpi_('Unique visitors', formatNumber_(t.uniqueVisitors), false) +
+        kpi_('CTA clicks', formatNumber_(t.ctaClicks), false) +
+        kpi_('Subscribers', formatNumber_(t.subscribers), false) +
+        kpi_('Contacts', formatNumber_(t.contacts), false) +
+        kpi_('Median dwell', formatDuration_(t.medianDwell), false) +
+      '</div>' +
+
+      sectionLabel_('Daily activity', 'PAGE VIEWS · UNIQUE VISITORS · ' + days + ' DAYS') +
+      '<div class="card">' + buildLineChart_(stats.daily) + '</div>' +
+
+      '<div class="grid-2">' +
+        '<div>' +
+          sectionLabel_('Top pages', stats.topPages.length + ' SHOWN') +
+          '<div class="card">' + buildTopPagesTable_(stats.topPages, t.pageViews) + '</div>' +
+        '</div>' +
+        '<div>' +
+          sectionLabel_('CTA clicks', stats.topCtas.length + ' ACTIONS') +
+          '<div class="card">' + buildCtaTable_(stats.topCtas) + '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="grid-2">' +
+        '<div>' +
+          sectionLabel_('Median dwell per page', 'TOP 20') +
+          '<div class="card">' + buildDwellTable_(stats.dwellRows) + '</div>' +
+        '</div>' +
+        '<div>' +
+          sectionLabel_('Recent subscribers', stats.subscribers.length + ' SHOWN') +
+          '<div class="card">' + buildSubscribersTable_(stats.subscribers) + '</div>' +
+        '</div>' +
+      '</div>' +
+
+      sectionLabel_('Recent contacts', 'TENZI.AI HOLDING-PAGE FORM') +
+      '<div class="card">' + buildContactsTable_(stats.contacts) + '</div>' +
+
+      '<footer class="foot">' +
+        '<span>Window: last ' + days + ' days · Site: ' + siteFilter + '</span>' +
+        '<span>Refreshed: ' + Utilities.formatDate(new Date(), DASHBOARD_TIMEZONE, 'yyyy-MM-dd HH:mm') + ' Melbourne</span>' +
+      '</footer>' +
+    '</div></body></html>';
+}
+
+function dashboardCss_() {
+  return ':root{--bg:#faf8f4;--panel:#fff;--border:#e5e1d9;--border-bright:#d3cec3;--border-light:#ece8df;--text:#1a1a1a;--muted:#6b6560;--dim:#a59f93;--accent:#2ca471;--accent-hover:#249765;--g700:#0F766E;--g500:#14A399;--g300:#5EEAD4;--g100:#CCFBF1;--g50:#F0FDFA;--neg:#9c3b3b;--radius:6px}' +
+    '*{margin:0;padding:0;box-sizing:border-box}' +
+    'body{font:14px/1.55 "Inter Tight",Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}' +
+    'a{color:var(--accent)}' +
+    '.wrap{max-width:1200px;margin:0 auto;padding:24px 28px}' +
+    '.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}' +
+    '.brand{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted)}' +
+    '.brand strong{color:var(--text);font-weight:500}' +
+    '.user{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:0.12em;color:var(--dim);text-transform:uppercase}' +
+    'h1{font-size:28px;font-weight:500;letter-spacing:-0.02em;margin-bottom:6px}' +
+    '.subtitle{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;max-width:740px}' +
+    '.filters{display:flex;gap:14px;align-items:center;padding:12px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:18px;flex-wrap:wrap}' +
+    '.filters .label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted)}' +
+    '.range,.site-tabs{display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden}' +
+    '.range a,.site-tabs a{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;padding:6px 12px;color:var(--muted);text-decoration:none;border-right:1px solid var(--border);letter-spacing:0.08em;text-transform:uppercase}' +
+    '.range a:last-child,.site-tabs a:last-child{border-right:none}' +
+    '.range a:hover,.site-tabs a:hover{color:var(--text);background:var(--bg)}' +
+    '.range a.active,.site-tabs a.active{background:var(--accent);color:#fff;border-color:var(--accent)}' +
+    '.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px}' +
+    '.kpi{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px}' +
+    '.kpi.accent{background:linear-gradient(135deg,var(--g50) 0%,var(--panel) 100%);border-color:rgba(20,163,153,0.25)}' +
+    '.kpi .lbl{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}' +
+    '.kpi .val{font-size:28px;font-weight:600;letter-spacing:-0.02em;font-feature-settings:"tnum"}' +
+    '.section-label{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:baseline;justify-content:space-between}' +
+    '.section-label .num{color:var(--dim)}' +
+    '.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px}' +
+    '.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0}' +
+    '.chart{width:100%;height:220px;display:block}' +
+    'table{width:100%;border-collapse:collapse;font-feature-settings:"tnum"}' +
+    'th{text-align:left;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:0 0 8px 0;border-bottom:1px solid var(--border)}' +
+    'th.r{text-align:right}' +
+    'td{padding:9px 0;font-size:13px;border-bottom:1px dashed var(--border);color:var(--muted);vertical-align:middle}' +
+    'td.r{text-align:right;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;font-weight:500;color:var(--text)}' +
+    'td.page{color:var(--text)}' +
+    'td.tsmono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;color:var(--dim)}' +
+    'tr:last-child td{border-bottom:none}' +
+    '.empty{font-size:13px;color:var(--dim);padding:18px 0;text-align:center;font-style:italic}' +
+    '.bar{display:flex;align-items:center;gap:8px}' +
+    '.bar-track{flex:1;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;min-width:60px}' +
+    '.bar-fill{height:100%;background:linear-gradient(90deg,var(--g300),var(--g700));border-radius:3px}' +
+    '.foot{padding:24px 0 12px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:18px;border-top:1px solid var(--border)}' +
+    '@media(max-width:900px){.kpi-row{grid-template-columns:repeat(3,1fr)}.grid-2{grid-template-columns:1fr}}' +
+    '@media(max-width:600px){.kpi-row{grid-template-columns:repeat(2,1fr)}.filters{flex-direction:column;align-items:stretch}}';
+}
+
+function kpi_(label, value, accent) {
+  return '<div class="kpi' + (accent ? ' accent' : '') + '">' +
+    '<div class="lbl">' + escapeHtml_(label) + '</div>' +
+    '<div class="val">' + escapeHtml_(value) + '</div>' +
+    '</div>';
+}
+
+function sectionLabel_(left, right) {
+  return '<div class="section-label"><span>' + escapeHtml_(left) + '</span><span class="num">' + escapeHtml_(right) + '</span></div>';
+}
+
+function buildLineChart_(daily) {
+  if (!daily || !daily.length) return '<div class="empty">No data in this window.</div>';
+
+  var w = 1100, h = 220, padL = 50, padR = 14, padT = 28, padB = 30;
+  var innerW = w - padL - padR, innerH = h - padT - padB;
+  var n = daily.length;
+  var maxVal = 0;
+  daily.forEach(function(d) {
+    if (d.pageViews > maxVal) maxVal = d.pageViews;
+    if (d.uniqueVisitors > maxVal) maxVal = d.uniqueVisitors;
+  });
+  if (maxVal < 4) maxVal = 4;
+  // round up to a clean tick
+  var tick = Math.pow(10, Math.floor(Math.log(maxVal) / Math.log(10)));
+  maxVal = Math.ceil(maxVal / tick) * tick;
+
+  function x(i) { return padL + (n === 1 ? innerW / 2 : (i / (n - 1)) * innerW); }
+  function y(v) { return padT + innerH - (v / maxVal) * innerH; }
+
+  var pvPts = daily.map(function(d, i) { return x(i) + ',' + y(d.pageViews); }).join(' ');
+  var uvPts = daily.map(function(d, i) { return x(i) + ',' + y(d.uniqueVisitors); }).join(' ');
+
+  var grid = '';
+  for (var t = 0; t <= 4; t++) {
+    var yy = padT + (t / 4) * innerH;
+    var lbl = Math.round(maxVal * (1 - t / 4));
+    grid += '<line x1="' + padL + '" y1="' + yy + '" x2="' + (w - padR) + '" y2="' + yy +
+      '" stroke="#ece8df" stroke-dasharray="2 3"/>' +
+      '<text x="' + (padL - 8) + '" y="' + (yy + 3) + '" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="9" fill="#a59f93">' + lbl + '</text>';
+  }
+
+  var xLabels = '';
+  var step = Math.max(1, Math.floor(n / 8));
+  for (var i = 0; i < n; i += step) {
+    var dt = daily[i].date.substring(5);
+    xLabels += '<text x="' + x(i) + '" y="' + (h - 10) + '" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#a59f93">' + dt + '</text>';
+  }
+
+  var legend =
+    '<g font-family="IBM Plex Mono,monospace" font-size="9" letter-spacing="0.08em">' +
+      '<rect x="' + padL + '" y="6" width="8" height="8" fill="#2ca471"/>' +
+      '<text x="' + (padL + 14) + '" y="13" fill="#1a1a1a">PAGE VIEWS</text>' +
+      '<rect x="' + (padL + 110) + '" y="6" width="8" height="8" fill="#a59f93"/>' +
+      '<text x="' + (padL + 124) + '" y="13" fill="#1a1a1a">UNIQUE VISITORS</text>' +
+    '</g>';
+
+  return '<svg class="chart" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
+    grid +
+    '<polyline points="' + uvPts + '" fill="none" stroke="#a59f93" stroke-width="1.5"/>' +
+    '<polyline points="' + pvPts + '" fill="none" stroke="#2ca471" stroke-width="2"/>' +
+    xLabels + legend +
+  '</svg>';
+}
+
+function buildTopPagesTable_(rows, total) {
+  if (!rows.length) return '<div class="empty">No page views in this window.</div>';
+  var maxV = rows[0].views;
+  var html = '<table><thead><tr><th>Page</th><th class="r">Views</th><th class="r" style="width:120px">Share</th></tr></thead><tbody>';
+  rows.forEach(function(r) {
+    var pct = total > 0 ? Math.round(r.views / total * 100) : 0;
+    html += '<tr><td class="page">' + escapeHtml_(r.page) + '</td>' +
+            '<td class="r">' + formatNumber_(r.views) + '</td>' +
+            '<td class="r"><div class="bar"><div class="bar-track"><div class="bar-fill" style="width:' + (r.views/maxV*100) + '%"></div></div><span style="font-size:11px;color:var(--dim);font-family:\'IBM Plex Mono\',monospace;min-width:36px;text-align:right">' + pct + '%</span></div></td></tr>';
+  });
+  return html + '</tbody></table>';
+}
+
+function buildCtaTable_(rows) {
+  if (!rows.length) return '<div class="empty">No CTA clicks in this window.</div>';
+  var maxV = rows[0].clicks;
+  var html = '<table><thead><tr><th>Action</th><th class="r" style="width:140px">Clicks</th></tr></thead><tbody>';
+  rows.forEach(function(r) {
+    html += '<tr><td class="page">' + escapeHtml_(r.action) + '</td>' +
+            '<td class="r"><div class="bar"><div class="bar-track"><div class="bar-fill" style="width:' + (r.clicks/maxV*100) + '%"></div></div><span style="min-width:36px;text-align:right">' + formatNumber_(r.clicks) + '</span></div></td></tr>';
+  });
+  return html + '</tbody></table>';
+}
+
+function buildDwellTable_(rows) {
+  if (!rows.length) return '<div class="empty">No dwell data yet — visitors need to leave a page for it to fire.</div>';
+  var html = '<table><thead><tr><th>Page</th><th class="r">Median</th><th class="r">P90</th><th class="r">N</th></tr></thead><tbody>';
+  rows.forEach(function(r) {
+    html += '<tr><td class="page">' + escapeHtml_(r.page) + '</td>' +
+            '<td class="r">' + formatDuration_(r.median) + '</td>' +
+            '<td class="r" style="color:var(--dim)">' + formatDuration_(r.p90) + '</td>' +
+            '<td class="r" style="color:var(--dim)">' + r.samples + '</td></tr>';
+  });
+  return html + '</tbody></table>';
+}
+
+function buildSubscribersTable_(rows) {
+  if (!rows.length) return '<div class="empty">No subscribers in this window.</div>';
+  var html = '<table><thead><tr><th>Email</th><th>When</th><th>From page</th></tr></thead><tbody>';
+  rows.forEach(function(r) {
+    html += '<tr><td class="page">' + escapeHtml_(r.email) + '</td>' +
+            '<td class="tsmono">' + formatTs_(r.ts) + '</td>' +
+            '<td>' + escapeHtml_(r.page) + '</td></tr>';
+  });
+  return html + '</tbody></table>';
+}
+
+function buildContactsTable_(rows) {
+  if (!rows.length) return '<div class="empty">No contact-form submissions in this window.</div>';
+  var html = '<table><thead><tr><th>When</th><th>Name</th><th>Email</th><th>Org</th><th>Role</th><th>Interest</th></tr></thead><tbody>';
+  rows.forEach(function(r) {
+    html += '<tr><td class="tsmono">' + formatTs_(r.ts) + '</td>' +
+            '<td class="page">' + escapeHtml_(r.name) + '</td>' +
+            '<td>' + escapeHtml_(r.email) + '</td>' +
+            '<td>' + escapeHtml_(r.organisation) + '</td>' +
+            '<td>' + escapeHtml_(r.role) + '</td>' +
+            '<td>' + escapeHtml_(r.interest) + '</td></tr>';
+  });
+  return html + '</tbody></table>';
 }
