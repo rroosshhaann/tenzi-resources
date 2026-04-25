@@ -343,7 +343,10 @@ function buildAccessDeniedHtml_() {
 
 function buildDashboardHtml_(stats, days, siteFilter, token) {
   var t = stats.totals;
-  var qs = function(d, s) { return '?view=dashboard&token=' + encodeURIComponent(token) + '&days=' + d + '&site=' + s; };
+  // Apps Script renders this HTML inside an iframe at script.googleusercontent.com,
+  // so relative URLs would resolve to the wrong host. Use the deployed web-app URL.
+  var baseUrl = ScriptApp.getService().getUrl();
+  var qs = function(d, s) { return baseUrl + '?view=dashboard&token=' + encodeURIComponent(token) + '&days=' + d + '&site=' + s; };
 
   var rangeBtn = function(label, d) {
     return '<a href="' + qs(d, siteFilter) + '" class="' + (days === d ? 'active' : '') + '">' + label + '</a>';
