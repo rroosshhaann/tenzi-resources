@@ -133,17 +133,9 @@ Canonical source is [`apps-script.gs`](./apps-script.gs). The deployed script li
 
 ### Dashboard
 
-The deployed web app doubles as a private analytics dashboard for `roshan@tenzi.ai`. It reads the Events + Contacts sheets, aggregates server-side, and returns a single HTML page with KPIs, a daily activity line chart, top pages, CTA breakdown, dwell stats per page, and recent subscribers/contacts.
+The deployed web app doubles as a private analytics dashboard. Same URL as the tracking beacon, branches on `?view=dashboard&token=<TOKEN>`. Token (`DASHBOARD_TOKEN` constant in the script) must NOT appear in `track.js`, page HTML, or commits — only in the bookmark.
 
-**Auth:** the script constant `DASHBOARD_TOKEN` is a secret. Append `&token=<value>` to the URL to access. Token must NOT appear in `track.js`, page HTML, or commits — only in the bookmark.
-
-**URL params:**
-- `view=dashboard` (required)
-- `token=<TOKEN>` (required, must match `DASHBOARD_TOKEN`)
-- `days=N` (1–365, default 30)
-- `site=all|marketing|resources` (default `all`)
-
-**Setup:** open the Apps Script editor, replace `DASHBOARD_TOKEN` with a long random string (e.g. `openssl rand -hex 24`), Deploy > Manage deployments > New version. Bookmark the URL. Same web-app URL as the tracking beacon — branching is on the `view` param.
+Full reference — what's on the page, parameters, auth model, code map, caveats, roadmap — lives in [`DASHBOARD.md`](./DASHBOARD.md). Update that doc whenever the dashboard layout, aggregation, or auth changes.
 
 **Hardening notes:**
 

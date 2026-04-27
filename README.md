@@ -74,6 +74,10 @@ Compare CTA click counts vs actual form submissions to measure drop-off per page
 2. Paste the new contents into the Apps Script editor (linked Google Sheet > Extensions > Apps Script).
 3. Deploy > Manage deployments > edit existing > set version to "New version" > Deploy.
 
+## Dashboard
+
+The same Apps Script web app exposes a private analytics dashboard (KPIs, daily activity chart, top pages, CTA breakdown, dwell stats, recent subscribers + contacts) at `?view=dashboard&token=<TOKEN>`. Token-gated, server-rendered HTML in the same Terminal Grid (Light) style as the rest of the site. Full reference: [`DASHBOARD.md`](./DASHBOARD.md).
+
 ## Adding a new page
 
 Every page must have all of the following:

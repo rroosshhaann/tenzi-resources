@@ -2,6 +2,11 @@
 // Lives in the Google Sheet linked to resources.tenzi.ai and tenzi.ai.
 // Canonical source-of-truth: this file. Paste into Apps Script after edits,
 // then Deploy > Manage deployments > New version > Deploy.
+//
+// Dashboard reference — layout, params, auth, caveats, roadmap:
+//   ./DASHBOARD.md
+// Tracking client — page-view / CTA / dwell / form POST helpers:
+//   ../tenzi-homepage/track.js  (served at https://tenzi.ai/track.js)
 
 var EVENTS_SHEET = 'Events';
 var CONTACTS_SHEET = 'Contacts';
