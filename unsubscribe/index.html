@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Unsubscribed · Tenzi</title>
+<title>Unsubscribe · Tenzi</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
@@ -39,7 +39,22 @@
     color: #1C233C;
   }
   p { margin: 0 0 12px 0; font-size: 14px; line-height: 1.6; color: #6b6560; }
-  p:last-child { margin-bottom: 0; }
+  .btn {
+    display: inline-block;
+    margin: 16px 0 8px 0;
+    padding: 12px 26px;
+    background: #2ca471;
+    color: #ffffff;
+    border: 0;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+  }
+  .btn:hover { background: #249765; }
+  .btn[disabled] { background: #a59f93; cursor: not-allowed; }
   a { color: #2ca471; text-decoration: none; }
   .email-display {
     font-family: 'IBM Plex Mono', ui-monospace, monospace;
@@ -57,22 +72,29 @@
 <body>
 <div class="card">
   <img class="logo" src="https://resources.tenzi.ai/tenzi-blue-transparent.png" alt="Tenzi" />
-  <h1 id="heading">Unsubscribing&hellip;</h1>
-  <p id="msg">One moment while we record your request.</p>
+  <h1 id="heading">Unsubscribe from Tenzi Monthly?</h1>
+  <p id="msg">Click the button below to confirm. We&rsquo;ll remove <span id="email" class="email-display"></span> from the list.</p>
+  <button id="confirm" class="btn">Yes, unsubscribe me</button>
   <p class="footer-link"><a href="https://resources.tenzi.ai">Back to resources.tenzi.ai</a></p>
 </div>
 <script>
-// Static unsubscribe page for the Tenzi newsletter. Fires
-// (cta: email_unsubscribe_click) to the same Apps Script doGet endpoint that
-// already handles opens, clicks, and form submissions. The recipient column
-// (G) records who opted out; Roshan filters Events for that action before
-// each monthly send and prunes recipients.csv accordingly.
+// Static unsubscribe page for the Tenzi newsletter. Requires an explicit
+// button click before firing (cta: email_unsubscribe_click) to the Apps
+// Script Events sheet — corporate email security scanners (Mimecast, MS
+// Safe Links, Proofpoint) pre-fetch the page in sandbox browsers and would
+// otherwise auto-trigger the beacon. Real users click the button; scanners
+// don't, so this filters them out cleanly.
 (function () {
   var ENDPOINT = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec';
 
   var p = new URLSearchParams(window.location.search);
   var recipient = p.get('recipient') || '';
   var campaign = p.get('campaign') || '';
+
+  var heading = document.getElementById('heading');
+  var msg = document.getElementById('msg');
+  var btn = document.getElementById('confirm');
+  var emailEl = document.getElementById('email');
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -83,37 +105,44 @@
   // Without a recipient param we can't tell who's asking, so don't write a
   // bogus row. Tell the visitor to reply manually instead.
   if (!recipient) {
-    document.getElementById('heading').textContent = 'Missing details';
-    document.getElementById('msg').innerHTML =
-      'We couldn&rsquo;t identify which subscriber to remove. Reply to any past Tenzi email with &ldquo;unsubscribe&rdquo; and we&rsquo;ll handle it manually.';
+    heading.textContent = 'Missing details';
+    msg.innerHTML = 'We couldn&rsquo;t identify which subscriber to remove. Reply to any past Tenzi email with &ldquo;unsubscribe&rdquo; and we&rsquo;ll handle it manually.';
+    btn.style.display = 'none';
     return;
   }
 
-  var beaconUrl = ENDPOINT
-    + '?email=' + encodeURIComponent('(cta: email_unsubscribe_click)')
-    + '&page=' + encodeURIComponent(campaign)
-    + '&recipient=' + encodeURIComponent(recipient)
-    + '&site=email';
+  // Echo the recipient back so the user knows which address is being removed.
+  emailEl.textContent = recipient;
 
-  // Fire-and-forget. keepalive lets the request complete even if the user
-  // closes the tab immediately. Image() is the fallback for older browsers.
-  try {
-    if (typeof fetch === 'function') {
-      fetch(beaconUrl, { keepalive: true, mode: 'no-cors' }).catch(function () {});
-    } else {
+  btn.addEventListener('click', function () {
+    btn.disabled = true;
+    btn.textContent = 'Unsubscribing…';
+
+    var beaconUrl = ENDPOINT
+      + '?email=' + encodeURIComponent('(cta: email_unsubscribe_click)')
+      + '&page=' + encodeURIComponent(campaign)
+      + '&recipient=' + encodeURIComponent(recipient)
+      + '&site=email';
+
+    // Fire-and-forget. keepalive lets the request complete even if the user
+    // closes the tab immediately. Image() is the fallback for older browsers.
+    try {
+      if (typeof fetch === 'function') {
+        fetch(beaconUrl, { keepalive: true, mode: 'no-cors' }).catch(function () {});
+      } else {
+        new Image().src = beaconUrl;
+      }
+    } catch (e) {
       new Image().src = beaconUrl;
     }
-  } catch (e) {
-    new Image().src = beaconUrl;
-  }
 
-  // Show confirmation immediately. We don't wait for the beacon response
-  // because the Apps Script doGet is no-cors and we can't read it anyway.
-  document.getElementById('heading').textContent = 'You’re unsubscribed';
-  document.getElementById('msg').innerHTML =
-    'We&rsquo;ve recorded the request for <span class="email-display">' +
-    escapeHtml(recipient) +
-    '</span>. You&rsquo;ll be removed from the list within 5 business days.';
+    heading.textContent = 'You’re unsubscribed';
+    msg.innerHTML =
+      'We&rsquo;ve recorded the request for <span class="email-display">' +
+      escapeHtml(recipient) +
+      '</span>. You&rsquo;ll be removed from the list within 5 business days.';
+    btn.style.display = 'none';
+  });
 })();
 </script>
 <noscript>
