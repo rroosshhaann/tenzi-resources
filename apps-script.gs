@@ -15,6 +15,11 @@ var CONTACT_RATE_LIMIT = 5;             // contact submissions per IP per window
 var CONTACT_RATE_WINDOW_MS = 3600000;   // 1 hour
 var EXCLUDED_IPS = [];                  // IPs silently dropped from all sheets — populate with your own (find via the Events sheet IP column)
 
+// Hosts permitted as redirect destinations from the click-tracking endpoint
+// (?redirect=<url>). Anything else is refused so the endpoint can't be abused
+// as an open redirect to phishing sites.
+var ALLOWED_REDIRECT_HOSTS = ['tenzi.ai', 'resources.tenzi.ai', 'linkedin.com'];
+
 // Dashboard auth — token in the URL is the simplest gate. Generate a long
 // random string and replace the placeholder. Bookmark the dashboard URL with
 // ?view=dashboard&token=<TOKEN>. The token must NOT appear anywhere public
@@ -48,18 +53,66 @@ function doGet(e) {
   }
   if (isExcludedIp_(e.parameter.ip)) return ContentService.createTextOutput('ok');
   var melbTime = Utilities.formatDate(new Date(), DASHBOARD_TIMEZONE, 'yyyy-MM-dd HH:mm:ss');
-  writeEvent_(e.parameter.email || '(page view)', e.parameter.page || '', melbTime, e.parameter.ip, e.parameter.ref, e.parameter.site);
+
+  // Click-tracking redirect — used by HTML newsletter links. Logs the CTA
+  // event (with recipient identity) and immediately redirects to the
+  // destination URL. Dest must match ALLOWED_REDIRECT_HOSTS.
+  if (e.parameter.redirect) {
+    var dest = String(e.parameter.redirect);
+    if (!isAllowedRedirect_(dest)) {
+      return HtmlService.createHtmlOutput('<!doctype html><meta charset="utf-8"><title>Blocked</title><p>Redirect blocked.</p>');
+    }
+    writeEvent_(
+      e.parameter.email || '(cta: email_click)',
+      e.parameter.page || '',
+      melbTime, e.parameter.ip, e.parameter.ref,
+      e.parameter.site || 'email',
+      e.parameter.recipient
+    );
+    var safeAttr = escapeHtml_(dest);
+    return HtmlService.createHtmlOutput(
+      '<!doctype html><html><head><meta charset="utf-8">' +
+      '<meta http-equiv="refresh" content="0;url=' + safeAttr + '">' +
+      '<title>Redirecting…</title></head><body style="font-family:system-ui,sans-serif;color:#6b6560;padding:40px;text-align:center">' +
+      '<script>location.replace(' + JSON.stringify(dest) + ')</script>' +
+      '<p>Redirecting to <a href="' + safeAttr + '">' + safeAttr + '</a>…</p>' +
+      '</body></html>'
+    );
+  }
+
+  writeEvent_(
+    e.parameter.email || '(page view)',
+    e.parameter.page || '',
+    melbTime, e.parameter.ip, e.parameter.ref,
+    e.parameter.site,
+    e.parameter.recipient
+  );
   return ContentService.createTextOutput('ok');
+}
+
+function isAllowedRedirect_(url) {
+  var m = url.match(/^https?:\/\/([^\/?#]+)/i);
+  if (!m) return false;
+  var host = m[1].toLowerCase();
+  for (var i = 0; i < ALLOWED_REDIRECT_HOSTS.length; i++) {
+    var h = ALLOWED_REDIRECT_HOSTS[i].toLowerCase();
+    if (host === h || host.length > h.length && host.substring(host.length - h.length - 1) === '.' + h) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function isExcludedIp_(ip) {
   return ip && EXCLUDED_IPS.indexOf(ip) !== -1;
 }
 
-// Column F holds the originating site tag ('marketing' / 'resources'). Existing
-// rows written before track.js was introduced have an empty F cell — that's fine.
-function writeEvent_(email, page, melbTime, ip, referrer, site) {
-  getOrCreate_(EVENTS_SHEET).appendRow([email || '', page || '', melbTime, ip || '', referrer || '', site || '']);
+// Column F holds the originating site tag ('marketing' / 'resources' / 'email').
+// Column G holds the recipient email for newsletter click/open events; empty
+// for site events. Older rows written before either column shipped will have
+// blank cells, which is fine.
+function writeEvent_(email, page, melbTime, ip, referrer, site, recipient) {
+  getOrCreate_(EVENTS_SHEET).appendRow([email || '', page || '', melbTime, ip || '', referrer || '', site || '', recipient || '']);
 }
 
 function writeContact_(data, melbTime) {
@@ -147,7 +200,7 @@ function isAuthorizedForDashboard_(e) {
 function computeStats_(days, siteFilter) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var events = readSheetWithHeaders_(ss.getSheetByName(EVENTS_SHEET),
-    ['Event','Page','Timestamp','IP','Referrer','Site']);
+    ['Event','Page','Timestamp','IP','Referrer','Site','Recipient']);
   var contacts = readSheetWithHeaders_(ss.getSheetByName(CONTACTS_SHEET),
     ['Timestamp','Name','Email','Organisation','Role','Interest','Message','Page','IP','Referrer','Site']);
 
