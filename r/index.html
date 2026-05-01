@@ -50,6 +50,9 @@
     + '&page=' + encodeURIComponent(campaign)
     + '&recipient=' + encodeURIComponent(recipient)
     + '&site=email';
+  // Apps Script doGet can't read request headers, so UA is passed as a URL
+  // param. The dashboard uses it to flag scanner traffic retroactively.
+  if (navigator.userAgent) beaconUrl += '&ua=' + encodeURIComponent(navigator.userAgent);
 
   // Fire-and-forget. keepalive lets the request survive the upcoming
   // navigation; Image() is the fallback for older browsers without fetch.

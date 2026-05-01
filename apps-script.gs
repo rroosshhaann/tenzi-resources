@@ -42,7 +42,7 @@ function doPost(e) {
     writeContact_(data, melbTime);
     notifyContact_(data);
   } else {
-    writeEvent_(data.email, data.page, melbTime, data.ip, data.referrer, data.site);
+    writeEvent_(data.email, data.page, melbTime, data.ip, data.referrer, data.site, '', data.ua);
   }
   return ContentService.createTextOutput('ok');
 }
@@ -50,6 +50,9 @@ function doPost(e) {
 function doGet(e) {
   if (e && e.parameter && e.parameter.view === 'dashboard') {
     return renderDashboard_(e);
+  }
+  if (e && e.parameter && e.parameter.view === 'newsletter') {
+    return renderNewsletterDashboard_(e);
   }
   if (isExcludedIp_(e.parameter.ip)) return ContentService.createTextOutput('ok');
   var melbTime = Utilities.formatDate(new Date(), DASHBOARD_TIMEZONE, 'yyyy-MM-dd HH:mm:ss');
@@ -67,7 +70,8 @@ function doGet(e) {
       e.parameter.page || '',
       melbTime, e.parameter.ip, e.parameter.ref,
       e.parameter.site || 'email',
-      e.parameter.recipient
+      e.parameter.recipient,
+      e.parameter.ua
     );
     // HtmlService output is wrapped in a same-origin iframe at
     // script.googleusercontent.com, so a bare location.replace() only navigates
@@ -94,7 +98,8 @@ function doGet(e) {
     e.parameter.page || '',
     melbTime, e.parameter.ip, e.parameter.ref,
     e.parameter.site,
-    e.parameter.recipient
+    e.parameter.recipient,
+    e.parameter.ua
   );
   return ContentService.createTextOutput('ok');
 }
@@ -118,10 +123,13 @@ function isExcludedIp_(ip) {
 
 // Column F holds the originating site tag ('marketing' / 'resources' / 'email').
 // Column G holds the recipient email for newsletter click/open events; empty
-// for site events. Older rows written before either column shipped will have
-// blank cells, which is fine.
-function writeEvent_(email, page, melbTime, ip, referrer, site, recipient) {
-  getOrCreate_(EVENTS_SHEET).appendRow([email || '', page || '', melbTime, ip || '', referrer || '', site || '', recipient || '']);
+// for site events. Column H holds the visitor's User-Agent — passed as a URL
+// param by track.js / r/ / unsubscribe/ because Apps Script doGet doesn't
+// expose request headers. Used by the dashboard to flag scanner traffic
+// (HeadlessChrome, Mimecast, Google-Apps-Script, Bot, Crawler etc.). Older
+// rows written before either column shipped will have blank cells.
+function writeEvent_(email, page, melbTime, ip, referrer, site, recipient, ua) {
+  getOrCreate_(EVENTS_SHEET).appendRow([email || '', page || '', melbTime, ip || '', referrer || '', site || '', recipient || '', ua || '']);
 }
 
 function writeContact_(data, melbTime) {
@@ -243,7 +251,7 @@ function isAuthorizedForDashboard_(e) {
 function computeStats_(days, siteFilter) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var events = readSheetWithHeaders_(ss.getSheetByName(EVENTS_SHEET),
-    ['Event','Page','Timestamp','IP','Referrer','Site','Recipient']);
+    ['Event','Page','Timestamp','IP','Referrer','Site','Recipient','UserAgent']);
   var contacts = readSheetWithHeaders_(ss.getSheetByName(CONTACTS_SHEET),
     ['Timestamp','Name','Email','Organisation','Role','Interest','Message','Page','IP','Referrer','Site']);
 
@@ -508,6 +516,8 @@ function buildDashboardHtml_(stats, days, siteFilter, token) {
       '<div class="subtitle">Page views, CTA clicks, dwell, and signups across tenzi.ai and resources.tenzi.ai. Server-rendered from the linked Google Sheet.</div>' +
 
       '<div class="filters">' +
+        '<span class="label">View</span>' +
+        '<div class="range"><a class="active">Site</a><a href="' + baseUrl + '?view=newsletter&token=' + encodeURIComponent(token) + '&days=' + days + '">Newsletter</a></div>' +
         '<span class="label">Range</span>' +
         '<div class="range">' + rangeBtn('7D', 7) + rangeBtn('30D', 30) + rangeBtn('90D', 90) + rangeBtn('1Y', 365) + '</div>' +
         '<span class="label">Site</span>' +
@@ -869,4 +879,413 @@ function buildReferrersTable_(rows) {
             '<td class="r"><div class="bar"><div class="bar-track"><div class="bar-fill" style="width:' + (r.visits/maxV*100) + '%"></div></div><span style="font-size:11px;color:var(--dim);font-family:\'IBM Plex Mono\',monospace;min-width:36px;text-align:right">' + pct + '%</span></div></td></tr>';
   });
   return wrapPaged_(html + '</tbody></table>', rows.length);
+}
+
+// ── NEWSLETTER DASHBOARD ──────────────────────────────────────────────
+// Same web app, branches on ?view=newsletter. Filters Events to Site=email
+// and applies real-recipient + real-campaign cross-validation so scanner
+// noise (Mimecast/ProofPoint/etc auto-fetches with scrambled local-parts
+// or scrambled campaign ids) doesn't pollute the numbers.
+//
+//   "Real subscriber" = an email address that appears anywhere in the Events
+//     sheet as a subscribe row (column A contains '@' and doesn't start with '(').
+//   "Real campaign" = a column-B value that has been seen with at least
+//     NEWSLETTER_REAL_CAMPAIGN_THRESHOLD distinct real subscribers — scanners
+//     can't fake this without forging real subscribers against a real campaign id.
+//
+// UA (column H) is also captured (via track.js / r/ / unsubscribe/) and any
+// row whose UA matches NEWSLETTER_BOT_UA_REGEX is dropped from real counts.
+
+var NEWSLETTER_REAL_CAMPAIGN_THRESHOLD = 3;
+var NEWSLETTER_BOT_UA_REGEX = /HeadlessChrome|Mimecast|ProofPoint|Barracuda|GoogleAppsScript|google-apps-script|safelinks|urldefense|fetcher|prefetch|\bbot\b|crawler|spider|scanner/i;
+
+function looksLikeBotUa_(ua) {
+  if (!ua) return false;
+  return NEWSLETTER_BOT_UA_REGEX.test(ua);
+}
+
+function renderNewsletterDashboard_(e) {
+  if (!isAuthorizedForDashboard_(e)) {
+    return HtmlService.createHtmlOutput(buildAccessDeniedHtml_()).setTitle('Access denied');
+  }
+  var days = parseInt(e.parameter.days || '90', 10);
+  if (isNaN(days) || days < 1) days = 90;
+  if (days > 365) days = 365;
+  var selectedCampaign = e.parameter.campaign || '';
+
+  var stats = computeNewsletterStats_(days);
+  if (!selectedCampaign && stats.campaigns.length) {
+    selectedCampaign = stats.campaigns[0].campaign;
+  }
+  var html = buildNewsletterHtml_(stats, days, selectedCampaign, e.parameter.token);
+  return HtmlService.createHtmlOutput(html)
+    .setTitle('Tenzi · Newsletter')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function computeNewsletterStats_(days) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var events = readSheetWithHeaders_(ss.getSheetByName(EVENTS_SHEET),
+    ['Event','Page','Timestamp','IP','Referrer','Site','Recipient','UserAgent']);
+
+  var cutoff = new Date();
+  cutoff.setHours(0, 0, 0, 0);
+  cutoff.setDate(cutoff.getDate() - days + 1);
+
+  // Pass 1: build realSubscribers from subscribe rows across all time / all sites.
+  var realSubscribers = {};
+  events.forEach(function(row) {
+    var ev = String(row.Event || '');
+    if (ev.indexOf('@') !== -1 && ev.charAt(0) !== '(') {
+      realSubscribers[ev.trim().toLowerCase()] = true;
+    }
+  });
+
+  // Pass 2: collect email events within the window, tag each with realRecipient + botUa.
+  var emailEvents = [];
+  var realRecipientsByCampaign = {};
+  events.forEach(function(row) {
+    if (String(row.Site || '') !== 'email') return;
+    var ts = parseTs_(row.Timestamp);
+    if (!ts || ts < cutoff) return;
+    var campaign = String(row.Page || '').trim();
+    var recipient = String(row.Recipient || '').trim();
+    var rkey = recipient.toLowerCase();
+    var realRecipient = !!realSubscribers[rkey];
+    emailEvents.push({
+      ts: ts,
+      event: String(row.Event || ''),
+      campaign: campaign,
+      recipient: recipient,
+      ua: String(row.UserAgent || ''),
+      realRecipient: realRecipient,
+      botUa: looksLikeBotUa_(String(row.UserAgent || ''))
+    });
+    if (realRecipient && campaign) {
+      var set = realRecipientsByCampaign[campaign] || (realRecipientsByCampaign[campaign] = {});
+      set[rkey] = true;
+    }
+  });
+
+  // Pass 3: derive realCampaigns — those with >= threshold distinct real recipients.
+  var realCampaigns = {};
+  Object.keys(realRecipientsByCampaign).forEach(function(c) {
+    if (Object.keys(realRecipientsByCampaign[c]).length >= NEWSLETTER_REAL_CAMPAIGN_THRESHOLD) {
+      realCampaigns[c] = true;
+    }
+  });
+
+  // Pass 4: aggregate per-campaign — track raw + real side-by-side.
+  var campaigns = {};
+  emailEvents.forEach(function(e) {
+    var c = e.campaign;
+    if (!c) return;
+    var entry = campaigns[c] || (campaigns[c] = {
+      campaign: c,
+      first: e.ts, last: e.ts,
+      raw: { opens: 0, clicks: 0, unsubs: 0, recipients: {} },
+      real: { opens: 0, clicks: 0, unsubs: 0, recipients: {}, ctaActions: {}, byHour: {}, recipientActivity: {} },
+      isReal: !!realCampaigns[c],
+      botRows: 0,
+      suspiciousRows: []
+    });
+    if (e.ts < entry.first) entry.first = e.ts;
+    if (e.ts > entry.last) entry.last = e.ts;
+
+    var ev = e.event;
+    var isOpen = ev === '(cta: email_open)';
+    var isUnsub = ev === '(cta: email_unsubscribe_click)';
+    var isCta = ev.indexOf('(cta: ') === 0 && !isOpen && !isUnsub && ev.charAt(ev.length - 1) === ')';
+    var rkey = e.recipient.toLowerCase();
+
+    if (isOpen) entry.raw.opens++;
+    else if (isUnsub) entry.raw.unsubs++;
+    else if (isCta) entry.raw.clicks++;
+    if (rkey) entry.raw.recipients[rkey] = true;
+
+    var passes = e.realRecipient && entry.isReal && !e.botUa;
+    if (!passes) {
+      entry.botRows++;
+      if (entry.suspiciousRows.length < 50) {
+        entry.suspiciousRows.push({
+          ts: e.ts, event: ev, recipient: e.recipient, ua: e.ua,
+          reason: !e.realRecipient ? 'recipient not in subscribers'
+                : !entry.isReal ? 'campaign id failed cross-validation'
+                : 'bot UA'
+        });
+      }
+      return;
+    }
+
+    if (isOpen) entry.real.opens++;
+    else if (isUnsub) entry.real.unsubs++;
+    else if (isCta) {
+      entry.real.clicks++;
+      var action = ev.substring(6, ev.length - 1);
+      entry.real.ctaActions[action] = (entry.real.ctaActions[action] || 0) + 1;
+    }
+    if (rkey) {
+      entry.real.recipients[rkey] = true;
+      var act = entry.real.recipientActivity[rkey] || (entry.real.recipientActivity[rkey] = {
+        recipient: e.recipient, opens: 0, clicks: 0, unsubs: 0, last: e.ts
+      });
+      if (isOpen) act.opens++;
+      else if (isUnsub) act.unsubs++;
+      else if (isCta) act.clicks++;
+      if (e.ts > act.last) act.last = e.ts;
+    }
+    var hourBucket = Math.floor((e.ts - entry.first) / 3600000);
+    if (hourBucket >= 0 && hourBucket < 168) {
+      var hb = entry.real.byHour[hourBucket] || (entry.real.byHour[hourBucket] = { opens: 0, clicks: 0, unsubs: 0 });
+      if (isOpen) hb.opens++;
+      else if (isUnsub) hb.unsubs++;
+      else if (isCta) hb.clicks++;
+    }
+  });
+
+  var campaignList = Object.keys(campaigns).map(function(c) {
+    var entry = campaigns[c];
+    return {
+      campaign: c, first: entry.first, last: entry.last, isReal: entry.isReal,
+      raw: entry.raw, real: entry.real,
+      rawRecipientCount: Object.keys(entry.raw.recipients).length,
+      realRecipientCount: Object.keys(entry.real.recipients).length,
+      botRows: entry.botRows,
+      suspiciousRows: entry.suspiciousRows
+    };
+  });
+  campaignList.sort(function(a, b) { return b.last - a.last; });
+
+  var realCampaignList = campaignList.filter(function(c) { return c.isReal; });
+
+  return {
+    campaigns: realCampaignList,
+    allCampaigns: campaignList,
+    realSubscriberCount: Object.keys(realSubscribers).length
+  };
+}
+
+function buildNewsletterHtml_(stats, days, selectedCampaign, token) {
+  var baseUrl = ScriptApp.getService().getUrl();
+  var qs = function(d, c) {
+    return baseUrl + '?view=newsletter&token=' + encodeURIComponent(token) + '&days=' + d
+      + (c ? '&campaign=' + encodeURIComponent(c) : '');
+  };
+  var rangeBtn = function(label, d) {
+    return '<a href="' + qs(d, selectedCampaign) + '" class="' + (days === d ? 'active' : '') + '">' + label + '</a>';
+  };
+
+  var selectedEntry = null;
+  for (var i = 0; i < stats.campaigns.length; i++) {
+    if (stats.campaigns[i].campaign === selectedCampaign) { selectedEntry = stats.campaigns[i]; break; }
+  }
+
+  var campaignOptions = stats.campaigns.map(function(c) {
+    var lbl = c.campaign + '  ·  ' + Utilities.formatDate(c.last, DASHBOARD_TIMEZONE, 'd MMM');
+    var sel = (c.campaign === selectedCampaign) ? ' selected' : '';
+    return '<option value="' + escapeHtml_(qs(days, c.campaign)) + '"' + sel + '>' + escapeHtml_(lbl) + '</option>';
+  }).join('');
+
+  var body =
+    '<nav class="nav">' +
+      '<div class="brand">tenzi · <strong>newsletter</strong></div>' +
+      '<div class="user">window: ' + days + 'd · campaigns: ' + stats.campaigns.length + ' · subscribers: ' + stats.realSubscriberCount + '</div>' +
+    '</nav>' +
+    '<h1>Newsletter analytics</h1>' +
+    '<div class="subtitle">Email opens, clicks, unsubscribes by campaign. Filtered to real subscribers (column G is in the subscribe set) and real campaign ids (≥' + NEWSLETTER_REAL_CAMPAIGN_THRESHOLD + ' distinct subscribers engaged). Scanner UA strings (Mimecast, ProofPoint, headless Chrome) are dropped from "real" counts but kept in raw + suspicious-rows panel.</div>' +
+
+    '<div class="filters">' +
+      '<span class="label">View</span>' +
+      '<div class="range"><a href="' + baseUrl + '?view=dashboard&token=' + encodeURIComponent(token) + '&days=' + days + '">Site</a><a class="active">Newsletter</a></div>' +
+      '<span class="label">Range</span>' +
+      '<div class="range">' + rangeBtn('30D', 30) + rangeBtn('90D', 90) + rangeBtn('180D', 180) + rangeBtn('1Y', 365) + '</div>' +
+      (stats.campaigns.length
+        ? '<span class="label">Campaign</span>' +
+          '<select class="campaign-select" onchange="if(this.value)location.href=this.value">' + campaignOptions + '</select>'
+        : '') +
+    '</div>';
+
+  if (!stats.campaigns.length) {
+    body += '<div class="card empty-card"><h3>No campaigns yet</h3>' +
+            '<p>No real campaigns detected in this window. A campaign becomes "real" once at least ' + NEWSLETTER_REAL_CAMPAIGN_THRESHOLD + ' subscribers from the subscribe set engage with it. Send a campaign and refresh.</p>' +
+            (stats.allCampaigns.length ? '<p style="color:var(--dim);font-size:12px">Saw ' + stats.allCampaigns.length + ' campaign-id values that didn\'t cross-validate — likely all scanner mangling.</p>' : '') +
+            '</div>';
+  } else if (selectedEntry) {
+    body += buildCampaignSection_(selectedEntry);
+  }
+
+  body += sectionLabel_('All campaigns', stats.campaigns.length + ' SHOWN') +
+          '<div class="card">' + buildCampaignOverview_(stats.campaigns, qs, days) + '</div>';
+
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>Tenzi · Newsletter</title>' +
+    '<base target="_top">' +
+    '<link rel="preconnect" href="https://fonts.googleapis.com">' +
+    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
+    '<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">' +
+    '<style>' + dashboardCss_() + newsletterCss_() + '</style>' +
+    '</head><body><div class="wrap">' + body +
+    '<footer class="foot">' +
+      '<span>Window: last ' + days + ' days · Real-campaign threshold: ≥' + NEWSLETTER_REAL_CAMPAIGN_THRESHOLD + ' real subscribers</span>' +
+      '<span>Refreshed: ' + Utilities.formatDate(new Date(), DASHBOARD_TIMEZONE, 'yyyy-MM-dd HH:mm') + ' Melbourne</span>' +
+    '</footer>' +
+    '</div>' +
+    '<script>' + dashboardJs_() + '</script>' +
+    '</body></html>';
+}
+
+function newsletterCss_() {
+  return '.campaign-select{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;padding:6px 10px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text);min-width:280px;cursor:pointer}' +
+    '.campaign-select:hover{border-color:var(--border-bright)}' +
+    '.kpi-pair{display:flex;align-items:baseline;gap:8px;font-feature-settings:"tnum"}' +
+    '.kpi-pair .raw{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;color:var(--dim)}' +
+    '.empty-card{padding:32px;text-align:center;color:var(--muted)}' +
+    '.empty-card h3{color:var(--text);font-weight:500;margin-bottom:8px;font-size:18px}' +
+    '.timeline-table td.r{font-feature-settings:"tnum"}' +
+    '.suspicious-toggle{margin:18px 0 4px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;color:var(--muted);cursor:pointer;text-transform:uppercase;letter-spacing:0.12em;display:inline-block;padding:6px 10px;border:1px solid var(--border);border-radius:4px;background:var(--panel)}' +
+    '.suspicious-toggle:hover{border-color:var(--border-bright);color:var(--text)}' +
+    '.ua-cell{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;color:var(--dim);max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+    '.reason-tag{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.12em;padding:2px 6px;border-radius:2px;background:rgba(156,59,59,0.08);color:#9c3b3b}';
+}
+
+function buildCampaignSection_(c) {
+  var t = c.real, raw = c.raw;
+  var realRecipients = c.realRecipientCount;
+  var rawRecipients = c.rawRecipientCount;
+  var openRate = realRecipients > 0 ? Math.round(t.opens / realRecipients * 100) : 0;
+  var clickRate = t.opens > 0 ? Math.round(t.clicks / t.opens * 100) : 0;
+  var unsubRate = realRecipients > 0 ? Math.round(t.unsubs / realRecipients * 100 * 10) / 10 : 0;
+
+  function pair(label, real, raw, accent) {
+    return '<div class="kpi' + (accent ? ' accent' : '') + '">' +
+      '<div class="lbl">' + label + '</div>' +
+      '<div class="val">' + formatNumber_(real) + '</div>' +
+      (raw !== undefined && raw !== real ? '<div class="kpi-pair"><span class="raw">raw ' + formatNumber_(raw) + '</span></div>' : '') +
+    '</div>';
+  }
+  function ratio(label, value, suffix) {
+    return '<div class="kpi"><div class="lbl">' + label + '</div><div class="val">' + value + (suffix || '') + '</div></div>';
+  }
+
+  var html = sectionLabel_(c.campaign, Utilities.formatDate(c.first, DASHBOARD_TIMEZONE, 'd MMM') + ' &rarr; ' + Utilities.formatDate(c.last, DASHBOARD_TIMEZONE, 'd MMM') + (c.botRows ? ' · ' + c.botRows + ' rows dropped' : ''));
+  html += '<div class="kpi-row">' +
+    pair('Engaged subscribers', realRecipients, rawRecipients, true) +
+    pair('Opens', t.opens, raw.opens) +
+    pair('Clicks', t.clicks, raw.clicks) +
+    pair('Unsubscribes', t.unsubs, raw.unsubs) +
+    ratio('Open rate', openRate, '%') +
+    ratio('Click-through', clickRate, '%') +
+  '</div>';
+
+  // CTA breakdown
+  var ctaRows = mapToList_(t.ctaActions, 'action', 'clicks');
+  html += '<div class="grid-2">' +
+    '<div>' +
+      sectionLabel_('CTA breakdown', ctaRows.length + ' ACTIONS') +
+      '<div class="card">' + buildNewsletterCtaTable_(ctaRows) + '</div>' +
+    '</div>' +
+    '<div>' +
+      sectionLabel_('Activity by hour after send', '0–48H') +
+      '<div class="card">' + buildNewsletterTimeline_(t.byHour) + '</div>' +
+    '</div>' +
+  '</div>';
+
+  // Recipient activity
+  var recipientRows = Object.keys(t.recipientActivity).map(function(k) { return t.recipientActivity[k]; });
+  recipientRows.sort(function(a, b) { return (b.opens + b.clicks) - (a.opens + a.clicks); });
+  html += sectionLabel_('Recipient activity', recipientRows.length + ' SUBSCRIBERS ENGAGED') +
+    '<div class="card">' + buildNewsletterRecipientsTable_(recipientRows) + '</div>';
+
+  // Suspicious rows panel — collapsed by default
+  if (c.suspiciousRows.length) {
+    html += '<details class="card" style="padding:14px 18px"><summary class="suspicious-toggle">Suspicious rows · ' + c.botRows + ' dropped this campaign · click to expand</summary>' +
+      '<div style="margin-top:12px">' + buildSuspiciousTable_(c.suspiciousRows) + '</div>' +
+    '</details>';
+  }
+
+  return html;
+}
+
+function buildNewsletterCtaTable_(rows) {
+  if (!rows.length) return '<div class="empty">No clicks recorded for this campaign yet.</div>';
+  var maxV = rows[0].clicks;
+  var html = '<table><thead><tr><th>Action</th><th class="r" style="width:140px">Clicks</th></tr></thead><tbody>';
+  rows.forEach(function(r) {
+    html += '<tr><td class="page">' + escapeHtml_(r.action) + '</td>' +
+            '<td class="r"><div class="bar"><div class="bar-track"><div class="bar-fill" style="width:' + (r.clicks / maxV * 100) + '%"></div></div><span style="min-width:36px;text-align:right">' + formatNumber_(r.clicks) + '</span></div></td></tr>';
+  });
+  return html + '</tbody></table>';
+}
+
+function buildNewsletterTimeline_(byHour) {
+  var keys = Object.keys(byHour).map(function(k) { return parseInt(k, 10); }).sort(function(a, b) { return a - b; });
+  if (!keys.length) return '<div class="empty">No activity recorded yet for this campaign.</div>';
+  var maxHour = Math.min(48, keys[keys.length - 1] + 1);
+  var maxVal = 0;
+  for (var h = 0; h < maxHour; h++) {
+    var b = byHour[h];
+    if (b) maxVal = Math.max(maxVal, b.opens + b.clicks);
+  }
+  if (maxVal === 0) maxVal = 1;
+  var html = '<table class="timeline-table"><thead><tr><th>Hour</th><th class="r">Opens</th><th class="r">Clicks</th><th class="r">Unsubs</th><th style="width:120px">Activity</th></tr></thead><tbody>';
+  for (var hr = 0; hr < maxHour; hr++) {
+    var b = byHour[hr] || { opens: 0, clicks: 0, unsubs: 0 };
+    var total = b.opens + b.clicks;
+    if (total === 0 && b.unsubs === 0 && hr > 12) continue;
+    var pct = (total / maxVal * 100);
+    html += '<tr><td class="tsmono">+' + (hr < 10 ? '0' + hr : hr) + 'h</td>' +
+            '<td class="r">' + formatNumber_(b.opens) + '</td>' +
+            '<td class="r">' + formatNumber_(b.clicks) + '</td>' +
+            '<td class="r">' + (b.unsubs ? formatNumber_(b.unsubs) : '') + '</td>' +
+            '<td><div class="bar-track" style="height:6px"><div class="bar-fill" style="width:' + pct + '%"></div></div></td></tr>';
+  }
+  return html + '</tbody></table>';
+}
+
+function buildNewsletterRecipientsTable_(rows) {
+  if (!rows.length) return '<div class="empty">No engaged subscribers yet.</div>';
+  var html = '<table><thead><tr><th>Recipient</th><th class="r">Opens</th><th class="r">Clicks</th><th class="r">Unsub</th><th class="r">Last activity</th></tr></thead><tbody>';
+  rows.forEach(function(r, i) {
+    var pg = Math.floor(i / DASHBOARD_PAGE_SIZE);
+    html += '<tr data-row="' + pg + '">' +
+            '<td>' + escapeHtml_(r.recipient) + '</td>' +
+            '<td class="r">' + formatNumber_(r.opens) + '</td>' +
+            '<td class="r">' + formatNumber_(r.clicks) + '</td>' +
+            '<td class="r">' + (r.unsubs ? '<span style="color:#9c3b3b">✓</span>' : '') + '</td>' +
+            '<td class="r tsmono">' + formatTs_(r.last) + '</td></tr>';
+  });
+  return wrapPaged_(html + '</tbody></table>', rows.length);
+}
+
+function buildSuspiciousTable_(rows) {
+  var html = '<table><thead><tr><th>When</th><th>Event</th><th>Recipient</th><th>UA</th><th>Reason</th></tr></thead><tbody>';
+  rows.forEach(function(r) {
+    var event = r.event;
+    if (event.length > 36) event = event.substring(0, 33) + '…';
+    html += '<tr>' +
+            '<td class="tsmono">' + formatTs_(r.ts) + '</td>' +
+            '<td>' + escapeHtml_(event) + '</td>' +
+            '<td>' + escapeHtml_(r.recipient || '—') + '</td>' +
+            '<td class="ua-cell" title="' + escapeHtml_(r.ua) + '">' + escapeHtml_(r.ua || '—') + '</td>' +
+            '<td><span class="reason-tag">' + escapeHtml_(r.reason) + '</span></td></tr>';
+  });
+  return html + '</tbody></table>';
+}
+
+function buildCampaignOverview_(rows, qs, days) {
+  if (!rows.length) return '<div class="empty">No real campaigns yet.</div>';
+  var html = '<table><thead><tr><th>Campaign</th><th class="r">Sent</th><th class="r">Opens</th><th class="r">Clicks</th><th class="r">Unsubs</th><th class="r">Open rate</th></tr></thead><tbody>';
+  rows.forEach(function(r) {
+    var openRate = r.realRecipientCount > 0 ? Math.round(r.real.opens / r.realRecipientCount * 100) : 0;
+    var sentDate = Utilities.formatDate(r.first, DASHBOARD_TIMEZONE, 'd MMM yy');
+    html += '<tr>' +
+            '<td><a href="' + escapeHtml_(qs(days, r.campaign)) + '" style="color:var(--accent);text-decoration:none">' + escapeHtml_(r.campaign) + '</a></td>' +
+            '<td class="r tsmono">' + sentDate + '</td>' +
+            '<td class="r">' + formatNumber_(r.real.opens) + '</td>' +
+            '<td class="r">' + formatNumber_(r.real.clicks) + '</td>' +
+            '<td class="r">' + formatNumber_(r.real.unsubs) + '</td>' +
+            '<td class="r">' + openRate + '%</td></tr>';
+  });
+  return html + '</tbody></table>';
 }

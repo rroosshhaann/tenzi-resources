@@ -1,6 +1,6 @@
 # Tenzi Analytics Dashboard
 
-Private, server-rendered HTML analytics page built into the same Apps Script web app that handles tracking. Branches on `?view=dashboard` instead of writing an Events row, aggregates the `Events` and `Contacts` sheets in memory, and returns a single static page styled to match the resources site (Terminal Grid (Light) — see [`DESIGN_STANDARD.md`](./DESIGN_STANDARD.md)).
+Private, server-rendered HTML analytics page built into the same Apps Script web app that handles tracking. Branches on `?view=dashboard` (the **Site** view) or `?view=newsletter` (the **Newsletter** view) instead of writing an Events row, aggregates the `Events` and `Contacts` sheets in memory, and returns a single static page styled to match the resources site (Terminal Grid (Light) — see [`DESIGN_STANDARD.md`](./DESIGN_STANDARD.md)). The two views share auth, CSS, and most helper functions; the toggle in the filter bar of either view links to the other.
 
 This doc is the source of truth for the dashboard. Everything else (CLAUDE.md, README.md, the Apps Script header) points here.
 
@@ -90,7 +90,7 @@ Set `DASHBOARD_TOKEN` back to the placeholder and redeploy. All `?view=dashboard
 
 Both reads happen on every dashboard load (no caching yet):
 
-- **`Events`** — `Event | Page | Timestamp | IP | Referrer | Site`. Header row optional; the script tolerates missing headers via `readSheetWithHeaders_` (matches the first cell against expected header names).
+- **`Events`** — `Event | Page | Timestamp | IP | Referrer | Site | Recipient | UserAgent`. Column G holds the recipient email for newsletter beacons (empty for site events). Column H holds the visitor User-Agent — passed as a URL param by `track.js` / `r/` / `unsubscribe/` because Apps Script `doGet` doesn't expose request headers. Used by the newsletter view to drop scanner traffic. Header row optional; the script tolerates missing headers via `readSheetWithHeaders_` (matches the first cell against expected header names).
 - **`Contacts`** — `Timestamp | Name | Email | Organisation | Role | Interest | Message | Page | IP | Referrer | Site`. Header row is written by `writeContact_` on first use of the sheet.
 
 ## Aggregation
@@ -128,13 +128,60 @@ All dashboard code lives in `apps-script.gs` under the comment `// ── DASHBO
 | `kpi_`, `sectionLabel_` | Markup helpers |
 | `buildLineChart_` | Hand-rolled inline-SVG line chart with per-day hover groups (no Chart.js) |
 | `dashboardJs_` | Inline JS injected before `</body>` — wires the line-chart hover tooltip; no other client-side behaviour |
-| `buildTopPagesTable_`, `buildCtaTable_`, `buildDwellTable_`, `buildSubscribersTable_`, `buildContactsTable_` | The five tables |
+| `buildTopPagesTable_`, `buildCtaTable_`, `buildDwellTable_`, `buildSubscribersTable_`, `buildContactsTable_`, `buildReferrersTable_`, `buildUnsubscribesTable_` | The site-view tables |
+| `renderNewsletterDashboard_(e)`, `computeNewsletterStats_(days)`, `buildNewsletterHtml_`, `buildCampaignSection_`, `buildNewsletterCtaTable_`, `buildNewsletterTimeline_`, `buildNewsletterRecipientsTable_`, `buildSuspiciousTable_`, `buildCampaignOverview_`, `newsletterCss_`, `looksLikeBotUa_` | Newsletter-view stack — see "Newsletter view" below |
 
 After any code change: paste the updated `apps-script.gs` into the Apps Script editor and **Deploy → New version**. The script is the deployment unit — there's no separate dashboard hosting.
 
 ### URL building
 
 Filter buttons use absolute URLs because the dashboard HTML is rendered inside an iframe at `script.googleusercontent.com`, not the bookmarked `script.google.com/macros/.../exec`. Relative `href`s would resolve against the iframe URL and 404. `buildDashboardHtml_` calls `ScriptApp.getService().getUrl()` to get the deployed web-app URL and prepends it to every link.
+
+## Newsletter view
+
+`?view=newsletter&token=<TOKEN>&days=N&campaign=<id>` renders a campaign-centric variant of the same dashboard, scoped to rows where `Site=email`.
+
+### What it shows
+
+1. **Filters** — View toggle (Site / Newsletter), Range (30D / 90D / 180D / 1Y, default 90D), Campaign dropdown listing every real campaign in the window with its send date
+2. **Selected campaign block** — section header with the campaign id and date range, then a 6-tile KPI strip: **Engaged subscribers** (real + raw side-by-side), **Opens** (real + raw), **Clicks** (real + raw), **Unsubscribes** (real + raw), **Open rate** (real-opens / real-recipients %), **Click-through** (real-clicks / real-opens %)
+3. **CTA breakdown** — bar list of every `email_*` action (excluding `email_open` + `email_unsubscribe_click`) for the selected campaign
+4. **Activity by hour after send** — table showing real opens/clicks/unsubs per hour for the first 48 hours, with a small inline bar visualising relative activity. Hour 0 is the campaign's first event timestamp (effectively the send moment)
+5. **Recipient activity** — paginated table of engaged subscribers with per-recipient open/click/unsub counts and the timestamp of their latest action, sorted by total engagement
+6. **Suspicious rows** — collapsed `<details>` panel listing dropped rows (timestamp, event, recipient, UA, drop reason). Pop it open for forensic auditing of scanner noise
+7. **All campaigns** — cross-campaign overview at the bottom, one row per real campaign, click-through to switch the selected campaign
+
+### Filter logic — what counts as "real"
+
+Three derived sets, computed every load:
+
+- **`realSubscribers`** — every email that appears anywhere in the Events sheet as a subscribe row (column A contains `@` AND doesn't start with `(`). All time, all sites — the subscribe set is the source of truth for who's allowed to count.
+- **`realCampaigns`** — every column-B value from `Site=email` rows that has been seen with **≥`NEWSLETTER_REAL_CAMPAIGN_THRESHOLD` (=3)** distinct real subscribers. A scanner can scramble the campaign id per-recipient, but it can't forge the cross-product of (real subscriber × real campaign id) at scale, so this filter cleanly drops scanner mangle.
+- **Bot UA tag** — UA matches `NEWSLETTER_BOT_UA_REGEX` (`HeadlessChrome|Mimecast|ProofPoint|Barracuda|GoogleAppsScript|safelinks|urldefense|fetcher|prefetch|bot|crawler|spider|scanner`). UA is captured client-side and passed via the `&ua=` URL param because Apps Script `doGet` can't read headers. Image-beacon opens have no UA (email pixels can't run JS) so they're not bot-tagged on UA alone.
+
+A row counts toward "real" if **`recipient ∈ realSubscribers` AND `campaign ∈ realCampaigns` AND `not bot UA`**. Anything else lands in the suspicious-rows panel with a reason tag.
+
+The campaign selector + cross-campaign overview only show real campaigns. Scrambled scanner-only campaign ids are hidden but counted toward the dropped-rows tally.
+
+### KPI definitions
+
+| KPI | Formula |
+|-|-|
+| Engaged subscribers | distinct real recipients with ≥1 event |
+| Opens (real) | rows where `Event = '(cta: email_open)'` AND passes the real filter |
+| Clicks (real) | rows where `Event` is a `(cta: email_*_click)` (excluding `email_unsubscribe_click`) AND passes |
+| Unsubscribes (real) | rows where `Event = '(cta: email_unsubscribe_click)'` AND passes |
+| Open rate | real opens ÷ real engaged subscribers (× 100) |
+| Click-through | real clicks ÷ real opens (× 100) |
+
+Open rate uses engaged-subscriber count (not list size) as the denominator because the script doesn't have access to `recipients.csv` — that file lives only on your laptop and is gitignored. Treat the displayed rate as "of subscribers we can prove engaged at all, what fraction opened" — the absolute number is meaningful only relative to itself across campaigns.
+
+### Tuning the filter
+
+Two constants near the top of the newsletter section in `apps-script.gs`:
+
+- `NEWSLETTER_REAL_CAMPAIGN_THRESHOLD` (default `3`) — minimum distinct real subscribers required for a campaign id to be considered real. Drop to `1` if your list is small (every send still validates the campaign id, but accepts more scanner noise); raise to `5+` for stricter filtering.
+- `NEWSLETTER_BOT_UA_REGEX` — case-insensitive pattern of UA substrings to flag as scanner traffic. Add new vendor patterns here when you spot them in the suspicious-rows panel.
 
 ## Performance and limits
 

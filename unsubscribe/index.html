@@ -123,6 +123,9 @@
       + '&page=' + encodeURIComponent(campaign)
       + '&recipient=' + encodeURIComponent(recipient)
       + '&site=email';
+    // UA goes via URL param because Apps Script doGet can't read headers —
+    // dashboard uses it to flag scanner-driven unsubscribes.
+    if (navigator.userAgent) beaconUrl += '&ua=' + encodeURIComponent(navigator.userAgent);
 
     // Fire-and-forget. keepalive lets the request complete even if the user
     // closes the tab immediately. Image() is the fallback for older browsers.
