@@ -211,6 +211,7 @@
   }
   .tile-data {
     display: grid; grid-template-columns: 260px 1fr; min-height: 240px; overflow: hidden;
+    position: relative;
   }
   .tile-data .chart {
     border-right: 1px solid var(--border); background: var(--chart-bg);
@@ -222,6 +223,27 @@
   .tile-data .meta { margin-bottom: 14px; }
   .tile-data .title { font-size: 20px; margin: 4px 0 10px; }
   .tile-data .cta { margin-top: 20px; }
+  /* Stretched overlay link makes the whole tile clickable while leaving room
+     for inline secondary buttons (z-index lifts them above the overlay). */
+  .stretched-link { position: absolute; inset: 0; z-index: 1; }
+  .tile-data .cta-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-top: 20px;
+  }
+  .tile-data .cta-row .cta { margin-top: 0; }
+  .tile-q1-btn {
+    position: relative; z-index: 2;
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 10px;
+    font-size: 10.5px; font-weight: 500;
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); background: transparent;
+    border: 1px solid var(--accent); border-radius: 3px;
+    text-decoration: none; white-space: nowrap;
+    transition: background .15s, color .15s;
+  }
+  .tile-q1-btn:hover { background: var(--accent); color: #fff; }
 
   /* Runbook row (3 tiles, list-preview + text) */
   .runbook-grid {
@@ -588,7 +610,8 @@
 
   <div class="data-grid">
 
-    <a href="reports/gi-broker-movement-april-2026.html" class="tile tile-data" onclick="trackCta('data_movement_click')">
+    <div class="tile tile-data">
+      <a href="reports/gi-broker-movement-april-2026.html" class="stretched-link" onclick="trackCta('data_movement_click')" aria-label="Open monthly movement dashboard"></a>
       <div class="chart">
         <!-- netbars chart: monthly AR movement, bars above/below zero -->
         <svg width="260" height="220" viewBox="0 0 260 220" style="display:block; background:#f4f1ea;">
@@ -624,9 +647,12 @@
         <div class="meta"><span>MONTHLY</span><span>APR 2026</span></div>
         <h3 class="title">GI Broker Movement Dashboard</h3>
         <p class="blurb">Who's growing, who's shrinking, and where brokers are moving. Monthly AR movements across AFS Licensees.</p>
-        <div class="cta">OPEN DASHBOARD →</div>
+        <div class="cta-row">
+          <span class="cta">OPEN DASHBOARD →</span>
+          <a href="reports/gi-broker-movement-dashboard.html" class="tile-q1-btn" onclick="trackCta('data_q1_report_click')">Q1 Report →</a>
+        </div>
       </div>
-    </a>
+    </div>
 
     <a href="reports/gi-broker-ar-profile.html" class="tile tile-data" onclick="trackCta('data_profile_click')">
       <div class="chart">
