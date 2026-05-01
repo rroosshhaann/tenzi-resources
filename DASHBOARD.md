@@ -22,7 +22,7 @@ Top to bottom:
    | Contacts | Rows in the Contacts sheet |
    | Median dwell | Median seconds across all `(dwell: N)` rows |
 
-5. **Daily activity chart** — inline SVG line chart. Page views (green) + unique visitors (grey) per day, gap-filled across the window
+5. **Daily activity chart** — inline SVG line chart. Page views (green) + unique visitors (grey) per day, gap-filled across the window. Hover anywhere over a column to surface a tooltip (date, page views, unique visitors) plus a vertical guide line and highlighted dots — handled by a small inline `<script>` block, no chart library
 6. **Top pages** — view count + share-of-total bar, top 20
 7. **CTA clicks** — click count bar per action, all actions sorted desc
 8. **Median dwell per page** — Median, P90, sample count, top 20 by median
@@ -122,7 +122,8 @@ All dashboard code lives in `apps-script.gs` under the comment `// ── DASHBO
 | `buildDashboardHtml_(stats, days, siteFilter, token)` | Top-level page template |
 | `dashboardCss_` | Inline CSS — Terminal Grid tokens copied verbatim from the resources site |
 | `kpi_`, `sectionLabel_` | Markup helpers |
-| `buildLineChart_` | Hand-rolled inline-SVG line chart (no Chart.js) |
+| `buildLineChart_` | Hand-rolled inline-SVG line chart with per-day hover groups (no Chart.js) |
+| `dashboardJs_` | Inline JS injected before `</body>` — wires the line-chart hover tooltip; no other client-side behaviour |
 | `buildTopPagesTable_`, `buildCtaTable_`, `buildDwellTable_`, `buildSubscribersTable_`, `buildContactsTable_` | The five tables |
 
 After any code change: paste the updated `apps-script.gs` into the Apps Script editor and **Deploy → New version**. The script is the deployment unit — there's no separate dashboard hosting.

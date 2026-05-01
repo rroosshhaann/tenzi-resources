@@ -424,7 +424,36 @@ function buildDashboardHtml_(stats, days, siteFilter, token) {
         '<span>Window: last ' + days + ' days · Site: ' + siteFilter + '</span>' +
         '<span>Refreshed: ' + Utilities.formatDate(new Date(), DASHBOARD_TIMEZONE, 'yyyy-MM-dd HH:mm') + ' Melbourne</span>' +
       '</footer>' +
-    '</div></body></html>';
+    '</div>' +
+    '<script>' + dashboardJs_() + '</script>' +
+    '</body></html>';
+}
+
+function dashboardJs_() {
+  return '(function(){' +
+    'var wrap=document.querySelector(".chart-wrap");if(!wrap)return;' +
+    'var tip=wrap.querySelector(".chart-tip");' +
+    'var dps=wrap.querySelectorAll(".dp");' +
+    'function fmt(n){return String(n).replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")}' +
+    'function show(g){' +
+      'tip.innerHTML="<div class=\\"tip-date\\">"+g.getAttribute("data-date")+"</div>"+' +
+        '"<div class=\\"tip-row\\"><span class=\\"tip-lbl\\">Page views</span><span class=\\"tip-val tip-pv\\">"+fmt(g.getAttribute("data-pv"))+"</span></div>"+' +
+        '"<div class=\\"tip-row\\"><span class=\\"tip-lbl\\">Unique</span><span class=\\"tip-val tip-uv\\">"+fmt(g.getAttribute("data-uv"))+"</span></div>";' +
+      'tip.hidden=false;' +
+      'var dot=g.querySelector(".dp-pv");' +
+      'var dr=dot.getBoundingClientRect();' +
+      'var wr=wrap.getBoundingClientRect();' +
+      'var half=tip.offsetWidth/2;' +
+      'var raw=dr.left+dr.width/2-wr.left;' +
+      'var left=Math.max(half+4,Math.min(wrap.clientWidth-half-4,raw));' +
+      'tip.style.left=left+"px";' +
+      'tip.style.top=(dr.top-wr.top)+"px";' +
+    '}' +
+    'for(var i=0;i<dps.length;i++){' +
+      'dps[i].addEventListener("mouseenter",function(){show(this)});' +
+    '}' +
+    'wrap.addEventListener("mouseleave",function(){tip.hidden=true});' +
+  '})();';
 }
 
 function dashboardCss_() {
@@ -455,7 +484,19 @@ function dashboardCss_() {
     '.section-label .num{color:var(--dim)}' +
     '.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px}' +
     '.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0}' +
-    '.chart{width:100%;height:220px;display:block}' +
+    '.chart{width:100%;height:220px;display:block;overflow:visible}' +
+    '.chart-wrap{position:relative}' +
+    '.chart .dp:hover .dp-dot,.chart .dp:hover .dp-guide{opacity:1}' +
+    '.chart .dp-hit{cursor:crosshair}' +
+    '.chart-tip{position:absolute;background:#1a1a1a;color:#f5f0e8;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;line-height:1.4;padding:8px 10px;border-radius:5px;pointer-events:none;white-space:nowrap;transform:translate(-50%,calc(-100% - 10px));box-shadow:0 4px 14px rgba(0,0,0,0.18);z-index:10}' +
+    '.chart-tip[hidden]{display:none}' +
+    '.chart-tip .tip-date{color:#a59f93;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px}' +
+    '.chart-tip .tip-row{display:flex;justify-content:space-between;gap:18px}' +
+    '.chart-tip .tip-row + .tip-row{margin-top:2px}' +
+    '.chart-tip .tip-lbl{color:#a59f93}' +
+    '.chart-tip .tip-val{font-weight:500}' +
+    '.chart-tip .tip-pv{color:#5EEAD4}' +
+    '.chart-tip .tip-uv{color:#e0dbcf}' +
     'table{width:100%;border-collapse:collapse;font-feature-settings:"tnum"}' +
     'th{text-align:left;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:0 0 8px 0;border-bottom:1px solid var(--border)}' +
     'th.r{text-align:right}' +
@@ -530,12 +571,40 @@ function buildLineChart_(daily) {
       '<text x="' + (padL + 124) + '" y="13" fill="#1a1a1a">UNIQUE VISITORS</text>' +
     '</g>';
 
-  return '<svg class="chart" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
-    grid +
-    '<polyline points="' + uvPts + '" fill="none" stroke="#a59f93" stroke-width="1.5"/>' +
-    '<polyline points="' + pvPts + '" fill="none" stroke="#2ca471" stroke-width="2"/>' +
-    xLabels + legend +
-  '</svg>';
+  // Hover overlay — one group per day. Hit-zone rect captures hover for the
+  // whole vertical column; dots + guide line fade in via CSS; the tooltip is
+  // positioned by JS using the page-views dot's bounding rect.
+  var colW = n === 1 ? innerW : innerW / (n - 1);
+  var hover = '';
+  for (var j = 0; j < n; j++) {
+    var xi = x(j);
+    var pvY = y(daily[j].pageViews);
+    var uvY = y(daily[j].uniqueVisitors);
+    var hitX, hitW;
+    if (n === 1)        { hitX = padL;          hitW = innerW; }
+    else if (j === 0)   { hitX = padL;          hitW = colW / 2; }
+    else if (j === n-1) { hitX = xi - colW / 2; hitW = colW / 2; }
+    else                { hitX = xi - colW / 2; hitW = colW; }
+    hover +=
+      '<g class="dp" data-date="' + daily[j].date +
+        '" data-pv="' + daily[j].pageViews +
+        '" data-uv="' + daily[j].uniqueVisitors + '">' +
+        '<line class="dp-guide" x1="' + xi + '" y1="' + padT + '" x2="' + xi + '" y2="' + (padT + innerH) + '" stroke="#1a1a1a" stroke-width="0.6" stroke-dasharray="2 3" opacity="0"/>' +
+        '<circle class="dp-dot" cx="' + xi + '" cy="' + uvY + '" r="3.5" fill="#a59f93" stroke="#fff" stroke-width="1.5" opacity="0"/>' +
+        '<circle class="dp-dot dp-pv" cx="' + xi + '" cy="' + pvY + '" r="3.5" fill="#2ca471" stroke="#fff" stroke-width="1.5" opacity="0"/>' +
+        '<rect class="dp-hit" x="' + hitX + '" y="' + padT + '" width="' + hitW + '" height="' + innerH + '" fill="transparent"/>' +
+      '</g>';
+  }
+
+  return '<div class="chart-wrap">' +
+    '<svg class="chart" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
+      grid +
+      '<polyline points="' + uvPts + '" fill="none" stroke="#a59f93" stroke-width="1.5"/>' +
+      '<polyline points="' + pvPts + '" fill="none" stroke="#2ca471" stroke-width="2"/>' +
+      xLabels + legend + hover +
+    '</svg>' +
+    '<div class="chart-tip" hidden></div>' +
+  '</div>';
 }
 
 function buildTopPagesTable_(rows, total) {
