@@ -42,11 +42,12 @@ Every page loads the shared **`track.js`** (served from `https://tenzi.ai/track.
 | Column | Field | Source |
 |-|-|-|
 | A | Event / email | `(page view)`, `(cta: action_name)`, `(dwell: N)`, or real form-submission email |
-| B | Page | `document.title` |
+| B | Page | `document.title` (or campaign tag for email-link events) |
 | C | Timestamp | Server-side Melbourne time (`Australia/Melbourne`, formatted in Apps Script) |
 | D | IP | Client-side lookup via `api.ipify.org` |
 | E | Referrer | `document.referrer` |
-| F | Site | `marketing` or `resources` (empty for rows written before `track.js` shipped) |
+| F | Site | `marketing`, `resources`, or `email` (empty for rows written before `track.js` shipped) |
+| G | Recipient | Email of the newsletter recipient who opened/clicked an email link (empty for site events) |
 
 **Event types** (in column A):
 - `(page view)` — fires on `tenziTrack.init()`
@@ -58,6 +59,8 @@ Every page loads the shared **`track.js`** (served from `https://tenzi.ai/track.
 - `(cta: PREMIUM_book_call_click)` — clicked premium "Book a call to discuss"
 - `(cta: linkedin_click)` — clicked "Join the conversation" on a free report/runbook
 - `(cta: PREMIUM_linkedin_click)` — clicked "Join the conversation" on a premium sample
+- `(cta: email_click)` — default action for newsletter click-tracking redirects (recipient in column G; site=`email`)
+- `(cta: email_unsubscribe_click)` — newsletter recipient hit `/unsubscribe/` (recipient in column G; campaign in B)
 - Real email — form submission (Events sheet) or contact form (Contacts sheet)
 
 Compare CTA click counts vs actual form submissions to measure drop-off per page. Column F lets Looker Studio slice by origin site.
@@ -76,7 +79,7 @@ Compare CTA click counts vs actual form submissions to measure drop-off per page
 
 ## Dashboard
 
-The same Apps Script web app exposes a private analytics dashboard (KPIs, daily activity chart, top pages, CTA breakdown, dwell stats, recent subscribers + contacts) at `?view=dashboard&token=<TOKEN>`. Token-gated, server-rendered HTML in the same Terminal Grid (Light) style as the rest of the site. Full reference: [`DASHBOARD.md`](./DASHBOARD.md).
+The same Apps Script web app exposes a private analytics dashboard (KPIs, daily activity chart, top pages, CTA breakdown, dwell stats, recent subscribers, recent unsubscribes, recent contacts, and top external referrers) at `?view=dashboard&token=<TOKEN>`. Every list paginates at 15 rows. Token-gated, server-rendered HTML in the same Terminal Grid (Light) style as the rest of the site. Full reference: [`DASHBOARD.md`](./DASHBOARD.md).
 
 ## Adding a new page
 
