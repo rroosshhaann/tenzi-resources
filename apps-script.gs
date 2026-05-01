@@ -254,7 +254,7 @@ function computeStats_(days, siteFilter) {
   var byDate = {};
   var viewsByPage = {}, ctaByAction = {}, dwellByPage = {};
   var refByDomain = {};
-  var allSubscribers = [], allContacts = [];
+  var allSubscribers = [], allContacts = [], allUnsubscribes = [];
   var totalPv = 0, totalCta = 0;
   var ipsAllTime = {};
 
@@ -287,6 +287,14 @@ function computeStats_(days, siteFilter) {
       entry.ctaClicks++;
       var action = ev.substring(6, ev.length - 1);
       ctaByAction[action] = (ctaByAction[action] || 0) + 1;
+      // Unsubscribes also get collected into a dedicated list so the dashboard
+      // can show who opted out (column G) — not just the aggregate count.
+      if (action === 'email_unsubscribe_click') {
+        var recipient = String(row.Recipient || '').trim();
+        if (recipient) {
+          allUnsubscribes.push({ ts: ts, recipient: recipient, campaign: page, site: site });
+        }
+      }
     } else if (ev.indexOf('(dwell: ') === 0 && ev.charAt(ev.length - 1) === ')') {
       var sec = parseInt(ev.substring(8, ev.length - 1), 10);
       if (!isNaN(sec) && sec > 0) {
@@ -364,6 +372,7 @@ function computeStats_(days, siteFilter) {
     topReferrers: topReferrers,
     dwellRows: dwellRows,
     subscribers: allSubscribers.sort(function(a,b){return b.ts-a.ts}).slice(0, 500),
+    unsubscribes: allUnsubscribes.sort(function(a,b){return b.ts-a.ts}).slice(0, 500),
     contacts: allContacts.sort(function(a,b){return b.ts-a.ts}).slice(0, 500)
   };
 }
@@ -512,14 +521,17 @@ function buildDashboardHtml_(stats, days, siteFilter, token) {
         '</div>' +
       '</div>' +
 
+      sectionLabel_('Median dwell per page', stats.dwellRows.length + ' PAGES') +
+      '<div class="card">' + buildDwellTable_(stats.dwellRows) + '</div>' +
+
       '<div class="grid-2">' +
-        '<div>' +
-          sectionLabel_('Median dwell per page', 'TOP 20') +
-          '<div class="card">' + buildDwellTable_(stats.dwellRows) + '</div>' +
-        '</div>' +
         '<div>' +
           sectionLabel_('Recent subscribers', stats.subscribers.length + ' SHOWN') +
           '<div class="card">' + buildSubscribersTable_(stats.subscribers) + '</div>' +
+        '</div>' +
+        '<div>' +
+          sectionLabel_('Recent unsubscribes', stats.unsubscribes.length + ' SHOWN') +
+          '<div class="card">' + buildUnsubscribesTable_(stats.unsubscribes) + '</div>' +
         '</div>' +
       '</div>' +
 
@@ -796,6 +808,18 @@ function buildSubscribersTable_(rows) {
     html += '<tr data-row="' + pg + '"><td class="page">' + escapeHtml_(r.email) + '</td>' +
             '<td class="tsmono">' + formatTs_(r.ts) + '</td>' +
             '<td>' + escapeHtml_(r.page) + '</td></tr>';
+  });
+  return wrapPaged_(html + '</tbody></table>', rows.length);
+}
+
+function buildUnsubscribesTable_(rows) {
+  if (!rows.length) return '<div class="empty">No unsubscribes in this window.</div>';
+  var html = '<table><thead><tr><th>Recipient</th><th>When</th><th>Campaign</th></tr></thead><tbody>';
+  rows.forEach(function(r, i) {
+    var pg = Math.floor(i / DASHBOARD_PAGE_SIZE);
+    html += '<tr data-row="' + pg + '"><td class="page">' + escapeHtml_(r.recipient) + '</td>' +
+            '<td class="tsmono">' + formatTs_(r.ts) + '</td>' +
+            '<td>' + escapeHtml_(r.campaign) + '</td></tr>';
   });
   return wrapPaged_(html + '</tbody></table>', rows.length);
 }
