@@ -23,12 +23,15 @@ Top to bottom:
    | Median dwell | Median seconds across all `(dwell: N)` rows |
 
 5. **Daily activity chart** — inline SVG line chart. Page views (green) + unique visitors (grey) per day, gap-filled across the window. Hover anywhere over a column to surface a tooltip (date, page views, unique visitors) plus a vertical guide line and highlighted dots — handled by a small inline `<script>` block, no chart library
-6. **Top pages** — view count + share-of-total bar, top 20
-7. **CTA clicks** — click count bar per action, all actions sorted desc
-8. **Median dwell per page** — Median, P90, sample count, top 20 by median
-9. **Recent subscribers** — Email + timestamp + originating page, last 50
-10. **Recent contacts** — full row from Contacts sheet, last 20
-11. **Footer** — refresh time + window summary
+6. **Top pages** — view count + share-of-total bar
+7. **CTA clicks** — click count bar per action, sorted desc
+8. **Median dwell per page** — Median, P90, sample count, sorted by median desc
+9. **Recent subscribers** — Email + timestamp + originating page, sorted newest first
+10. **Recent contacts** — full row from Contacts sheet, sorted newest first
+11. **Top referrers** — distinct external sources sending traffic to the sites, sorted by visit count. Internal traffic (`tenzi.ai`, `resources.tenzi.ai`, any `*.tenzi.ai` subdomain) is excluded so the list shows true outside sources only — LinkedIn, Google, Cal.com, email clients, etc. Visits with no `Referrer` header land in a `(direct)` row; unparseable referrers fall into `(unknown)`. Counted from `(page view)` events only — CTA clicks and dwell don't add to referrer counts.
+12. **Footer** — refresh time + window summary
+
+**List pagination.** Every list section (top pages, CTA clicks, dwell, recent subscribers, recent contacts, top referrers) renders 15 rows per page with `← Prev` / `Next →` buttons below the table. Lists with 15 or fewer rows show no paginator. All data up to the server-side cap (200 for top-N lists, 500 for recent rows) is rendered into the page upfront and switched client-side via inline JS — no extra round trips per page change. Each list maintains independent page state.
 
 ## URL
 

@@ -166,6 +166,40 @@ function getOrCreate_(name) {
   return ss.getSheetByName(name) || ss.insertSheet(name);
 }
 
+// Extract the bare domain from a referrer URL: 'https://www.linkedin.com/x' → 'linkedin.com'.
+function extractDomain_(url) {
+  var m = String(url).match(/^https?:\/\/([^\/?#]+)/i);
+  if (!m) return '(unknown)';
+  return m[1].toLowerCase().replace(/^www\./, '');
+}
+
+// True if the referrer domain is one of our own properties — we exclude these
+// so the Top referrers list shows external sources only (LinkedIn, Google,
+// Cal.com, email clients, etc.). '(direct)' is treated as external.
+function isInternalReferrer_(domain) {
+  if (!domain || domain === '(direct)' || domain === '(unknown)') return false;
+  return domain === 'tenzi.ai' || domain === 'resources.tenzi.ai' ||
+         domain.indexOf('.tenzi.ai') !== -1;
+}
+
+// Wrap a list/table HTML fragment with a paginator UI. Each row inside `html`
+// must carry data-row="N" (0-indexed page). Lists with 15 rows or fewer get
+// no UI — pagination only kicks in beyond that. Page switching is handled
+// client-side by the JS in dashboardJs_.
+var DASHBOARD_PAGE_SIZE = 15;
+function wrapPaged_(html, totalRows) {
+  if (totalRows <= DASHBOARD_PAGE_SIZE) return html;
+  var totalPages = Math.ceil(totalRows / DASHBOARD_PAGE_SIZE);
+  return '<div class="paged" data-pages="' + totalPages + '">' +
+    html +
+    '<div class="pager">' +
+      '<button type="button" class="pg-prev">← Prev</button>' +
+      '<span class="pg-status">Page <span class="pg-current">1</span> of ' + totalPages + '</span>' +
+      '<button type="button" class="pg-next">Next →</button>' +
+    '</div>' +
+  '</div>';
+}
+
 // ── DASHBOARD ─────────────────────────────────────────────────────────
 // Server-rendered HTML. Read Events + Contacts, aggregate, return a single
 // page with KPIs, a daily activity chart, top pages, CTA breakdown, dwell
@@ -210,6 +244,7 @@ function computeStats_(days, siteFilter) {
 
   var byDate = {};
   var viewsByPage = {}, ctaByAction = {}, dwellByPage = {};
+  var refByDomain = {};
   var allSubscribers = [], allContacts = [];
   var totalPv = 0, totalCta = 0;
   var ipsAllTime = {};
@@ -232,6 +267,12 @@ function computeStats_(days, siteFilter) {
       entry.pageViews++;
       if (ip) { entry.ips[ip] = true; ipsAllTime[ip] = true; }
       viewsByPage[page] = (viewsByPage[page] || 0) + 1;
+      // External referrer aggregation — internal tenzi.ai traffic excluded.
+      var ref = String(row.Referrer || '').trim();
+      var domain = ref ? extractDomain_(ref) : '(direct)';
+      if (!isInternalReferrer_(domain)) {
+        refByDomain[domain] = (refByDomain[domain] || 0) + 1;
+      }
     } else if (ev.indexOf('(cta: ') === 0 && ev.charAt(ev.length - 1) === ')') {
       totalCta++;
       entry.ctaClicks++;
@@ -280,8 +321,10 @@ function computeStats_(days, siteFilter) {
     });
   }
 
-  var topPages = mapToList_(viewsByPage, 'page', 'views').slice(0, 20);
-  var topCtas = mapToList_(ctaByAction, 'action', 'clicks');
+  // Caps bumped from earlier 20/50 limits — pagination handles display.
+  var topPages = mapToList_(viewsByPage, 'page', 'views').slice(0, 200);
+  var topCtas = mapToList_(ctaByAction, 'action', 'clicks').slice(0, 200);
+  var topReferrers = mapToList_(refByDomain, 'source', 'visits').slice(0, 200);
 
   var dwellRows = [];
   Object.keys(dwellByPage).forEach(function(p) {
@@ -289,7 +332,7 @@ function computeStats_(days, siteFilter) {
     dwellRows.push({ page: p, samples: arr.length, median: median_(arr), p90: percentile_(arr, 90) });
   });
   dwellRows.sort(function(a, b) { return b.median - a.median; });
-  dwellRows = dwellRows.slice(0, 20);
+  dwellRows = dwellRows.slice(0, 200);
 
   var allDwell = [];
   Object.keys(dwellByPage).forEach(function(p) {
@@ -309,9 +352,10 @@ function computeStats_(days, siteFilter) {
     daily: daily,
     topPages: topPages,
     topCtas: topCtas,
+    topReferrers: topReferrers,
     dwellRows: dwellRows,
-    subscribers: allSubscribers.sort(function(a,b){return b.ts-a.ts}).slice(0, 50),
-    contacts: allContacts.sort(function(a,b){return b.ts-a.ts}).slice(0, 20)
+    subscribers: allSubscribers.sort(function(a,b){return b.ts-a.ts}).slice(0, 500),
+    contacts: allContacts.sort(function(a,b){return b.ts-a.ts}).slice(0, 500)
   };
 }
 
@@ -473,6 +517,9 @@ function buildDashboardHtml_(stats, days, siteFilter, token) {
       sectionLabel_('Recent contacts', 'TENZI.AI HOLDING-PAGE FORM') +
       '<div class="card">' + buildContactsTable_(stats.contacts) + '</div>' +
 
+      sectionLabel_('Top referrers', 'EXTERNAL SOURCES · ' + stats.topReferrers.length + ' DOMAINS') +
+      '<div class="card">' + buildReferrersTable_(stats.topReferrers) + '</div>' +
+
       '<footer class="foot">' +
         '<span>Window: last ' + days + ' days · Site: ' + siteFilter + '</span>' +
         '<span>Refreshed: ' + Utilities.formatDate(new Date(), DASHBOARD_TIMEZONE, 'yyyy-MM-dd HH:mm') + ' Melbourne</span>' +
@@ -506,6 +553,33 @@ function dashboardJs_() {
       'dps[i].addEventListener("mouseenter",function(){show(this)});' +
     '}' +
     'wrap.addEventListener("mouseleave",function(){tip.hidden=true});' +
+  '})();' +
+  // Per-list pagination — one independent paginator per .paged container.
+  '(function(){' +
+    'var lists=document.querySelectorAll(".paged");' +
+    'for(var p=0;p<lists.length;p++){' +
+      '(function(list){' +
+        'var rows=list.querySelectorAll("[data-row]");' +
+        'var total=parseInt(list.getAttribute("data-pages")||"1",10);' +
+        'var prev=list.querySelector(".pg-prev");' +
+        'var next=list.querySelector(".pg-next");' +
+        'var status=list.querySelector(".pg-current");' +
+        'var current=0;' +
+        'function show(page){' +
+          'if(page<0)page=0;if(page>total-1)page=total-1;' +
+          'current=page;' +
+          'for(var i=0;i<rows.length;i++){' +
+            'if(parseInt(rows[i].getAttribute("data-row"),10)===page){rows[i].classList.add("visible")}else{rows[i].classList.remove("visible")}' +
+          '}' +
+          'if(status)status.textContent=page+1;' +
+          'if(prev)prev.disabled=page===0;' +
+          'if(next)next.disabled=page===total-1;' +
+        '}' +
+        'if(prev)prev.addEventListener("click",function(){show(current-1)});' +
+        'if(next)next.addEventListener("click",function(){show(current+1)});' +
+        'show(0);' +
+      '})(lists[p]);' +
+    '}' +
   '})();';
 }
 
@@ -562,6 +636,12 @@ function dashboardCss_() {
     '.bar{display:flex;align-items:center;gap:8px}' +
     '.bar-track{flex:1;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;min-width:60px}' +
     '.bar-fill{height:100%;background:linear-gradient(90deg,var(--g300),var(--g700));border-radius:3px}' +
+    '.paged tr[data-row]:not(.visible){display:none}' +
+    '.pager{display:flex;align-items:center;justify-content:center;gap:14px;padding-top:14px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;color:var(--muted);letter-spacing:0.04em}' +
+    '.pager button{background:var(--panel);border:1px solid var(--border);padding:5px 12px;border-radius:4px;cursor:pointer;font:inherit;color:var(--text);letter-spacing:0.04em}' +
+    '.pager button:hover:not(:disabled){border-color:var(--border-bright)}' +
+    '.pager button:disabled{opacity:0.35;cursor:not-allowed}' +
+    '.pg-current{color:var(--text);font-weight:500}' +
     '.foot{padding:24px 0 12px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:18px;border-top:1px solid var(--border)}' +
     '@media(max-width:900px){.kpi-row{grid-template-columns:repeat(3,1fr)}.grid-2{grid-template-columns:1fr}}' +
     '@media(max-width:600px){.kpi-row{grid-template-columns:repeat(2,1fr)}.filters{flex-direction:column;align-items:stretch}}';
@@ -664,59 +744,80 @@ function buildTopPagesTable_(rows, total) {
   if (!rows.length) return '<div class="empty">No page views in this window.</div>';
   var maxV = rows[0].views;
   var html = '<table><thead><tr><th>Page</th><th class="r">Views</th><th class="r" style="width:120px">Share</th></tr></thead><tbody>';
-  rows.forEach(function(r) {
+  rows.forEach(function(r, i) {
     var pct = total > 0 ? Math.round(r.views / total * 100) : 0;
-    html += '<tr><td class="page">' + escapeHtml_(r.page) + '</td>' +
+    var pg = Math.floor(i / DASHBOARD_PAGE_SIZE);
+    html += '<tr data-row="' + pg + '"><td class="page">' + escapeHtml_(r.page) + '</td>' +
             '<td class="r">' + formatNumber_(r.views) + '</td>' +
             '<td class="r"><div class="bar"><div class="bar-track"><div class="bar-fill" style="width:' + (r.views/maxV*100) + '%"></div></div><span style="font-size:11px;color:var(--dim);font-family:\'IBM Plex Mono\',monospace;min-width:36px;text-align:right">' + pct + '%</span></div></td></tr>';
   });
-  return html + '</tbody></table>';
+  return wrapPaged_(html + '</tbody></table>', rows.length);
 }
 
 function buildCtaTable_(rows) {
   if (!rows.length) return '<div class="empty">No CTA clicks in this window.</div>';
   var maxV = rows[0].clicks;
   var html = '<table><thead><tr><th>Action</th><th class="r" style="width:140px">Clicks</th></tr></thead><tbody>';
-  rows.forEach(function(r) {
-    html += '<tr><td class="page">' + escapeHtml_(r.action) + '</td>' +
+  rows.forEach(function(r, i) {
+    var pg = Math.floor(i / DASHBOARD_PAGE_SIZE);
+    html += '<tr data-row="' + pg + '"><td class="page">' + escapeHtml_(r.action) + '</td>' +
             '<td class="r"><div class="bar"><div class="bar-track"><div class="bar-fill" style="width:' + (r.clicks/maxV*100) + '%"></div></div><span style="min-width:36px;text-align:right">' + formatNumber_(r.clicks) + '</span></div></td></tr>';
   });
-  return html + '</tbody></table>';
+  return wrapPaged_(html + '</tbody></table>', rows.length);
 }
 
 function buildDwellTable_(rows) {
   if (!rows.length) return '<div class="empty">No dwell data yet — visitors need to leave a page for it to fire.</div>';
   var html = '<table><thead><tr><th>Page</th><th class="r">Median</th><th class="r">P90</th><th class="r">N</th></tr></thead><tbody>';
-  rows.forEach(function(r) {
-    html += '<tr><td class="page">' + escapeHtml_(r.page) + '</td>' +
+  rows.forEach(function(r, i) {
+    var pg = Math.floor(i / DASHBOARD_PAGE_SIZE);
+    html += '<tr data-row="' + pg + '"><td class="page">' + escapeHtml_(r.page) + '</td>' +
             '<td class="r">' + formatDuration_(r.median) + '</td>' +
             '<td class="r" style="color:var(--dim)">' + formatDuration_(r.p90) + '</td>' +
             '<td class="r" style="color:var(--dim)">' + r.samples + '</td></tr>';
   });
-  return html + '</tbody></table>';
+  return wrapPaged_(html + '</tbody></table>', rows.length);
 }
 
 function buildSubscribersTable_(rows) {
   if (!rows.length) return '<div class="empty">No subscribers in this window.</div>';
   var html = '<table><thead><tr><th>Email</th><th>When</th><th>From page</th></tr></thead><tbody>';
-  rows.forEach(function(r) {
-    html += '<tr><td class="page">' + escapeHtml_(r.email) + '</td>' +
+  rows.forEach(function(r, i) {
+    var pg = Math.floor(i / DASHBOARD_PAGE_SIZE);
+    html += '<tr data-row="' + pg + '"><td class="page">' + escapeHtml_(r.email) + '</td>' +
             '<td class="tsmono">' + formatTs_(r.ts) + '</td>' +
             '<td>' + escapeHtml_(r.page) + '</td></tr>';
   });
-  return html + '</tbody></table>';
+  return wrapPaged_(html + '</tbody></table>', rows.length);
 }
 
 function buildContactsTable_(rows) {
   if (!rows.length) return '<div class="empty">No contact-form submissions in this window.</div>';
   var html = '<table><thead><tr><th>When</th><th>Name</th><th>Email</th><th>Org</th><th>Role</th><th>Interest</th></tr></thead><tbody>';
-  rows.forEach(function(r) {
-    html += '<tr><td class="tsmono">' + formatTs_(r.ts) + '</td>' +
+  rows.forEach(function(r, i) {
+    var pg = Math.floor(i / DASHBOARD_PAGE_SIZE);
+    html += '<tr data-row="' + pg + '"><td class="tsmono">' + formatTs_(r.ts) + '</td>' +
             '<td class="page">' + escapeHtml_(r.name) + '</td>' +
             '<td>' + escapeHtml_(r.email) + '</td>' +
             '<td>' + escapeHtml_(r.organisation) + '</td>' +
             '<td>' + escapeHtml_(r.role) + '</td>' +
             '<td>' + escapeHtml_(r.interest) + '</td></tr>';
   });
-  return html + '</tbody></table>';
+  return wrapPaged_(html + '</tbody></table>', rows.length);
+}
+
+function buildReferrersTable_(rows) {
+  if (!rows.length) return '<div class="empty">No external referrers in this window — visits are arriving direct, from internal links, or with no referrer header.</div>';
+  var maxV = rows[0].visits;
+  var totalVisits = 0;
+  rows.forEach(function(r) { totalVisits += r.visits; });
+  var html = '<table><thead><tr><th>Source</th><th class="r">Visits</th><th class="r" style="width:120px">Share</th></tr></thead><tbody>';
+  rows.forEach(function(r, i) {
+    var pct = totalVisits > 0 ? Math.round(r.visits / totalVisits * 100) : 0;
+    var pg = Math.floor(i / DASHBOARD_PAGE_SIZE);
+    html += '<tr data-row="' + pg + '"><td class="page">' + escapeHtml_(r.source) + '</td>' +
+            '<td class="r">' + formatNumber_(r.visits) + '</td>' +
+            '<td class="r"><div class="bar"><div class="bar-track"><div class="bar-fill" style="width:' + (r.visits/maxV*100) + '%"></div></div><span style="font-size:11px;color:var(--dim);font-family:\'IBM Plex Mono\',monospace;min-width:36px;text-align:right">' + pct + '%</span></div></td></tr>';
+  });
+  return wrapPaged_(html + '</tbody></table>', rows.length);
 }
