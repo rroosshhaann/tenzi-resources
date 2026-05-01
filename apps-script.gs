@@ -18,7 +18,7 @@ var EXCLUDED_IPS = [];                  // IPs silently dropped from all sheets 
 // Hosts permitted as redirect destinations from the click-tracking endpoint
 // (?redirect=<url>). Anything else is refused so the endpoint can't be abused
 // as an open redirect to phishing sites.
-var ALLOWED_REDIRECT_HOSTS = ['tenzi.ai', 'resources.tenzi.ai', 'linkedin.com'];
+var ALLOWED_REDIRECT_HOSTS = ['tenzi.ai', 'resources.tenzi.ai', 'linkedin.com', 'cal.com'];
 
 // Dashboard auth — token in the URL is the simplest gate. Generate a long
 // random string and replace the placeholder. Bookmark the dashboard URL with
