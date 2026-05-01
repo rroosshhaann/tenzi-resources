@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="../tenzi-arcs-small.svg">
-<title>GI Broker Movement Dashboard — April 2026</title>
+<title>GI Broker AR Movement — April 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -34,7 +34,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .back-link { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 500; color: var(--text-secondary); text-decoration: none; transition: color 0.15s; }
 .back-link:hover { color: var(--g900); }
 
-/* Header */
+/* Header (now flex) */
 .header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
 .header-content { flex: 1; min-width: 0; }
 .header-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--g500); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
@@ -73,21 +73,38 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 }
 .btn-linkedin:hover { border-color: rgba(61,138,168,0.7); background: rgba(61,138,168,0.06); }
 
-/* Cross-report nav strip */
-.prev-report-strip { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
-.prev-report-label { font-size: 13px; color: var(--text-secondary); }
+/* Cross-report nav — standalone row below the header */
+.prev-report-row { margin-bottom: 18px; }
 .btn-prev-report {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 14px;
+  padding: 9px 16px;
   background: var(--bg); color: var(--g700);
   border: 1px solid var(--g700); border-radius: 999px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px; font-weight: 500;
   text-transform: uppercase; letter-spacing: 0.6px;
   text-decoration: none;
+  white-space: nowrap;
   transition: background 0.18s, color 0.18s;
 }
 .btn-prev-report:hover { background: var(--g700); color: #fff; }
+
+/* Headline insights */
+.insights-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 18px; }
+.insights-list { display: flex; flex-direction: column; gap: 12px; }
+.insight-item { display: flex; gap: 12px; align-items: flex-start; }
+.insight-dot { flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--g500); margin-top: 8px; }
+.insight-body { flex: 1; font-size: 14px; line-height: 1.55; color: var(--text-secondary); }
+.insight-body strong { font-weight: 700; color: var(--g900); margin-right: 4px; }
+
+/* Scope toggle */
+.scope-toggle { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 4px; margin-bottom: 18px; gap: 0; }
+.scope-toggle button { background: transparent; border: 0; padding: 6px 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.6px; color: var(--text-secondary); border-radius: 999px; cursor: pointer; transition: background 0.18s, color 0.18s; }
+.scope-toggle button:hover { color: var(--g700); }
+.scope-toggle button.active { background: var(--g700); color: #fff; }
+
+.view { display: none; }
+.view.active { display: block; }
 
 .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
 .kpi-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 14px 16px; position: relative; overflow: hidden; }
@@ -209,15 +226,21 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   .kpi-value { font-size: 24px; }
   .flow-row { gap: 6px; padding: 8px 10px; }
   .wf-bar { width: 36px; }
+  .scope-toggle button { padding: 6px 10px; font-size: 11px; }
   .subscribe-form { min-width: 0; }
 }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-.kpi-card, .waterfall-wrap, .table-card, .flow-card, .sticky-stat, .net-card { animation: fadeUp 0.4s ease both; }
-.kpi-card:nth-child(1) { animation-delay: 0.03s; }
-.kpi-card:nth-child(2) { animation-delay: 0.06s; }
-.kpi-card:nth-child(3) { animation-delay: 0.09s; }
-.kpi-card:nth-child(4) { animation-delay: 0.12s; }
-.waterfall-wrap { animation-delay: 0.15s; }
+.view.active .kpi-card,
+.view.active .waterfall-wrap,
+.view.active .table-card,
+.view.active .flow-card,
+.view.active .sticky-stat,
+.view.active .net-card { animation: fadeUp 0.4s ease both; }
+.view.active .kpi-card:nth-child(1) { animation-delay: 0.03s; }
+.view.active .kpi-card:nth-child(2) { animation-delay: 0.06s; }
+.view.active .kpi-card:nth-child(3) { animation-delay: 0.09s; }
+.view.active .kpi-card:nth-child(4) { animation-delay: 0.12s; }
+.view.active .waterfall-wrap { animation-delay: 0.15s; }
 </style>
 </head>
 <body>
@@ -293,10 +316,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     <div class="header-content">
       <div class="header-eyebrow">General Insurance &middot; Authorised Representatives</div>
       <h1>AR Market Movement Dashboard</h1>
-      <div class="header-sub"><span>11 Jan 2026 &rarr; 8 Apr 2026</span> &middot; Individual ARs only</div>
+      <div class="header-sub"><span>31 Mar 2026 &rarr; 30 Apr 2026</span> &middot; April 2026</div>
     </div>
     <div class="cta-group">
-      <a class="btn-linkedin" href="https://www.linkedin.com/posts/roshan-khozouei_where-are-australias-gi-ar-brokers-moving-activity-7447542771428597760-DTgu" target="_blank" rel="noopener" onclick="trackCta('linkedin_click')">
+      <a class="btn-linkedin" href="https://www.linkedin.com/posts/roshan-khozouei_where-are-australias-gi-broker-ars-moving-activity-7455839172164079616-2EY4" target="_blank" rel="noopener" onclick="trackCta('linkedin_click')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
         Join the conversation
       </a>
@@ -307,70 +330,96 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     </div>
   </div>
 
-  <div class="prev-report-strip">
-    <span class="prev-report-label">Looking for the latest monthly view?</span>
-    <a class="btn-prev-report" href="gi-broker-movement-april-2026.html" onclick="trackCta('april_report_click')">
-      Take me to the April report
+  <div class="prev-report-row">
+    <a class="btn-prev-report" href="gi-broker-movement-dashboard.html" onclick="trackCta('q1_report_click')">
+      Take me to the Q1 report
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
     </a>
   </div>
 
+  <div class="section-title">Headline insights</div>
+  <div class="insights-card">
+    <div class="insights-list">
+      <div class="insight-item">
+        <div class="insight-dot"></div>
+        <div class="insight-body"><strong>The market is sticky at one-month cadence.</strong>99% of individual ARs stayed exactly where they were. Just 7 ARs switched AFSL across the whole of April.</div>
+      </div>
+      <div class="insight-item">
+        <div class="insight-dot"></div>
+        <div class="insight-body"><strong>Growth is from new blood, not poaching.</strong>59 new individual ARs entered the GI broker set &mdash; 43 brand new, 16 re-entering after a gap, 0 from non-GI AFSLs. Compare that to just 7 inter-AFSL switches.</div>
+      </div>
+      <div class="insight-item">
+        <div class="insight-dot"></div>
+        <div class="insight-body"><strong>Metrix Connect is the destination of choice.</strong>Of the 7 inter-AFSL moves, 3 landed at Metrix &mdash; the only AFSL with multiple inflows this month. Dynamic Insurance Services &rarr; Metrix: 2. Community Broker Network &rarr; Metrix: 1.</div>
+      </div>
+      <div class="insight-item">
+        <div class="insight-dot"></div>
+        <div class="insight-body"><strong>CBN has flipped vs Q1.</strong>Last quarter Community Broker Network was the biggest exporter, shedding 12 ARs to other AFSLs. In April it's the biggest absolute grower (+10 net) &mdash; but that came almost entirely from new ARs joining their network, not poaching.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scope-toggle" role="tablist" aria-label="Scope">
+    <button data-scope="individuals" class="active">AR</button><button data-scope="both">AR + CAR</button><button data-scope="cars">CAR</button>
+  </div>
+
+<div class="view active" data-scope="individuals">
   <div class="kpi-row">
     <div class="kpi-card accent">
-      <div class="kpi-label">Total Individual Broker ARs</div>
-      <div class="kpi-value">4,259</div>
-      <span class="kpi-delta up">&#9650; +37 (+0.9%)</span>
+      <div class="kpi-label">Total Individual ARs</div>
+      <div class="kpi-value">3,885</div>
+      <span class="kpi-delta up">&#9650; +19 (+0.5%)</span>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Stayed at Same AFSL</div>
-      <div class="kpi-value">4,008</div>
-      <span class="kpi-delta neutral">95% retention</span>
-      <div class="kpi-secondary">48 switched AFSL</div>
+      <div class="kpi-value">3,819</div>
+      <span class="kpi-delta neutral">99% retention</span>
+      <div class="kpi-secondary">7 ARs switched AFSL</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">New Entrants</div>
-      <div class="kpi-value">214</div>
+      <div class="kpi-label">New Individual ARs</div>
+      <div class="kpi-value">59</div>
       <span class="kpi-delta up">&#9650; new ARs in window</span>
-      <div class="kpi-secondary">172 new &middot; 31 re-entering &middot; 11 transfers</div>
+      <div class="kpi-secondary">43 new &middot; 16 re-entering &middot; 0 from other AFSLs</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Ceased / Left</div>
-      <div class="kpi-value">177</div>
-      <span class="kpi-delta down">&#9660; departed Jan&ndash;Apr</span>
+      <div class="kpi-value">40</div>
+      <span class="kpi-delta down">&#9660; ARs ceased in window</span>
     </div>
   </div>
 
   <div class="waterfall-wrap">
-    <div class="waterfall-title">Population Bridge &middot; Jan &rarr; Apr 2026</div>
-    <div class="waterfall-subtitle">+214 entered the GI broker set, &minus;177 ceased or left</div>
+    <div class="waterfall-title">Population Bridge &middot; Individual ARs only</div>
+    <div class="waterfall-subtitle">+59 ARs entered, &minus;40 ceased or left</div>
     <div class="waterfall-chart">
       <div class="wf-col">
         <div class="wf-upper">
-          <div class="wf-val">4,222</div>
-          <div class="wf-bar start" style="height:160px"></div>
+          <div class="wf-val">3,866</div>
+          <div class="wf-bar start" style="height:159px"></div>
         </div>
-        <div class="wf-lower"><div class="wf-label">11 Jan 2026<br>Baseline</div></div>
+        <div class="wf-lower"><div class="wf-label">31 Mar 2026<br>Baseline</div></div>
       </div>
       <div class="wf-col">
         <div class="wf-upper">
-          <div class="wf-val">+214</div>
-          <div class="wf-bar positive" style="height:82px"></div>
+          <div class="wf-val">+59</div>
+          <div class="wf-bar positive" style="height:110px"></div>
         </div>
         <div class="wf-lower"><div class="wf-label">New<br>Entrants</div></div>
       </div>
       <div class="wf-col">
         <div class="wf-upper"><div class="wf-label">Ceased /<br>Left</div></div>
         <div class="wf-lower">
-          <div class="wf-bar negative" style="height:68px"></div>
-          <div class="wf-val">&minus;177</div>
+          <div class="wf-bar negative" style="height:75px"></div>
+          <div class="wf-val">&minus;40</div>
         </div>
       </div>
       <div class="wf-col">
         <div class="wf-upper">
-          <div class="wf-val">4,259</div>
-          <div class="wf-bar end" style="height:163px"></div>
+          <div class="wf-val">3,885</div>
+          <div class="wf-bar end" style="height:160px"></div>
         </div>
-        <div class="wf-lower"><div class="wf-label">8 Apr 2026<br>Result</div></div>
+        <div class="wf-lower"><div class="wf-label">30 Apr 2026<br>Result</div></div>
       </div>
     </div>
   </div>
@@ -378,11 +427,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   <div class="sticky-stat">
     <h3>Market Stickiness</h3>
     <div class="progress-track">
-      <div class="progress-fill" style="width:95%"></div>
+      <div class="progress-fill" style="width:99%"></div>
     </div>
     <div class="progress-labels">
-      <span><strong>95%</strong> stayed at same AFSL</span>
-      <span><strong>1.1%</strong> switched AFSL</span>
+      <span><strong>99%</strong> stayed at same AFSL</span>
+      <span><strong>0.2%</strong> switched AFSL</span>
     </div>
   </div>
 
@@ -390,29 +439,29 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   <div class="two-col">
     <div class="table-card">
       <h3>Biggest Growers</h3>
-      <div class="card-sub">Absolute net change in AR count</div>
+      <div class="card-sub">Absolute net change</div>
       <table class="data-table">
         <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
         <tbody>
-          <tr><td>McLardy McShane</td><td class="pos">+15</td></tr>
-          <tr><td>Bentleys QLD Advisory</td><td class="pos">+15</td></tr>
-          <tr><td>Austar Finance <span class="badge new">NEW</span></td><td class="pos">+11</td></tr>
-          <tr><td>Metrix Connect</td><td class="pos">+10</td></tr>
-          <tr><td>Insurance Advisernet</td><td class="pos">+8</td></tr>
+<tr><td>Community Broker Network</td><td class="pos">+10</td></tr>
+<tr><td>Peninsula Mutual</td><td class="pos">+4</td></tr>
+<tr><td>Metrix Connect</td><td class="pos">+4</td></tr>
+<tr><td>McLardy McShane Partners</td><td class="pos">+3</td></tr>
+<tr><td>Sirius Insurance</td><td class="pos">+3</td></tr>
         </tbody>
       </table>
     </div>
     <div class="table-card">
       <h3>Biggest Shrinkers</h3>
-      <div class="card-sub">Absolute net change in AR count</div>
+      <div class="card-sub">Absolute net change</div>
       <table class="data-table">
         <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
         <tbody>
-          <tr><td>Peninsula Mutual</td><td class="neg">&minus;17</td></tr>
-          <tr><td>Ausure</td><td class="neg">&minus;13</td></tr>
-          <tr><td>SureInsure</td><td class="neg">&minus;7</td></tr>
-          <tr><td>PSC Connect</td><td class="neg">&minus;5</td></tr>
-          <tr><td>Community Broker Network</td><td class="neg">&minus;5</td></tr>
+<tr><td>Resilium Insurance Broking</td><td class="neg">-5</td></tr>
+<tr><td>Dynamic Insurance Services</td><td class="neg">-3</td></tr>
+<tr><td>Professional Services Corporation</td><td class="neg">-2</td></tr>
+<tr><td>Oracle Group (australia)</td><td class="neg">-2</td></tr>
+<tr><td>Ausure</td><td class="neg">-1</td></tr>
         </tbody>
       </table>
     </div>
@@ -425,10 +474,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <table class="data-table">
         <thead><tr><th>AFSL</th><th>%</th></tr></thead>
         <tbody>
-          <tr><td>Bentleys QLD Advisory <span style="color:var(--text-muted);font-size:13px">12&rarr;27</span></td><td class="pos">+125%</td></tr>
-          <tr><td>Red Star Insurance</td><td class="pos">+40%</td></tr>
-          <tr><td>MPF Representatives</td><td class="pos">+31%</td></tr>
-          <tr><td>BMIA Broker Network</td><td class="pos">+25%</td></tr>
+<tr><td>Webber Insurance Group <span style="color:var(--text-muted);font-size:13px">7&rarr;9</span></td><td class="pos">+29%</td></tr>
+<tr><td>AJS Holding Co <span style="color:var(--text-muted);font-size:13px">5&rarr;6</span></td><td class="pos">+20%</td></tr>
+<tr><td>EBN Holdings <span style="color:var(--text-muted);font-size:13px">11&rarr;13</span></td><td class="pos">+18%</td></tr>
+<tr><td>Sirius Insurance <span style="color:var(--text-muted);font-size:13px">29&rarr;32</span></td><td class="pos">+10%</td></tr>
+<tr><td>Sureinsure <span style="color:var(--text-muted);font-size:13px">22&rarr;24</span></td><td class="pos">+9%</td></tr>
         </tbody>
       </table>
     </div>
@@ -438,10 +488,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <table class="data-table">
         <thead><tr><th>AFSL</th><th>%</th></tr></thead>
         <tbody>
-          <tr><td>Eminence Global</td><td class="neg">&minus;43%</td></tr>
-          <tr><td>SureInsure</td><td class="neg">&minus;24%</td></tr>
-          <tr><td>Charter Group GI</td><td class="neg">&minus;20%</td></tr>
-          <tr><td>PSC Reliance</td><td class="neg">&minus;19%</td></tr>
+<tr><td>Professional Services Corporation <span style="color:var(--text-muted);font-size:13px">5&rarr;3</span></td><td class="neg">-40%</td></tr>
+<tr><td>Dynamic Insurance Services <span style="color:var(--text-muted);font-size:13px">10&rarr;7</span></td><td class="neg">-30%</td></tr>
+<tr><td>Elliott Australia Group <span style="color:var(--text-muted);font-size:13px">5&rarr;4</span></td><td class="neg">-20%</td></tr>
+<tr><td>Sparaxis <span style="color:var(--text-muted);font-size:13px">8&rarr;7</span></td><td class="neg">-12%</td></tr>
+<tr><td>Kbi Group <span style="color:var(--text-muted);font-size:13px">17&rarr;16</span></td><td class="neg">-6%</td></tr>
         </tbody>
       </table>
     </div>
@@ -449,52 +500,361 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
   <div class="section-title">Movement Flows</div>
   <div class="flow-card">
-    <h3>AFSL Transfers &middot; Top Routes</h3>
-    <div class="card-sub">48 ARs switched AFSL (37 within GI + 11 from non-GI) &mdash; 15 were bulk transfers</div>
-    <div class="flow-row">
-      <div class="flow-count">6</div>
-      <div class="flow-from">Community Broker Network</div>
-      <div class="flow-arrow">&rarr;</div>
-      <div class="flow-to">Metrix Connect</div>
-      <div class="flow-tag">transfer</div>
-    </div>
-    <div class="flow-row">
-      <div class="flow-count">5</div>
-      <div class="flow-from">Community Broker Network</div>
-      <div class="flow-arrow">&rarr;</div>
-      <div class="flow-to">McLardy McShane</div>
-      <div class="flow-tag">transfer</div>
-    </div>
-    <div class="flow-row">
-      <div class="flow-count">4</div>
-      <div class="flow-from">Ausure</div>
-      <div class="flow-arrow">&rarr;</div>
-      <div class="flow-to">Lavaro <span class="badge new">NEW AFSL</span></div>
-      <div class="flow-tag">transfer</div>
-    </div>
+    <h3>AFSL Transfers &middot; Individual ARs only</h3>
+    <div class="card-sub">7 ARs switched AFSL within the GI-primary set</div>
+<div class="flow-row"><div class="flow-count">2</div><div class="flow-from">Dynamic Insurance Services</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Metrix Connect</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Community Broker Network</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Metrix Connect</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Elliott Australia Group</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Apollo Risk Services</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Insurance Advisernet Australia</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Resilium Insurance Broking</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">PSC Connect</div><div class="flow-arrow">&rarr;</div><div class="flow-to">McLardy McShane Partners</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Resilium Insurance Broking</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Community Broker Network</div><div class="flow-tag">transfer</div></div>
   </div>
 
   <div class="net-row">
     <div class="net-card">
       <h4>Top Net Importers (from moves)</h4>
-      <div class="net-item"><span class="name">Metrix Connect</span><span class="val pos">+10</span></div>
-      <div class="net-item"><span class="name">McLardy McShane</span><span class="val pos">+8</span></div>
+<div class="net-item"><span class="name">Metrix Connect</span><span class="val pos">+3</span></div>
+<div class="net-item"><span class="name">Apollo Risk Services</span><span class="val pos">+1</span></div>
+<div class="net-item"><span class="name">McLardy McShane Partners</span><span class="val pos">+1</span></div>
     </div>
     <div class="net-card">
       <h4>Top Net Exporters (from moves)</h4>
-      <div class="net-item"><span class="name">Community Broker Network</span><span class="val neg">&minus;10</span></div>
+<div class="net-item"><span class="name">Dynamic Insurance Services</span><span class="val neg">-2</span></div>
+<div class="net-item"><span class="name">Elliott Australia Group</span><span class="val neg">-1</span></div>
+<div class="net-item"><span class="name">Insurance Advisernet Australia</span><span class="val neg">-1</span></div>
     </div>
   </div>
+</div>
+
+<div class="view" data-scope="both">
+  <div class="kpi-row">
+    <div class="kpi-card accent">
+      <div class="kpi-label">Total Registered ARs + CARs</div>
+      <div class="kpi-value">5,989</div>
+      <span class="kpi-delta up">&#9650; +23 (+0.4%)</span>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Stayed at Same AFSL</div>
+      <div class="kpi-value">5,896</div>
+      <span class="kpi-delta neutral">99% retention</span>
+      <div class="kpi-secondary">11 ARs + CARs switched AFSL</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">New Entrants</div>
+      <div class="kpi-value">82</div>
+      <span class="kpi-delta up">&#9650; new ARs + CARs in window</span>
+      <div class="kpi-secondary">64 new &middot; 17 re-entering &middot; 1 from other AFSLs</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ceased / Left</div>
+      <div class="kpi-value">59</div>
+      <span class="kpi-delta down">&#9660; ARs + CARs ceased in window</span>
+    </div>
+  </div>
+
+  <div class="waterfall-wrap">
+    <div class="waterfall-title">Population Bridge &middot; Individual ARs + CARs</div>
+    <div class="waterfall-subtitle">+82 ARs + CARs entered, &minus;59 ceased or left</div>
+    <div class="waterfall-chart">
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">5,966</div>
+          <div class="wf-bar start" style="height:159px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">31 Mar 2026<br>Baseline</div></div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">+82</div>
+          <div class="wf-bar positive" style="height:110px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">New<br>Entrants</div></div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper"><div class="wf-label">Ceased /<br>Left</div></div>
+        <div class="wf-lower">
+          <div class="wf-bar negative" style="height:79px"></div>
+          <div class="wf-val">&minus;59</div>
+        </div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">5,989</div>
+          <div class="wf-bar end" style="height:160px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">30 Apr 2026<br>Result</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sticky-stat">
+    <h3>Market Stickiness</h3>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:99%"></div>
+    </div>
+    <div class="progress-labels">
+      <span><strong>99%</strong> stayed at same AFSL</span>
+      <span><strong>0.2%</strong> switched AFSL</span>
+    </div>
+  </div>
+
+  <div class="section-title">AFSL Performance</div>
+  <div class="two-col">
+    <div class="table-card">
+      <h3>Biggest Growers</h3>
+      <div class="card-sub">Absolute net change</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
+        <tbody>
+<tr><td>Community Broker Network</td><td class="pos">+10</td></tr>
+<tr><td>Sirius Insurance</td><td class="pos">+9</td></tr>
+<tr><td>Metrix Connect</td><td class="pos">+8</td></tr>
+<tr><td>McLardy McShane Partners</td><td class="pos">+5</td></tr>
+<tr><td>Peninsula Mutual</td><td class="pos">+4</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <h3>Biggest Shrinkers</h3>
+      <div class="card-sub">Absolute net change</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
+        <tbody>
+<tr><td>Whitbread Associates</td><td class="neg">-6</td></tr>
+<tr><td>Resilium Insurance Broking</td><td class="neg">-6</td></tr>
+<tr><td>Dynamic Insurance Services</td><td class="neg">-6</td></tr>
+<tr><td>Oracle Group (australia)</td><td class="neg">-4</td></tr>
+<tr><td>Resolute Property Protect</td><td class="neg">-4</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="table-card">
+      <h3>Fastest Growing</h3>
+      <div class="card-sub">Percentage change (min 5 ARs + CARs)</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>%</th></tr></thead>
+        <tbody>
+<tr><td>Webber Insurance Group <span style="color:var(--text-muted);font-size:13px">8&rarr;10</span></td><td class="pos">+25%</td></tr>
+<tr><td>Sirius Insurance <span style="color:var(--text-muted);font-size:13px">44&rarr;53</span></td><td class="pos">+20%</td></tr>
+<tr><td>AJS Holding Co <span style="color:var(--text-muted);font-size:13px">6&rarr;7</span></td><td class="pos">+17%</td></tr>
+<tr><td>EBN Holdings <span style="color:var(--text-muted);font-size:13px">25&rarr;27</span></td><td class="pos">+8%</td></tr>
+<tr><td>Metrix Connect <span style="color:var(--text-muted);font-size:13px">107&rarr;115</span></td><td class="pos">+7%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <h3>Fastest Shrinking</h3>
+      <div class="card-sub">Percentage change (min 5 ARs + CARs)</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>%</th></tr></thead>
+        <tbody>
+<tr><td>Dynamic Insurance Services <span style="color:var(--text-muted);font-size:13px">17&rarr;11</span></td><td class="neg">-35%</td></tr>
+<tr><td>McCormick Harris &amp; Associates <span style="color:var(--text-muted);font-size:13px">6&rarr;5</span></td><td class="neg">-17%</td></tr>
+<tr><td>Elliott Australia Group <span style="color:var(--text-muted);font-size:13px">6&rarr;5</span></td><td class="neg">-17%</td></tr>
+<tr><td>Sparaxis <span style="color:var(--text-muted);font-size:13px">16&rarr;14</span></td><td class="neg">-12%</td></tr>
+<tr><td>BMS Risk Solutions <span style="color:var(--text-muted);font-size:13px">11&rarr;10</span></td><td class="neg">-9%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Movement Flows</div>
+  <div class="flow-card">
+    <h3>AFSL Transfers &middot; Individual ARs + CARs</h3>
+    <div class="card-sub">11 ARs + CARs switched AFSL within the GI-primary set</div>
+<div class="flow-row"><div class="flow-count">5</div><div class="flow-from">Dynamic Insurance Services</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Metrix Connect</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">2</div><div class="flow-from">PSC Connect</div><div class="flow-arrow">&rarr;</div><div class="flow-to">McLardy McShane Partners</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Community Broker Network</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Metrix Connect</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Elliott Australia Group</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Apollo Risk Services</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Insurance Advisernet Australia</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Resilium Insurance Broking</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Resilium Insurance Broking</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Community Broker Network</div><div class="flow-tag">transfer</div></div>
+  </div>
+
+  <div class="net-row">
+    <div class="net-card">
+      <h4>Top Net Importers (from moves)</h4>
+<div class="net-item"><span class="name">Metrix Connect</span><span class="val pos">+6</span></div>
+<div class="net-item"><span class="name">McLardy McShane Partners</span><span class="val pos">+2</span></div>
+<div class="net-item"><span class="name">Apollo Risk Services</span><span class="val pos">+1</span></div>
+    </div>
+    <div class="net-card">
+      <h4>Top Net Exporters (from moves)</h4>
+<div class="net-item"><span class="name">Dynamic Insurance Services</span><span class="val neg">-5</span></div>
+<div class="net-item"><span class="name">PSC Connect</span><span class="val neg">-2</span></div>
+<div class="net-item"><span class="name">Insurance Advisernet Australia</span><span class="val neg">-1</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="view" data-scope="cars">
+  <div class="kpi-row">
+    <div class="kpi-card accent">
+      <div class="kpi-label">Total Corporate ARs</div>
+      <div class="kpi-value">2,104</div>
+      <span class="kpi-delta up">&#9650; +4 (+0.2%)</span>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Stayed at Same AFSL</div>
+      <div class="kpi-value">2,077</div>
+      <span class="kpi-delta neutral">99% retention</span>
+      <div class="kpi-secondary">4 CARs switched AFSL</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">New Corporate ARs</div>
+      <div class="kpi-value">23</div>
+      <span class="kpi-delta up">&#9650; new CARs in window</span>
+      <div class="kpi-secondary">21 new &middot; 1 re-entering &middot; 1 from other AFSLs</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ceased / Left</div>
+      <div class="kpi-value">19</div>
+      <span class="kpi-delta down">&#9660; CARs ceased in window</span>
+    </div>
+  </div>
+
+  <div class="waterfall-wrap">
+    <div class="waterfall-title">Population Bridge &middot; Corporate ARs only</div>
+    <div class="waterfall-subtitle">+23 CARs entered, &minus;19 ceased or left</div>
+    <div class="waterfall-chart">
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">2,100</div>
+          <div class="wf-bar start" style="height:160px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">31 Mar 2026<br>Baseline</div></div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">+23</div>
+          <div class="wf-bar positive" style="height:110px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">New<br>Entrants</div></div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper"><div class="wf-label">Ceased /<br>Left</div></div>
+        <div class="wf-lower">
+          <div class="wf-bar negative" style="height:91px"></div>
+          <div class="wf-val">&minus;19</div>
+        </div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">2,104</div>
+          <div class="wf-bar end" style="height:160px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">30 Apr 2026<br>Result</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sticky-stat">
+    <h3>Market Stickiness</h3>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:99%"></div>
+    </div>
+    <div class="progress-labels">
+      <span><strong>99%</strong> stayed at same AFSL</span>
+      <span><strong>0.2%</strong> switched AFSL</span>
+    </div>
+  </div>
+
+  <div class="section-title">AFSL Performance</div>
+  <div class="two-col">
+    <div class="table-card">
+      <h3>Biggest Growers</h3>
+      <div class="card-sub">Absolute net change</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
+        <tbody>
+<tr><td>Sirius Insurance</td><td class="pos">+6</td></tr>
+<tr><td>Metrix Connect</td><td class="pos">+4</td></tr>
+<tr><td>McLardy McShane Partners</td><td class="pos">+2</td></tr>
+<tr><td>Finstead Risk Solutions <span class="badge new">NEW</span></td><td class="pos">+1</td></tr>
+<tr><td>BMIA Broker Network</td><td class="pos">+1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <h3>Biggest Shrinkers</h3>
+      <div class="card-sub">Absolute net change</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
+        <tbody>
+<tr><td>Whitbread Associates</td><td class="neg">-6</td></tr>
+<tr><td>Resolute Property Protect</td><td class="neg">-4</td></tr>
+<tr><td>Dynamic Insurance Services</td><td class="neg">-3</td></tr>
+<tr><td>Oracle Group (australia)</td><td class="neg">-2</td></tr>
+<tr><td>Australian Broker Network</td><td class="neg">-1</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="table-card">
+      <h3>Fastest Growing</h3>
+      <div class="card-sub">Percentage change (min 5 CARs)</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>%</th></tr></thead>
+        <tbody>
+<tr><td>Sirius Insurance <span style="color:var(--text-muted);font-size:13px">15&rarr;21</span></td><td class="pos">+40%</td></tr>
+<tr><td>BMIA Broker Network <span style="color:var(--text-muted);font-size:13px">9&rarr;10</span></td><td class="pos">+11%</td></tr>
+<tr><td>Metrix Connect <span style="color:var(--text-muted);font-size:13px">37&rarr;41</span></td><td class="pos">+11%</td></tr>
+<tr><td>Network Insurance House Broking <span style="color:var(--text-muted);font-size:13px">17&rarr;18</span></td><td class="pos">+6%</td></tr>
+<tr><td>Sureinsure <span style="color:var(--text-muted);font-size:13px">20&rarr;21</span></td><td class="pos">+5%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <h3>Fastest Shrinking</h3>
+      <div class="card-sub">Percentage change (min 5 CARs)</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>%</th></tr></thead>
+        <tbody>
+<tr><td>Dynamic Insurance Services <span style="color:var(--text-muted);font-size:13px">7&rarr;4</span></td><td class="neg">-43%</td></tr>
+<tr><td>McCormick Harris &amp; Associates <span style="color:var(--text-muted);font-size:13px">6&rarr;5</span></td><td class="neg">-17%</td></tr>
+<tr><td>Sparaxis <span style="color:var(--text-muted);font-size:13px">8&rarr;7</span></td><td class="neg">-12%</td></tr>
+<tr><td>Whitbread Associates <span style="color:var(--text-muted);font-size:13px">117&rarr;111</span></td><td class="neg">-5%</td></tr>
+<tr><td>Resolute Property Protect <span style="color:var(--text-muted);font-size:13px">84&rarr;80</span></td><td class="neg">-5%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Movement Flows</div>
+  <div class="flow-card">
+    <h3>AFSL Transfers &middot; Corporate ARs only</h3>
+    <div class="card-sub">4 CARs switched AFSL within the GI-primary set</div>
+<div class="flow-row"><div class="flow-count">3</div><div class="flow-from">Dynamic Insurance Services</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Metrix Connect</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">PSC Connect</div><div class="flow-arrow">&rarr;</div><div class="flow-to">McLardy McShane Partners</div><div class="flow-tag">transfer</div></div>
+  </div>
+
+  <div class="net-row">
+    <div class="net-card">
+      <h4>Top Net Importers (from moves)</h4>
+<div class="net-item"><span class="name">Metrix Connect</span><span class="val pos">+3</span></div>
+<div class="net-item"><span class="name">McLardy McShane Partners</span><span class="val pos">+1</span></div>
+    </div>
+    <div class="net-card">
+      <h4>Top Net Exporters (from moves)</h4>
+<div class="net-item"><span class="name">Dynamic Insurance Services</span><span class="val neg">-3</span></div>
+<div class="net-item"><span class="name">PSC Connect</span><span class="val neg">-1</span></div>
+    </div>
+  </div>
+</div>
 
   <div class="section-title">Source &amp; Method</div>
   <div class="source-card">
     <div>
       <div class="source-label">Dataset</div>
-      <p>ASIC Financial Advisers Register. Individual ARs with General Insurance authorisation. Corporate ARs excluded. Snapshots taken 11 Jan and 8 Apr 2026.</p>
+      <p>ASIC AFS Representative Register (data.gov.au). Active GI-broker AFSLs only &mdash; excludes banks, insurers, underwriters, multi-class licensees, and captive auto-finance. Snapshots taken 31 Mar 2026 and 30 Apr 2026.</p>
     </div>
     <div>
       <div class="source-label">Cut</div>
-      <p>A "switch" = same AR appears under a different AFSL between snapshots. New entrants = first ever appearance. Ceased = present in Jan, absent in Apr.</p>
+      <p>A "switch" = same AR appearing under a different AFSL between snapshots, matched on name + ABN. New entrants = first ever appearance. Ceased = present in March, absent in April. Recent registrations awaiting ASIC catch-up may briefly show as ceased.</p>
     </div>
   </div>
 
@@ -563,6 +923,17 @@ function submitSubscribe(e) {
   e.target.innerHTML = '<div style="flex:1;padding:10px 0;font-family:\'JetBrains Mono\',monospace;font-size:12px;color:var(--g700);letter-spacing:0.6px;text-transform:uppercase;">&#10003; Subscribed &mdash; thanks.</div>';
   return false;
 }
+</script>
+<script>
+(function() {
+  const buttons = document.querySelectorAll('.scope-toggle button');
+  const views = document.querySelectorAll('.view');
+  buttons.forEach(btn => btn.addEventListener('click', () => {
+    const s = btn.dataset.scope;
+    buttons.forEach(b => b.classList.toggle('active', b === btn));
+    views.forEach(v => v.classList.toggle('active', v.dataset.scope === s));
+  }));
+})();
 </script>
 </body>
 </html>
