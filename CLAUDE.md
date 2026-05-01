@@ -209,7 +209,16 @@ Dashboard data comes from the `ar-dataset/` project in the `python-scrapbook` re
 
 ## Adding a new page — MANDATORY checklist
 
-Every page on the site MUST have all of the following. No exceptions.
+This applies to **content pages** — reports, runbooks, premium samples, and
+the index. Utility pages (`/r/index.html` and `/unsubscribe/index.html`) are
+explicitly **out of scope** for this checklist: they don't carry a nav bar,
+don't load `track.js`, don't have a content CTA modal, and don't appear as
+tiles on the index. They're functional plumbing for the newsletter, fully
+documented in the "Newsletter integration (static pages)" section above. Do
+not "fix" them by adding the missing pieces — that would break the
+integration.
+
+Every content page on the site MUST have all of the following. No exceptions.
 
 1. **Nav bar** — back-link on left, Tenzi logo SVG on right. Copy from an existing page. Back-link href should use `../index.html` for pages in subfolders.
 2. **Page view tracking + CTA tracking helper** — paste the standard shared-tracker block (see Analytics section above: two `<script>` tags — load `https://tenzi.ai/track.js`, then call `tenziTrack.init({ site: 'resources' })`) at the bottom of the page.
