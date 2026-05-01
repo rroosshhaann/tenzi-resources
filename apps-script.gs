@@ -69,13 +69,22 @@ function doGet(e) {
       e.parameter.site || 'email',
       e.parameter.recipient
     );
+    // HtmlService output is wrapped in a same-origin iframe at
+    // script.googleusercontent.com, so a bare location.replace() only navigates
+    // the iframe — and most destinations (GitHub Pages, LinkedIn) send
+    // X-Frame-Options: DENY, which would render a blocked page. top.location
+    // navigates the parent window and is permitted cross-origin (it's a
+    // navigation, not a read). The target="_top" link is the no-JS fallback;
+    // meta-refresh is intentionally omitted because it can't break out of the
+    // iframe either.
     var safeAttr = escapeHtml_(dest);
     return HtmlService.createHtmlOutput(
       '<!doctype html><html><head><meta charset="utf-8">' +
-      '<meta http-equiv="refresh" content="0;url=' + safeAttr + '">' +
-      '<title>Redirecting…</title></head><body style="font-family:system-ui,sans-serif;color:#6b6560;padding:40px;text-align:center">' +
-      '<script>location.replace(' + JSON.stringify(dest) + ')</script>' +
-      '<p>Redirecting to <a href="' + safeAttr + '">' + safeAttr + '</a>…</p>' +
+      '<title>Redirecting…</title></head>' +
+      '<body style="font-family:system-ui,sans-serif;color:#6b6560;padding:40px;text-align:center">' +
+      '<script>(function(d){try{top.location.replace(d)}catch(e){location.replace(d)}})(' + JSON.stringify(dest) + ');</script>' +
+      '<p>Redirecting to <a href="' + safeAttr + '" target="_top" rel="noopener">' + safeAttr + '</a>…</p>' +
+      '<noscript><p>JavaScript is required. <a href="' + safeAttr + '" target="_top" rel="noopener">Continue manually</a>.</p></noscript>' +
       '</body></html>'
     );
   }
