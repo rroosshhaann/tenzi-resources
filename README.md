@@ -8,10 +8,13 @@ Live at **https://resources.tenzi.ai**
 
 ```
 tenzi-resources/
-  index.html              Central landing page
-  reports/                Free analytics reports
-  runbooks/               Free operational runbooks
-  premium-samples/        Samples of premium paid reports
+  index.html                       Central landing page
+  reports/                         Free analytics reports
+  runbooks/                        Free operational runbooks
+  premium-samples/                 Samples of premium paid reports
+  r/index.html                     Newsletter click-tracking redirect
+  unsubscribe/index.html           Newsletter unsubscribe (with confirm step)
+  tenzi-blue-transparent.png       Logo asset used by the newsletter email
 ```
 
 **Free reports** (`reports/`)
@@ -76,6 +79,32 @@ Compare CTA click counts vs actual form submissions to measure drop-off per page
 1. Edit [`apps-script.gs`](./apps-script.gs) in this repo (source of truth) and commit the change.
 2. Paste the new contents into the Apps Script editor (linked Google Sheet > Extensions > Apps Script).
 3. Deploy > Manage deployments > edit existing > set version to "New version" > Deploy.
+
+## Newsletter integration
+
+The `tenzi-newsletter` repo (separate, private) sends a monthly HTML email
+that hits this site's tracking endpoint. Two static pages live here purely
+for newsletter use:
+
+- **`/r/index.html`** — click-tracking redirect. Reads
+  `?to=<dest>&action=<cta>&recipient=<email>&campaign=<id>` from the URL,
+  fires a beacon to the Apps Script `doGet` (writes a row tagged `site=email`
+  with recipient in column G), then `location.replace`s to `to`. Same
+  allowlist as `apps-script.gs` (`tenzi.ai`, `linkedin.com`, `cal.com` plus
+  subdomains). Routing through this page rather than the Apps Script's own
+  `?redirect=` mode keeps visitors on `resources.tenzi.ai` instead of the
+  Apps Script wrapper at `script.google.com`.
+- **`/unsubscribe/index.html`** — opt-out page with an explicit
+  "Yes, unsubscribe me" confirm button. Required to defeat corporate email
+  security scanners (Mimecast, MS Defender Safe Links, Proofpoint) that
+  pre-fetch every URL in incoming emails — they fetch the HTML but don't
+  simulate UI clicks, so the beacon doesn't fire. After click: writes
+  `(cta: email_unsubscribe_click)` to Events.
+
+Both pages are pure GitHub Pages static HTML, no build step. Apps Script is
+only the beacon receiver. The `apps-script.gs` `?redirect=` mode and
+`ALLOWED_REDIRECT_HOSTS` are dead code now (kept as a fallback) — newsletter
+clicks don't go through them.
 
 ## Dashboard
 

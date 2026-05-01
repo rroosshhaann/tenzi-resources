@@ -20,7 +20,10 @@ tenzi-resources/
     resilium-ar-flow.html                 # Resilium AR flow analysis (48mo)
     *.gif                                 # Embedded chart assets
   unsubscribe/                            # Newsletter unsubscribe landing
-    index.html                            # Reads ?recipient= + ?campaign= from URL, fires (cta: email_unsubscribe_click) with recipient in column G
+    index.html                            # Reads ?recipient= + ?campaign= from URL, requires confirm-button click, then fires (cta: email_unsubscribe_click) with recipient in column G
+  r/                                      # Newsletter click-tracking redirect
+    index.html                            # Reads ?to=&action=&recipient=&campaign=, fires beacon, then location.replace to ?to (allowlisted hosts only)
+  tenzi-blue-transparent.png              # 741×291 RGBA logo asset used by the newsletter email header (sits on cream #faf8f4 background cleanly)
 ```
 
 | Page type | CTA pattern |
@@ -122,6 +125,26 @@ When a LinkedIn post exists for a page, add a "Join the conversation" secondary 
 - Strip LinkedIn's `?utm_source=share&utm_medium=...&rcm=...` tracking params from the URL before committing — they bloat the link without benefit.
 - Label font: `IBM Plex Mono` 11px 500, uppercase, letter-spacing `0.1em`. Matches the mono-eyebrow treatment defined in the design standard.
 - Copy the full button markup from an existing page rather than retyping the SVG path.
+
+### Newsletter integration (static pages)
+
+The `tenzi-newsletter` repo (private, `rroosshhaann/tenzi-newsletter`) sends a
+monthly HTML email that hits this site's tracking endpoint. Two static pages
+live here purely for newsletter use:
+
+**`/r/index.html`** — click-tracking redirect.
+- URL shape: `https://resources.tenzi.ai/r/?to=<dest>&action=<cta>&recipient=<email>&campaign=<id>`
+- Fires a beacon to the Apps Script `doGet` (`?email=(cta:&nbsp;<action>)&page=<campaign>&recipient=<email>&site=email`) via `fetch({ keepalive: true })` with an `Image()` fallback, then `window.location.replace(to)`.
+- Allowlist mirrored from `apps-script.gs` `ALLOWED_REDIRECT_HOSTS`: `tenzi.ai`, `linkedin.com`, `cal.com` plus subdomains. Anchored regex prevents host-spoof URLs.
+- Deliberately routes through `resources.tenzi.ai` instead of the Apps Script's own `?redirect=` mode, so visitors briefly see the Tenzi domain rather than the `script.googleusercontent.com` iframe wrapper.
+
+**`/unsubscribe/index.html`** — opt-out page with required confirm step.
+- URL shape: `https://resources.tenzi.ai/unsubscribe/?recipient=<email>&campaign=<id>`
+- Shows "Unsubscribe from Tenzi Monthly?" + recipient echoed back + green "Yes, unsubscribe me" button.
+- Beacon **only** fires after button click — fires `(cta: email_unsubscribe_click)` to the same Apps Script doGet with recipient in column G.
+- The confirm step exists to defeat corporate email security scanners (Mimecast, MS Defender Safe Links, Proofpoint) that pre-fetch every URL in incoming emails and execute the page in sandbox browsers. They fetch the HTML but don't simulate UI clicks, so the beacon doesn't fire.
+
+Both pages are pure GitHub Pages static HTML. No build step, no track.js (they fire their own beacons because they need to inject `recipient` into the URL — track.js doesn't support that). Apps Script is only the beacon receiver. The `apps-script.gs` `?redirect=` mode and `ALLOWED_REDIRECT_HOSTS`/`isAllowedRedirect_` are dead code now; left as a fallback but not used by current emails.
 
 ### Apps Script (source of truth: `apps-script.gs` in this repo)
 
