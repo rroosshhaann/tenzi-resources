@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Unsubscribed · Tenzi</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter Tight', Inter, system-ui, -apple-system, sans-serif;
+    background: #faf8f4;
+    color: #1a1a1a;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    box-sizing: border-box;
+  }
+  .card {
+    max-width: 480px;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e5e1d9;
+    border-radius: 8px;
+    padding: 40px 36px 32px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .logo { width: 120px; height: auto; display: block; margin: 0 auto 24px; }
+  h1 {
+    margin: 0 0 14px 0;
+    font-size: 22px;
+    line-height: 1.3;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #1C233C;
+  }
+  p { margin: 0 0 12px 0; font-size: 14px; line-height: 1.6; color: #6b6560; }
+  p:last-child { margin-bottom: 0; }
+  a { color: #2ca471; text-decoration: none; }
+  .email-display {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 13px;
+    color: #1C233C;
+    font-weight: 500;
+  }
+  .footer-link {
+    margin-top: 24px;
+    font-size: 12px;
+    color: #a59f93;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <img class="logo" src="https://resources.tenzi.ai/tenzi-blue-transparent.png" alt="Tenzi" />
+  <h1 id="heading">Unsubscribing&hellip;</h1>
+  <p id="msg">One moment while we record your request.</p>
+  <p class="footer-link"><a href="https://resources.tenzi.ai">Back to resources.tenzi.ai</a></p>
+</div>
+<script>
+// Static unsubscribe page for the Tenzi newsletter. Fires
+// (cta: email_unsubscribe_click) to the same Apps Script doGet endpoint that
+// already handles opens, clicks, and form submissions. The recipient column
+// (G) records who opted out; Roshan filters Events for that action before
+// each monthly send and prunes recipients.csv accordingly.
+(function () {
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec';
+
+  var p = new URLSearchParams(window.location.search);
+  var recipient = p.get('recipient') || '';
+  var campaign = p.get('campaign') || '';
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  // Without a recipient param we can't tell who's asking, so don't write a
+  // bogus row. Tell the visitor to reply manually instead.
+  if (!recipient) {
+    document.getElementById('heading').textContent = 'Missing details';
+    document.getElementById('msg').innerHTML =
+      'We couldn&rsquo;t identify which subscriber to remove. Reply to any past Tenzi email with &ldquo;unsubscribe&rdquo; and we&rsquo;ll handle it manually.';
+    return;
+  }
+
+  var beaconUrl = ENDPOINT
+    + '?email=' + encodeURIComponent('(cta: email_unsubscribe_click)')
+    + '&page=' + encodeURIComponent(campaign)
+    + '&recipient=' + encodeURIComponent(recipient)
+    + '&site=email';
+
+  // Fire-and-forget. keepalive lets the request complete even if the user
+  // closes the tab immediately. Image() is the fallback for older browsers.
+  try {
+    if (typeof fetch === 'function') {
+      fetch(beaconUrl, { keepalive: true, mode: 'no-cors' }).catch(function () {});
+    } else {
+      new Image().src = beaconUrl;
+    }
+  } catch (e) {
+    new Image().src = beaconUrl;
+  }
+
+  // Show confirmation immediately. We don't wait for the beacon response
+  // because the Apps Script doGet is no-cors and we can't read it anyway.
+  document.getElementById('heading').textContent = 'You’re unsubscribed';
+  document.getElementById('msg').innerHTML =
+    'We&rsquo;ve recorded the request for <span class="email-display">' +
+    escapeHtml(recipient) +
+    '</span>. You&rsquo;ll be removed from the list within 5 business days.';
+})();
+</script>
+<noscript>
+<p>JavaScript is required to confirm your unsubscribe. Reply to any past Tenzi email with &ldquo;unsubscribe&rdquo; and we&rsquo;ll handle it manually.</p>
+</noscript>
+</body>
+</html>
