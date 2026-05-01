@@ -254,7 +254,11 @@ function computeStats_(days, siteFilter) {
   var byDate = {};
   var viewsByPage = {}, ctaByAction = {}, dwellByPage = {};
   var refByDomain = {};
-  var allSubscribers = [], allContacts = [], allUnsubscribes = [];
+  // Subscribers + unsubscribes are deduped by email / recipient (case-insensitive,
+  // trimmed). When the same address appears more than once, we keep the most recent
+  // occurrence so the row reflects the latest action. Contacts aren't deduped — each
+  // contact-form submission is a distinct conversation worth seeing.
+  var subscribersByEmail = {}, unsubscribesByRecipient = {}, allContacts = [];
   var totalPv = 0, totalCta = 0;
   var ipsAllTime = {};
 
@@ -292,7 +296,11 @@ function computeStats_(days, siteFilter) {
       if (action === 'email_unsubscribe_click') {
         var recipient = String(row.Recipient || '').trim();
         if (recipient) {
-          allUnsubscribes.push({ ts: ts, recipient: recipient, campaign: page, site: site });
+          var rkey = recipient.toLowerCase();
+          var existingUnsub = unsubscribesByRecipient[rkey];
+          if (!existingUnsub || existingUnsub.ts < ts) {
+            unsubscribesByRecipient[rkey] = { ts: ts, recipient: recipient, campaign: page, site: site };
+          }
         }
       }
     } else if (ev.indexOf('(dwell: ') === 0 && ev.charAt(ev.length - 1) === ')') {
@@ -302,7 +310,11 @@ function computeStats_(days, siteFilter) {
       }
     } else if (ev.indexOf('@') !== -1 && ev.charAt(0) !== '(') {
       entry.subscribers++;
-      allSubscribers.push({ email: ev, page: page, ts: ts, site: site });
+      var ekey = ev.trim().toLowerCase();
+      var existingSub = subscribersByEmail[ekey];
+      if (!existingSub || existingSub.ts < ts) {
+        subscribersByEmail[ekey] = { email: ev, page: page, ts: ts, site: site };
+      }
     }
   });
 
@@ -356,6 +368,10 @@ function computeStats_(days, siteFilter) {
     allDwell = allDwell.concat(dwellByPage[p]);
   });
   allDwell.sort(function(a, b) { return a - b; });
+
+  // Flatten the dedup maps into arrays for sorting + display.
+  var allSubscribers = Object.keys(subscribersByEmail).map(function(k) { return subscribersByEmail[k]; });
+  var allUnsubscribes = Object.keys(unsubscribesByRecipient).map(function(k) { return unsubscribesByRecipient[k]; });
 
   return {
     totals: {
