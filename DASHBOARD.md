@@ -26,13 +26,13 @@ Top to bottom:
 6. **Top pages** — view count + share-of-total bar
 7. **CTA clicks** — click count bar per action, sorted desc
 8. **Median dwell per page** — Median, P90, sample count, sorted by median desc
-9. **Recent subscribers** — Email + timestamp + originating page, sorted newest first. Deduped by email (case-insensitive, trimmed) — when the same address appears more than once in the window, only the most recent occurrence is shown. The `Subscribers` KPI in the strip uses the same deduped count.
-10. **Recent unsubscribes** — Recipient (column G of the Events sheet) + timestamp + campaign tag (the `page` field on the unsubscribe beacon), sorted newest first. Deduped by recipient (case-insensitive, trimmed) — same convention as Recent subscribers, so the row reflects the latest unsubscribe action per address. Sourced from rows where Event = `(cta: email_unsubscribe_click)` AND column G is non-empty. Anonymous unsubscribe clicks (no recipient) are excluded — they shouldn't happen in practice because the static unsubscribe page refuses to fire the beacon when the URL is missing the `recipient` param. Pair with Recent subscribers above to read sub:unsub ratios at a glance.
-11. **Recent contacts** — full row from Contacts sheet, sorted newest first
-12. **Top referrers** — distinct external sources sending traffic to the sites, sorted by visit count. Internal traffic (`tenzi.ai`, `resources.tenzi.ai`, any `*.tenzi.ai` subdomain) is excluded so the list shows true outside sources only — LinkedIn, Google, Cal.com, email clients, etc. Visits with no `Referrer` header land in a `(direct)` row; unparseable referrers fall into `(unknown)`. Counted from `(page view)` events only — CTA clicks and dwell don't add to referrer counts.
-13. **Footer** — refresh time + window summary
+9. **Recent contacts** — full row from Contacts sheet, sorted newest first
+10. **Top referrers** — distinct external sources sending traffic to the sites, sorted by visit count. Internal traffic (`tenzi.ai`, `resources.tenzi.ai`, any `*.tenzi.ai` subdomain) is excluded so the list shows true outside sources only — LinkedIn, Google, Cal.com, email clients, etc. Visits with no `Referrer` header land in a `(direct)` row; unparseable referrers fall into `(unknown)`. Counted from `(page view)` events only — CTA clicks and dwell don't add to referrer counts.
+11. **Footer** — refresh time + window summary
 
-**List pagination.** Every list section (top pages, CTA clicks, dwell, recent subscribers, recent contacts, top referrers) renders 15 rows per page with `← Prev` / `Next →` buttons below the table. Lists with 15 or fewer rows show no paginator. All data up to the server-side cap (200 for top-N lists, 500 for recent rows) is rendered into the page upfront and switched client-side via inline JS — no extra round trips per page change. Each list maintains independent page state.
+The **Recent subscribers** and **Recent unsubscribes** lists used to live on this view but moved to the Newsletter view (see below) — they're inherently newsletter-shaped data, easier to read alongside campaign engagement. The `Subscribers` KPI tile stays on this view because it answers "how many distinct people subscribed via the site in this window".
+
+**List pagination.** Every list section (top pages, CTA clicks, dwell, recent contacts, top referrers) renders 15 rows per page with `← Prev` / `Next →` buttons below the table. Lists with 15 or fewer rows show no paginator. All data up to the server-side cap (200 for top-N lists, 500 for recent rows) is rendered into the page upfront and switched client-side via inline JS — no extra round trips per page change. Each list maintains independent page state.
 
 ## URL
 
@@ -149,7 +149,8 @@ Filter buttons use absolute URLs because the dashboard HTML is rendered inside a
 4. **Activity by hour after send** — table showing real opens/clicks/unsubs per hour for the first 48 hours, with a small inline bar visualising relative activity. Hour 0 is the campaign's first event timestamp (effectively the send moment)
 5. **Recipient activity** — paginated table of engaged subscribers with per-recipient open/click/unsub counts and the timestamp of their latest action, sorted by total engagement
 6. **Suspicious rows** — collapsed `<details>` panel listing dropped rows (timestamp, event, recipient, UA, drop reason). Pop it open for forensic auditing of scanner noise
-7. **All campaigns** — cross-campaign overview at the bottom, one row per real campaign, click-through to switch the selected campaign
+7. **All campaigns** — cross-campaign overview, one row per real campaign, click-through to switch the selected campaign
+8. **Recent subscribers** + **Recent unsubscribes** (grid-2, at the bottom) — deduped by email/recipient (case-insensitive, trimmed) so the same address never appears twice; sorted newest first. Window-scoped (matches the Range filter). Same data shape as the previous Site-view lists — no filtering against `realSubscribers` is applied here, so a subscribe row is shown even if the subscriber hasn't engaged with a campaign yet, and an unsubscribe is shown even if the recipient slipped through the button-click gate. Pair them at a glance to read sub:unsub ratio for the window
 
 ### Filter logic — what counts as "real"
 

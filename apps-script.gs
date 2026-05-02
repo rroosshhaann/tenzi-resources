@@ -550,17 +550,6 @@ function buildDashboardHtml_(stats, days, siteFilter, token) {
       sectionLabel_('Median dwell per page', stats.dwellRows.length + ' PAGES') +
       '<div class="card">' + buildDwellTable_(stats.dwellRows) + '</div>' +
 
-      '<div class="grid-2">' +
-        '<div>' +
-          sectionLabel_('Recent subscribers', stats.subscribers.length + ' SHOWN') +
-          '<div class="card">' + buildSubscribersTable_(stats.subscribers) + '</div>' +
-        '</div>' +
-        '<div>' +
-          sectionLabel_('Recent unsubscribes', stats.unsubscribes.length + ' SHOWN') +
-          '<div class="card">' + buildUnsubscribesTable_(stats.unsubscribes) + '</div>' +
-        '</div>' +
-      '</div>' +
-
       sectionLabel_('Recent contacts', 'TENZI.AI HOLDING-PAGE FORM') +
       '<div class="card">' + buildContactsTable_(stats.contacts) + '</div>' +
 
@@ -1058,10 +1047,44 @@ function computeNewsletterStats_(days) {
 
   var realCampaignList = campaignList.filter(function(c) { return c.isReal; });
 
+  // Pass 5: build the deduped Recent-subscribers + Recent-unsubscribes lists
+  // (within the window). Mirrors computeStats_'s dedup-by-email/recipient
+  // convention — same row shape so buildSubscribersTable_/buildUnsubscribesTable_
+  // can render either feed unchanged.
+  var subscribersByEmail = {}, unsubscribesByRecipient = {};
+  events.forEach(function(row) {
+    var ts = parseTs_(row.Timestamp);
+    if (!ts || ts < cutoff) return;
+    var ev = String(row.Event || '');
+    var page = String(row.Page || '');
+    var site = String(row.Site || '');
+
+    if (ev.indexOf('@') !== -1 && ev.charAt(0) !== '(') {
+      var ekey = ev.trim().toLowerCase();
+      var existingSub = subscribersByEmail[ekey];
+      if (!existingSub || existingSub.ts < ts) {
+        subscribersByEmail[ekey] = { email: ev, page: page, ts: ts, site: site };
+      }
+    } else if (ev === '(cta: email_unsubscribe_click)') {
+      var recipient = String(row.Recipient || '').trim();
+      if (recipient) {
+        var rkey = recipient.toLowerCase();
+        var existingUnsub = unsubscribesByRecipient[rkey];
+        if (!existingUnsub || existingUnsub.ts < ts) {
+          unsubscribesByRecipient[rkey] = { ts: ts, recipient: recipient, campaign: page, site: site };
+        }
+      }
+    }
+  });
+  var subscribers = Object.keys(subscribersByEmail).map(function(k) { return subscribersByEmail[k]; });
+  var unsubscribes = Object.keys(unsubscribesByRecipient).map(function(k) { return unsubscribesByRecipient[k]; });
+
   return {
     campaigns: realCampaignList,
     allCampaigns: campaignList,
-    realSubscriberCount: Object.keys(realSubscribers).length
+    realSubscriberCount: Object.keys(realSubscribers).length,
+    subscribers: subscribers.sort(function(a,b){return b.ts-a.ts}).slice(0, 500),
+    unsubscribes: unsubscribes.sort(function(a,b){return b.ts-a.ts}).slice(0, 500)
   };
 }
 
@@ -1115,7 +1138,18 @@ function buildNewsletterHtml_(stats, days, selectedCampaign, token) {
   }
 
   body += sectionLabel_('All campaigns', stats.campaigns.length + ' SHOWN') +
-          '<div class="card">' + buildCampaignOverview_(stats.campaigns, qs, days) + '</div>';
+          '<div class="card">' + buildCampaignOverview_(stats.campaigns, qs, days) + '</div>' +
+
+          '<div class="grid-2">' +
+            '<div>' +
+              sectionLabel_('Recent subscribers', stats.subscribers.length + ' SHOWN') +
+              '<div class="card">' + buildSubscribersTable_(stats.subscribers) + '</div>' +
+            '</div>' +
+            '<div>' +
+              sectionLabel_('Recent unsubscribes', stats.unsubscribes.length + ' SHOWN') +
+              '<div class="card">' + buildUnsubscribesTable_(stats.unsubscribes) + '</div>' +
+            '</div>' +
+          '</div>';
 
   return '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
