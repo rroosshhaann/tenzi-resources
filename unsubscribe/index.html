@@ -67,6 +67,58 @@
     font-size: 12px;
     color: #a59f93;
   }
+  .reason-form {
+    text-align: left;
+    margin: 22px 0 4px 0;
+    padding: 18px 0 4px 0;
+    border-top: 1px solid #f0ece4;
+  }
+  .reason-form .field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #a59f93;
+    margin: 0 0 6px 0;
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+  .reason-form select,
+  .reason-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 14px;
+    color: #1C233C;
+    background: #ffffff;
+    border: 1px solid #e5e1d9;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin: 0 0 14px 0;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .reason-form select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%236b6560' d='M0 0l5 6 5-6z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  .reason-form textarea {
+    resize: vertical;
+    min-height: 64px;
+    line-height: 1.5;
+  }
+  .reason-form select:focus,
+  .reason-form textarea:focus {
+    border-color: #2ca471;
+  }
+  .reason-form .help {
+    font-size: 12px;
+    color: #a59f93;
+    margin: -8px 0 12px 0;
+  }
 </style>
 </head>
 <body>
@@ -74,6 +126,22 @@
   <img class="logo" src="https://resources.tenzi.ai/tenzi-blue-transparent.png" alt="Tenzi" />
   <h1 id="heading">Unsubscribe from Tenzi Monthly?</h1>
   <p id="msg">Click the button below to confirm. We&rsquo;ll remove <span id="email" class="email-display"></span> from the list.</p>
+
+  <div id="reason-form" class="reason-form">
+    <label class="field-label" for="reason">Reason (optional)</label>
+    <select id="reason">
+      <option value="">— Select a reason —</option>
+      <option value="too_frequent">Too many emails</option>
+      <option value="not_relevant">Content isn&rsquo;t relevant</option>
+      <option value="didnt_signup">I don&rsquo;t recall subscribing</option>
+      <option value="decluttering">Just decluttering my inbox</option>
+      <option value="other">Other</option>
+    </select>
+    <label class="field-label" for="comment">Anything else? (optional)</label>
+    <textarea id="comment" maxlength="500" rows="3" placeholder="A short note helps us improve."></textarea>
+    <p class="help">Both fields are optional. Your unsubscribe is processed either way.</p>
+  </div>
+
   <button id="confirm" class="btn">Yes, unsubscribe me</button>
   <p class="footer-link"><a href="https://resources.tenzi.ai">Back to resources.tenzi.ai</a></p>
 </div>
@@ -84,6 +152,10 @@
 // Safe Links, Proofpoint) pre-fetch the page in sandbox browsers and would
 // otherwise auto-trigger the beacon. Real users click the button; scanners
 // don't, so this filters them out cleanly.
+//
+// The beacon also carries optional `reason` and `comment` form fields, which
+// land in columns I and J of the Events sheet. Empty params are omitted to
+// keep URLs short and the sheet readable.
 (function () {
   var ENDPOINT = 'https://script.google.com/macros/s/AKfycbzO6crfhklS6kIOXOGNIBBSk9ZiIUdM1lESOw6hGkqfE7qxz9MbVz47_ydAitFyFQtW/exec';
 
@@ -95,6 +167,9 @@
   var msg = document.getElementById('msg');
   var btn = document.getElementById('confirm');
   var emailEl = document.getElementById('email');
+  var formEl = document.getElementById('reason-form');
+  var reasonEl = document.getElementById('reason');
+  var commentEl = document.getElementById('comment');
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -108,6 +183,7 @@
     heading.textContent = 'Missing details';
     msg.innerHTML = 'We couldn&rsquo;t identify which subscriber to remove. Reply to any past Tenzi email with &ldquo;unsubscribe&rdquo; and we&rsquo;ll handle it manually.';
     btn.style.display = 'none';
+    formEl.style.display = 'none';
     return;
   }
 
@@ -118,11 +194,16 @@
     btn.disabled = true;
     btn.textContent = 'Unsubscribing…';
 
+    var reason = (reasonEl.value || '').trim();
+    var comment = (commentEl.value || '').trim();
+
     var beaconUrl = ENDPOINT
       + '?email=' + encodeURIComponent('(cta: email_unsubscribe_click)')
       + '&page=' + encodeURIComponent(campaign)
       + '&recipient=' + encodeURIComponent(recipient)
       + '&site=email';
+    if (reason) beaconUrl += '&reason=' + encodeURIComponent(reason);
+    if (comment) beaconUrl += '&comment=' + encodeURIComponent(comment);
     // UA goes via URL param because Apps Script doGet can't read headers —
     // dashboard uses it to flag scanner-driven unsubscribes.
     if (navigator.userAgent) beaconUrl += '&ua=' + encodeURIComponent(navigator.userAgent);
@@ -139,12 +220,15 @@
       new Image().src = beaconUrl;
     }
 
+    var thanks = (reason || comment) ? ' Thanks for the feedback.' : '';
     heading.textContent = 'You’re unsubscribed';
     msg.innerHTML =
       'We&rsquo;ve recorded the request for <span class="email-display">' +
       escapeHtml(recipient) +
-      '</span>. You&rsquo;ll be removed from the list within 5 business days.';
+      '</span>. You&rsquo;ll be removed from the list within 5 business days.' +
+      escapeHtml(thanks);
     btn.style.display = 'none';
+    formEl.style.display = 'none';
   });
 })();
 </script>

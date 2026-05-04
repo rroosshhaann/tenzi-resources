@@ -42,7 +42,7 @@ function doPost(e) {
     writeContact_(data, melbTime);
     notifyContact_(data);
   } else {
-    writeEvent_(data.email, data.page, melbTime, data.ip, data.referrer, data.site, '', data.ua);
+    writeEvent_(data.email, data.page, melbTime, data.ip, data.referrer, data.site, '', data.ua, '', '');
   }
   return ContentService.createTextOutput('ok');
 }
@@ -71,7 +71,8 @@ function doGet(e) {
       melbTime, e.parameter.ip, e.parameter.ref,
       e.parameter.site || 'email',
       e.parameter.recipient,
-      e.parameter.ua
+      e.parameter.ua,
+      '', ''
     );
     // HtmlService output is wrapped in a same-origin iframe at
     // script.googleusercontent.com, so a bare location.replace() only navigates
@@ -99,7 +100,9 @@ function doGet(e) {
     melbTime, e.parameter.ip, e.parameter.ref,
     e.parameter.site,
     e.parameter.recipient,
-    e.parameter.ua
+    e.parameter.ua,
+    e.parameter.reason,
+    e.parameter.comment
   );
   return ContentService.createTextOutput('ok');
 }
@@ -126,10 +129,16 @@ function isExcludedIp_(ip) {
 // for site events. Column H holds the visitor's User-Agent — passed as a URL
 // param by track.js / r/ / unsubscribe/ because Apps Script doGet doesn't
 // expose request headers. Used by the dashboard to flag scanner traffic
-// (HeadlessChrome, Mimecast, Google-Apps-Script, Bot, Crawler etc.). Older
-// rows written before either column shipped will have blank cells.
-function writeEvent_(email, page, melbTime, ip, referrer, site, recipient, ua) {
-  getOrCreate_(EVENTS_SHEET).appendRow([email || '', page || '', melbTime, ip || '', referrer || '', site || '', recipient || '', ua || '']);
+// (HeadlessChrome, Mimecast, Google-Apps-Script, Bot, Crawler etc.). Columns
+// I/J hold the optional unsubscribe reason + free-text comment captured by
+// the unsubscribe page form — populated only on (cta: email_unsubscribe_click)
+// rows where the visitor filled in either field. Older rows written before
+// any of these columns shipped will have blank cells.
+function writeEvent_(email, page, melbTime, ip, referrer, site, recipient, ua, reason, comment) {
+  getOrCreate_(EVENTS_SHEET).appendRow([
+    email || '', page || '', melbTime, ip || '', referrer || '',
+    site || '', recipient || '', ua || '', reason || '', comment || ''
+  ]);
 }
 
 function writeContact_(data, melbTime) {
@@ -251,7 +260,7 @@ function isAuthorizedForDashboard_(e) {
 function computeStats_(days, siteFilter) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var events = readSheetWithHeaders_(ss.getSheetByName(EVENTS_SHEET),
-    ['Event','Page','Timestamp','IP','Referrer','Site','Recipient','UserAgent']);
+    ['Event','Page','Timestamp','IP','Referrer','Site','Recipient','UserAgent','Reason','Comment']);
   var contacts = readSheetWithHeaders_(ss.getSheetByName(CONTACTS_SHEET),
     ['Timestamp','Name','Email','Organisation','Role','Interest','Message','Page','IP','Referrer','Site']);
 
@@ -307,7 +316,11 @@ function computeStats_(days, siteFilter) {
           var rkey = recipient.toLowerCase();
           var existingUnsub = unsubscribesByRecipient[rkey];
           if (!existingUnsub || existingUnsub.ts < ts) {
-            unsubscribesByRecipient[rkey] = { ts: ts, recipient: recipient, campaign: page, site: site };
+            unsubscribesByRecipient[rkey] = {
+              ts: ts, recipient: recipient, campaign: page, site: site,
+              reason: String(row.Reason || '').trim(),
+              comment: String(row.Comment || '').trim()
+            };
           }
         }
       }
@@ -827,16 +840,56 @@ function buildSubscribersTable_(rows) {
   return wrapPaged_(html + '</tbody></table>', rows.length);
 }
 
+// Map the machine-readable reason values written by unsubscribe/index.html
+// onto human-readable labels for the dashboard. Unknown values fall through
+// unchanged so any future additions still display.
+var UNSUB_REASON_LABELS = {
+  too_frequent: 'Too many emails',
+  not_relevant: "Content isn't relevant",
+  didnt_signup: "Doesn't recall subscribing",
+  decluttering: 'Decluttering inbox',
+  other: 'Other'
+};
+function formatUnsubReason_(raw) {
+  if (!raw) return '';
+  return UNSUB_REASON_LABELS[raw] || raw;
+}
+
 function buildUnsubscribesTable_(rows) {
   if (!rows.length) return '<div class="empty">No unsubscribes in this window.</div>';
-  var html = '<table><thead><tr><th>Recipient</th><th>When</th><th>Campaign</th></tr></thead><tbody>';
+  var html = '<table><thead><tr><th>Recipient</th><th>When</th><th>Campaign</th><th>Reason</th></tr></thead><tbody>';
   rows.forEach(function(r, i) {
     var pg = Math.floor(i / DASHBOARD_PAGE_SIZE);
+    var reasonLabel = formatUnsubReason_(r.reason);
+    var comment = r.comment || '';
+    // Compose the Reason cell: dim placeholder when nothing was shared, the
+    // mapped label when only a reason was picked, "Reason — comment" when
+    // both, and just the comment in italics when the visitor skipped the
+    // dropdown but typed a note. Full comment surfaced via title= tooltip
+    // so long entries don't blow out the column width.
+    var cell;
+    if (reasonLabel && comment) {
+      cell = '<span title="' + escapeHtml_(comment) + '">' + escapeHtml_(reasonLabel) +
+             ' <span style="color:var(--dim)">— ' + escapeHtml_(truncate_(comment, 80)) + '</span></span>';
+    } else if (reasonLabel) {
+      cell = escapeHtml_(reasonLabel);
+    } else if (comment) {
+      cell = '<span title="' + escapeHtml_(comment) + '" style="font-style:italic">' +
+             escapeHtml_(truncate_(comment, 80)) + '</span>';
+    } else {
+      cell = '<span style="color:var(--dim)">—</span>';
+    }
     html += '<tr data-row="' + pg + '"><td class="page">' + escapeHtml_(r.recipient) + '</td>' +
             '<td class="tsmono">' + formatTs_(r.ts) + '</td>' +
-            '<td>' + escapeHtml_(r.campaign) + '</td></tr>';
+            '<td>' + escapeHtml_(r.campaign) + '</td>' +
+            '<td>' + cell + '</td></tr>';
   });
   return wrapPaged_(html + '</tbody></table>', rows.length);
+}
+
+function truncate_(s, n) {
+  s = String(s);
+  return s.length > n ? s.substring(0, n - 1) + '…' : s;
 }
 
 function buildContactsTable_(rows) {
@@ -915,7 +968,7 @@ function renderNewsletterDashboard_(e) {
 function computeNewsletterStats_(days) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var events = readSheetWithHeaders_(ss.getSheetByName(EVENTS_SHEET),
-    ['Event','Page','Timestamp','IP','Referrer','Site','Recipient','UserAgent']);
+    ['Event','Page','Timestamp','IP','Referrer','Site','Recipient','UserAgent','Reason','Comment']);
 
   var cutoff = new Date();
   cutoff.setHours(0, 0, 0, 0);
@@ -1071,7 +1124,11 @@ function computeNewsletterStats_(days) {
         var rkey = recipient.toLowerCase();
         var existingUnsub = unsubscribesByRecipient[rkey];
         if (!existingUnsub || existingUnsub.ts < ts) {
-          unsubscribesByRecipient[rkey] = { ts: ts, recipient: recipient, campaign: page, site: site };
+          unsubscribesByRecipient[rkey] = {
+            ts: ts, recipient: recipient, campaign: page, site: site,
+            reason: String(row.Reason || '').trim(),
+            comment: String(row.Comment || '').trim()
+          };
         }
       }
     }
