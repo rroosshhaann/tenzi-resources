@@ -9,7 +9,8 @@ Hosted on GitHub Pages at `https://resources.tenzi.ai`.
 tenzi-resources/
   index.html                              # Central landing page
   reports/                                # Free analytics reports
-    gi-broker-movement-dashboard.html
+    gi-broker-movement-dashboard.html     # Q1 (Jan→Apr) 3-month window — restyled to match the monthly aesthetic
+    gi-broker-movement-april-2026.html    # Monthly cadence (31 Mar → 30 Apr) — deeper-green / DM Sans variant; index tile primary link, Q1 reachable via "Take me to the Q1 report" pill button
     gi-broker-ar-profile.html
   runbooks/                               # Free operational runbooks
     new-business-quoting-runbook.html
@@ -74,7 +75,14 @@ The Apps Script (`apps-script.gs` in this repo — deploy via Apps Script editor
 | `(cta: linkedin_click)` | Clicked "Join the conversation" LinkedIn button on a free report/runbook |
 | `(cta: PREMIUM_linkedin_click)` | Clicked "Join the conversation" LinkedIn button on a premium sample |
 | `(cta: email_click)` | Default action for newsletter click-tracking redirects (when the email-link URL omits an explicit `email` param). Recipient identity in column G; site=`email` |
-| `(cta: email_unsubscribe_click)` | Newsletter recipient hit the unsubscribe page. Recipient email in column G; campaign tag in B (page). Surfaced in the dashboard's Recent unsubscribes panel — filter Events for this action to get the opt-out list |
+| `(cta: email_open)` | Newsletter open-pixel fired (image beacon — no UA captured because email pixels can't run JS). Recipient in column G; campaign id in B |
+| `(cta: email_report_click)` | Clicked the primary "Read the report" CTA in the newsletter email |
+| `(cta: email_premium_health_click)` | Clicked the premium-sample card in the newsletter email |
+| `(cta: email_book_chat_click)` | Clicked the "Book a 30-min chat" CTA in the newsletter (Cal.com) |
+| `(cta: email_resources_click)` | Clicked "browse the library" or the footer resources link in the newsletter |
+| `(cta: email_website_click)` | Clicked the header logo / footer `tenzi.ai` link in the newsletter |
+| `(cta: email_linkedin_click)` | Clicked the LinkedIn link in the newsletter footer |
+| `(cta: email_unsubscribe_click)` | Newsletter recipient hit the unsubscribe page AND clicked the confirm button. Recipient email in column G; campaign tag in B. Surfaced in the dashboard's Recent unsubscribes panel — filter Events for this action to get the opt-out list |
 | Real email address | Form submission (subscribe or request copy) |
 
 Compare CTA click counts vs actual form submissions to measure drop-off. Column F lets Looker Studio slice by origin site.
@@ -151,18 +159,24 @@ Both pages are pure GitHub Pages static HTML. No build step, no track.js (they f
 Canonical source is [`apps-script.gs`](./apps-script.gs). The deployed script lives in the linked Google Sheet — after editing the file, paste it into the Apps Script editor and Deploy > Manage deployments > New version. Summary:
 
 - `doPost(e)` — branches on `data.source === 'holding_page_contact'` (Contacts sheet + honeypot + rate limit + notify email) vs everything else (Events sheet).
-- `doGet(e)` — branches on `e.parameter.view === 'dashboard'` (renders the analytics dashboard) vs the default tracking-beacon path (writes an Events row). Both paths share the same web-app deployment.
-- `writeEvent_(email, page, melbTime, ip, referrer, site)` — appends to Events. Column F = site tag.
+- `doGet(e)` — branches on `e.parameter.view === 'dashboard'` (Site analytics view), `e.parameter.view === 'newsletter'` (Newsletter analytics view, scoped to Site=email rows with real-recipient + real-campaign cross-validation), `e.parameter.redirect=<url>` (legacy click-tracking redirect — dead code now that emails route through `/r/`), or the default tracking-beacon path (writes an Events row). All paths share the same web-app deployment.
+- `writeEvent_(email, page, melbTime, ip, referrer, site, recipient, ua)` — appends to Events. Column F = site tag, G = recipient (newsletter only), H = User-Agent (passed via `&ua=` URL param because doGet can't read headers).
 - `writeContact_(data, melbTime)` — appends to Contacts (11 cols including site).
 - `isExcludedIp_` / `EXCLUDED_IPS` — silently drop rows from listed IPs.
 - `withinRateLimit_` — PropertiesService-backed per-IP cap on contact submissions (5/hour).
-- `renderDashboard_` and helpers — server-rendered HTML analytics built from Events + Contacts. Auth = secret token in URL (`DASHBOARD_TOKEN` constant). Hit at `<web-app-url>?view=dashboard&token=<TOKEN>&days=30&site=all`. See "Dashboard" section below.
+- `renderDashboard_` and helpers — server-rendered Site-view HTML analytics built from Events + Contacts. Auth = secret token in URL (`DASHBOARD_TOKEN` constant). Hit at `<web-app-url>?view=dashboard&token=<TOKEN>&days=30&site=all`.
+- `renderNewsletterDashboard_` / `computeNewsletterStats_` / `looksLikeBotUa_` and the `buildCampaign*` / `buildNewsletter*` / `buildSuspiciousTable_` helpers — Newsletter-view stack. Same auth, same CSS, scoped to `Site=email`. Filters scanner noise via three derived sets (`realSubscribers`, `realCampaigns` ≥ `NEWSLETTER_REAL_CAMPAIGN_THRESHOLD`, `NEWSLETTER_BOT_UA_REGEX`). Hit at `<web-app-url>?view=newsletter&token=<TOKEN>&days=90&campaign=<id>`.
+- See "Dashboard" section below + [`DASHBOARD.md`](./DASHBOARD.md) for the full reference on both views.
 
 ### Dashboard
 
-The deployed web app doubles as a private analytics dashboard. Same URL as the tracking beacon, branches on `?view=dashboard&token=<TOKEN>`. Token (`DASHBOARD_TOKEN` constant in the script) must NOT appear in `track.js`, page HTML, or commits — only in the bookmark.
+The deployed web app doubles as a private analytics dashboard with two views:
+- **Site** — `?view=dashboard&token=<TOKEN>` (page views, dwell, CTAs, contacts, referrers). Default landing.
+- **Newsletter** — `?view=newsletter&token=<TOKEN>` (per-campaign opens, clicks, unsubscribes, recipient activity, suspicious-rows panel — scoped to `Site=email`, cross-validated against the subscribe set + bot-UA regex). Recent subscribers + Recent unsubscribes lists live here.
 
-Full reference — what's on the page, parameters, auth model, code map, caveats, roadmap — lives in [`DASHBOARD.md`](./DASHBOARD.md). Update that doc whenever the dashboard layout, aggregation, or auth changes.
+A "View: Site / Newsletter" toggle in either view's filter bar links across. Token (`DASHBOARD_TOKEN` constant in the script) must NOT appear in `track.js`, page HTML, or commits — only in the bookmark.
+
+Full reference — what's on each page, parameters, auth model, filter logic, code map, caveats, roadmap — lives in [`DASHBOARD.md`](./DASHBOARD.md). Update that doc whenever either view's layout, aggregation, or auth changes.
 
 **Hardening notes:**
 
