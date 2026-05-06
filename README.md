@@ -18,7 +18,8 @@ tenzi-resources/
 ```
 
 **Free reports** (`reports/`)
-- **GI Broker Movement Dashboard** — Monthly AR movement analysis: who's growing, shrinking, and where brokers are moving between AFSLs
+- **GI Broker Movement Dashboard — April 2026** (`gi-broker-movement-april-2026.html`) — Monthly cadence (31 Mar → 30 Apr) with three-way scope toggle (AR / AR + CAR / CAR), headline insights, KPI strip, waterfall, AFSL performance tables, and movement flows. Index tile primary link
+- **GI Broker Movement Dashboard — Q1 2026** (`gi-broker-movement-dashboard.html`) — 3-month window (Jan → Apr) Individual ARs only. Reachable via the "Take me to the Q1 report" pill button on the April page (and the index tile's nested Q1 button)
 - **Profile of the Average GI Broker AR** — State distribution, tenure, AFSL loyalty stats, and record holders
 
 **Runbooks** (`runbooks/`)
@@ -51,6 +52,9 @@ Every page loads the shared **`track.js`** (served from `https://tenzi.ai/track.
 | E | Referrer | `document.referrer` |
 | F | Site | `marketing`, `resources`, or `email` (empty for rows written before `track.js` shipped) |
 | G | Recipient | Email of the newsletter recipient who opened/clicked an email link (empty for site events) |
+| H | UserAgent | `navigator.userAgent` from the visitor's browser. Passed via `&ua=` URL param because Apps Script `doGet` can't read request headers. Used by the newsletter dashboard view to flag scanner traffic. Empty for image-beacon opens (email pixels can't run JS) and rows written before UA capture shipped |
+| I | Reason | Optional unsubscribe-form reason — populated only on `(cta: email_unsubscribe_click)` rows |
+| J | Comment | Optional unsubscribe-form free-text comment — same trigger as I |
 
 **Event types** (in column A):
 - `(page view)` — fires on `tenziTrack.init()`
@@ -63,7 +67,8 @@ Every page loads the shared **`track.js`** (served from `https://tenzi.ai/track.
 - `(cta: linkedin_click)` — clicked "Join the conversation" on a free report/runbook
 - `(cta: PREMIUM_linkedin_click)` — clicked "Join the conversation" on a premium sample
 - `(cta: email_click)` — default action for newsletter click-tracking redirects (recipient in column G; site=`email`)
-- `(cta: email_unsubscribe_click)` — newsletter recipient hit `/unsubscribe/` (recipient in column G; campaign in B)
+- `(cta: email_open)` / `email_report_click` / `email_premium_health_click` / `email_book_chat_click` / `email_resources_click` / `email_website_click` / `email_linkedin_click` — newsletter-email events (open pixel + the six labelled CTAs); recipient in column G, campaign id in column B
+- `(cta: email_unsubscribe_click)` — newsletter recipient hit `/unsubscribe/` and clicked the confirm button (recipient in column G; campaign in B; optional reason/comment in I/J)
 - Real email — form submission (Events sheet) or contact form (Contacts sheet)
 
 Compare CTA click counts vs actual form submissions to measure drop-off per page. Column F lets Looker Studio slice by origin site.
@@ -108,7 +113,12 @@ clicks don't go through them.
 
 ## Dashboard
 
-The same Apps Script web app exposes a private analytics dashboard (KPIs, daily activity chart, top pages, CTA breakdown, dwell stats, recent subscribers, recent unsubscribes, recent contacts, and top external referrers) at `?view=dashboard&token=<TOKEN>`. Every list paginates at 15 rows. Token-gated, server-rendered HTML in the same Terminal Grid (Light) style as the rest of the site. Full reference: [`DASHBOARD.md`](./DASHBOARD.md).
+The same Apps Script web app exposes a private analytics dashboard with two views, switchable via a "View: Site / Newsletter" toggle in the filter bar of either page:
+
+- **Site** (`?view=dashboard&token=<TOKEN>`) — KPIs, daily activity chart with hover tooltips, top pages, CTA breakdown, dwell stats, recent contacts, top external referrers.
+- **Newsletter** (`?view=newsletter&token=<TOKEN>`) — campaign selector, per-campaign KPI strip (real + raw side-by-side: engaged subscribers, opens, clicks, unsubscribes, plus open rate + click-through), CTA breakdown, hour-by-hour activity for the first 48h after send, recipient activity, suspicious-rows panel, cross-campaign overview, and the Recent subscribers + Recent unsubscribes lists. Filters scanner noise via the `realSubscribers`/`realCampaigns`/UA cross-validation described in [`DASHBOARD.md`](./DASHBOARD.md).
+
+Every list paginates at 15 rows. Token-gated, server-rendered HTML in the same Terminal Grid (Light) style as the rest of the site. Full reference: [`DASHBOARD.md`](./DASHBOARD.md).
 
 ## Adding a new page
 
