@@ -233,7 +233,7 @@ function wrapPaged_(html, totalRows) {
 //   ?view=dashboard       — required
 //   &token=<TOKEN>        — required (must match DASHBOARD_TOKEN)
 //   &days=N               — window length, 1..365 (default 30)
-//   &site=all|marketing|resources  — site filter (default all)
+//   &site=all|marketing|resources|partner  — site filter (default all)
 
 function renderDashboard_(e) {
   if (!isAuthorizedForDashboard_(e)) {
@@ -243,7 +243,7 @@ function renderDashboard_(e) {
   if (isNaN(days) || days < 1) days = 30;
   if (days > 365) days = 365;
   var siteFilter = e.parameter.site || 'all';
-  if (['all','marketing','resources'].indexOf(siteFilter) === -1) siteFilter = 'all';
+  if (['all','marketing','resources','partner'].indexOf(siteFilter) === -1) siteFilter = 'all';
 
   var stats = computeStats_(days, siteFilter);
   var html = buildDashboardHtml_(stats, days, siteFilter, e.parameter.token);
@@ -534,7 +534,7 @@ function buildDashboardHtml_(stats, days, siteFilter, token) {
         '<span class="label">Range</span>' +
         '<div class="range">' + rangeBtn('7D', 7) + rangeBtn('30D', 30) + rangeBtn('90D', 90) + rangeBtn('1Y', 365) + '</div>' +
         '<span class="label">Site</span>' +
-        '<div class="site-tabs">' + siteBtn('All', 'all') + siteBtn('Marketing', 'marketing') + siteBtn('Resources', 'resources') + '</div>' +
+        '<div class="site-tabs">' + siteBtn('All', 'all') + siteBtn('Marketing', 'marketing') + siteBtn('Resources', 'resources') + siteBtn('Partner', 'partner') + '</div>' +
       '</div>' +
 
       '<div class="kpi-row">' +

@@ -51,7 +51,7 @@ Range and site buttons inside the page carry the token through, so once you load
 | `view` | yes | — | Must be `dashboard` |
 | `token` | yes | — | Must match `DASHBOARD_TOKEN` in the script |
 | `days` | no | `30` | Window length in days, 1–365 |
-| `site` | no | `all` | `all`, `marketing`, or `resources` |
+| `site` | no | `all` | `all`, `marketing`, `resources`, or `partner` |
 
 ## Auth
 
@@ -195,7 +195,7 @@ Two constants near the top of the newsletter section in `apps-script.gs`:
 
 - **Dwell warm-up** — dwell rows are empty until visitors leave a page after `track.js` deployed (April 2026 onwards). Historical visits to old pages have no dwell signal.
 - **Missing IPs** — when `api.ipify.org` fails or is blocked, the IP cell is empty. Those rows still count as page views but don't contribute to unique-visitor counts.
-- **Legacy rows + site filter** — rows written before `track.js` shipped have an empty `Site` column. They're INCLUDED in `site=all` views but EXCLUDED from `site=marketing` / `site=resources`.
+- **Legacy rows + site filter** — rows written before `track.js` shipped have an empty `Site` column. They're INCLUDED in `site=all` views but EXCLUDED from `site=marketing` / `site=resources` / `site=partner`.
 - **Clock skew** — timestamps are written as Melbourne-formatted strings (`yyyy-MM-dd HH:mm:ss`) by `Utilities.formatDate(date, 'Australia/Melbourne', …)`, then parsed back as local `Date` objects in the script's runtime timezone. If the script TZ isn't Melbourne (set in Apps Script project settings), events near midnight may bucket on the "wrong" calendar day. Pin the script TZ to `Australia/Melbourne` for accuracy.
 - **Subscriber detection is heuristic** — any Events row whose `Event` cell contains `@` and doesn't start with `(` is counted as a subscriber. False positives are unlikely (event placeholders all start with `(`), but worth knowing if you ever add a non-form event with `@` in the name.
 
