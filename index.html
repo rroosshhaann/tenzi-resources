@@ -189,6 +189,33 @@
   .tile-premium .foot {
     margin-top: 20px; display: flex; justify-content: space-between; align-items: center;
   }
+  /* Thumbnail variant: meta strip at top, full-width chart thumb, then text.
+     Tweakables — change these two values on .premium-track to flip the look:
+       --thumb-fit:      'contain' = letterbox full chart; 'cover' = fill & crop.
+       --thumb-position: 'center' or 'top' (only matters when fit is 'cover'). */
+  .premium-track { --thumb-fit: cover; --thumb-position: top; }
+  .tile-premium-thumb .meta {
+    display: flex; justify-content: space-between;
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--dim); margin-bottom: 12px;
+  }
+  .tile-premium-thumb .thumb {
+    background: var(--chart-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    height: 180px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .tile-premium-thumb .thumb img {
+    width: 100%; height: 100%;
+    object-fit: var(--thumb-fit);
+    object-position: var(--thumb-position);
+    display: block;
+  }
+  .tile-premium-thumb .title { margin-top: 0; }
   .premium-dots {
     display: flex; justify-content: center; gap: 8px; margin-top: 18px;
   }
@@ -216,6 +243,15 @@
   .tile-data .chart {
     border-right: 1px solid var(--border); background: var(--chart-bg);
     display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  /* Data-grid uses the same --thumb-fit / --thumb-position vars as premium. */
+  .data-grid { --thumb-fit: cover; --thumb-position: top; }
+  .tile-data .chart img {
+    width: 100%; height: 100%;
+    object-fit: var(--thumb-fit);
+    object-position: var(--thumb-position);
+    display: block;
   }
   .tile-data .body {
     padding: 24px; display: flex; flex-direction: column;
@@ -512,18 +548,10 @@
     </button>
     <div class="premium-track">
 
-    <a href="premium-samples/senior-broker-quadrant.html" class="tile tile-premium" onclick="trackCta('premium_tenure_quadrant_click')">
-      <div class="head">
-        <div class="meta"><span>MAY 2026</span><span>22 NETWORKS</span></div>
-        <!-- quadrant icon: axes + dots, with prominent marker top-right -->
-        <svg width="44" height="44" viewBox="0 0 56 56" fill="none" stroke="#2ca471" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="6" y1="28" x2="50" y2="28" opacity="0.4"/>
-          <line x1="28" y1="6" x2="28" y2="50" opacity="0.4"/>
-          <circle cx="40" cy="14" r="4" fill="#2ca471" stroke="none"/>
-          <circle cx="18" cy="18" r="2.5" fill="#2ca471" stroke="none" opacity="0.55"/>
-          <circle cx="20" cy="38" r="2.5" fill="#2ca471" stroke="none" opacity="0.55"/>
-          <circle cx="42" cy="40" r="2.5" fill="#2ca471" stroke="none" opacity="0.55"/>
-        </svg>
+    <a href="premium-samples/senior-broker-quadrant.html" class="tile tile-premium tile-premium-thumb" onclick="trackCta('premium_tenure_quadrant_click')">
+      <div class="meta"><span>MAY 2026</span><span>22 NETWORKS</span></div>
+      <div class="thumb">
+        <img src="premium-samples/tenure_quadrant_202506_202605.thumb.jpg" alt="Senior broker quadrant chart preview" loading="lazy" decoding="async">
       </div>
       <h3 class="title">The Senior Broker Quadrant</h3>
       <p class="blurb">Senior bench depth vs 12-month senior flow, plotted across 22 GI broker networks. M.G.A. is the only network in the top-right quadrant — 42% senior bench AND growing seniors. United Insurance Group leads on depth at 45%.</p>
@@ -533,18 +561,10 @@
       </div>
     </a>
 
-    <a href="premium-samples/afsl-health-leaderboard.html" class="tile tile-premium" onclick="trackCta('premium_health_click')">
-      <div class="head">
-        <div class="meta"><span>APR 2026</span><span>7 SIGNALS</span></div>
-        <!-- leaderboard icon: three segments of ranked bars -->
-        <svg width="44" height="44" viewBox="0 0 56 56" fill="none" stroke="#2ca471" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="8" y1="10" x2="40" y2="10" stroke-width="3" stroke="#2ca471"/>
-          <line x1="8" y1="16" x2="30" y2="16" stroke-width="3" stroke="#2ca471" opacity="0.65"/>
-          <line x1="8" y1="26" x2="46" y2="26" stroke-width="3" stroke="#2ca471"/>
-          <line x1="8" y1="32" x2="34" y2="32" stroke-width="3" stroke="#2ca471" opacity="0.65"/>
-          <line x1="8" y1="42" x2="38" y2="42" stroke-width="3" stroke="#2ca471"/>
-          <line x1="8" y1="48" x2="26" y2="48" stroke-width="3" stroke="#2ca471" opacity="0.65"/>
-        </svg>
+    <a href="premium-samples/afsl-health-leaderboard.html" class="tile tile-premium tile-premium-thumb" onclick="trackCta('premium_health_click')">
+      <div class="meta"><span>APR 2026</span><span>7 SIGNALS</span></div>
+      <div class="thumb">
+        <img src="premium-samples/afsl_health_leaderboard_segment_202604.thumb.jpg" alt="GI broker network health leaderboard preview" loading="lazy" decoding="async">
       </div>
       <h3 class="title">GI Broker Network Health Score</h3>
       <p class="blurb">Composite 0–100 score across seven signals of network health. Metrix Connect (108 ARs) tops the list, outscoring every Dominant in the country — and Australia's largest network sits mid-pack. Size isn't health.</p>
@@ -554,16 +574,10 @@
       </div>
     </a>
 
-    <a href="premium-samples/gi-broker-race-chart.html" class="tile tile-premium" onclick="trackCta('premium_race_click')">
-      <div class="head">
-        <div class="meta"><span>24 MO</span><span>1,180 ARs</span></div>
-        <!-- race icon -->
-        <svg width="44" height="44" viewBox="0 0 56 56" fill="none" stroke="#2ca471" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="8" y1="12" x2="48" y2="12" stroke-width="3" stroke="#2ca471"/>
-          <line x1="8" y1="22" x2="40" y2="22" stroke-width="3" stroke="#2ca471" opacity="0.75"/>
-          <line x1="8" y1="32" x2="30" y2="32" stroke-width="3" stroke="#2ca471" opacity="0.55"/>
-          <line x1="8" y1="42" x2="20" y2="42" stroke-width="3" stroke="#2ca471" opacity="0.35"/>
-        </svg>
+    <a href="premium-samples/gi-broker-race-chart.html" class="tile tile-premium tile-premium-thumb" onclick="trackCta('premium_race_click')">
+      <div class="meta"><span>24 MO</span><span>1,180 ARs</span></div>
+      <div class="thumb">
+        <img src="premium-samples/ar_race_chart.thumb.jpg" alt="GI broker AFSL race chart preview" loading="lazy" decoding="async">
       </div>
       <h3 class="title">GI Broker AFSL Race Chart</h3>
       <p class="blurb">Animated 24-month view of the Top 20 GI broker networks. See who's growing, shrinking, and how the Envest/Steadfast story played out in real-time AR data.</p>
@@ -573,18 +587,10 @@
       </div>
     </a>
 
-    <a href="premium-samples/resilium-ar-flow.html" class="tile tile-premium" onclick="trackCta('premium_resilium_click')">
-      <div class="head">
-        <div class="meta"><span>48 MO</span><span>123 ARs</span></div>
-        <!-- flow icon -->
-        <svg width="44" height="44" viewBox="0 0 56 56" fill="none" stroke="#2ca471" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="28" y1="6" x2="28" y2="50" opacity="0.4"/>
-          <line x1="28" y1="14" x2="46" y2="14" stroke-width="3" stroke="#2ca471"/>
-          <line x1="28" y1="22" x2="40" y2="22" stroke-width="3" stroke="#2ca471" opacity="0.75"/>
-          <line x1="28" y1="30" x2="14" y2="30" stroke-width="3" stroke="#2ca471" opacity="0.75"/>
-          <line x1="28" y1="38" x2="8" y2="38" stroke-width="3" stroke="#2ca471"/>
-          <line x1="28" y1="46" x2="20" y2="46" stroke-width="3" stroke="#2ca471" opacity="0.55"/>
-        </svg>
+    <a href="premium-samples/resilium-ar-flow.html" class="tile tile-premium tile-premium-thumb" onclick="trackCta('premium_resilium_click')">
+      <div class="meta"><span>48 MO</span><span>123 ARs</span></div>
+      <div class="thumb">
+        <img src="premium-samples/afsl_flow_RESILIUM_INSURANCE_BROKING.thumb.jpg" alt="Resilium AR flow preview" loading="lazy" decoding="async">
       </div>
       <h3 class="title">Resilium AR Flow Analysis</h3>
       <p class="blurb">123 departing ARs, 48 months, mapped to every destination. The Steadfast ecosystem dominated before the deal was announced.</p>
@@ -594,18 +600,10 @@
       </div>
     </a>
 
-    <a href="premium-samples/psc-connect-ar-flow.html" class="tile tile-premium" onclick="trackCta('premium_psc_click')">
-      <div class="head">
-        <div class="meta"><span>48 MO</span><span>134 ARs</span></div>
-        <!-- slice icon (dominant capture) -->
-        <svg width="44" height="44" viewBox="0 0 56 56" fill="none" stroke="#2ca471" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="28" y1="6" x2="28" y2="50" opacity="0.4"/>
-          <line x1="28" y1="14" x2="50" y2="14" stroke-width="3" stroke="#2ca471"/>
-          <line x1="28" y1="22" x2="44" y2="22" stroke-width="3" stroke="#2ca471" opacity="0.8"/>
-          <line x1="28" y1="30" x2="36" y2="30" stroke-width="3" stroke="#2ca471" opacity="0.6"/>
-          <line x1="28" y1="38" x2="20" y2="38" stroke-width="3" stroke="#2ca471" opacity="0.5"/>
-          <line x1="28" y1="46" x2="22" y2="46" stroke-width="3" stroke="#2ca471" opacity="0.35"/>
-        </svg>
+    <a href="premium-samples/psc-connect-ar-flow.html" class="tile tile-premium tile-premium-thumb" onclick="trackCta('premium_psc_click')">
+      <div class="meta"><span>48 MO</span><span>134 ARs</span></div>
+      <div class="thumb">
+        <img src="premium-samples/afsl_flow_PSC_CONNECT.thumb.jpg" alt="PSC Connect AR flow preview" loading="lazy" decoding="async">
       </div>
       <h3 class="title">PSC Connect AR Flow Analysis</h3>
       <p class="blurb">McLardy McShane — not Ausure — quietly captured 57% of traceable leavers well before the Steadfast deal was announced.</p>
@@ -634,35 +632,7 @@
     <div class="tile tile-data">
       <a href="reports/gi-broker-movement-april-2026.html" class="stretched-link" onclick="trackCta('data_movement_click')" aria-label="Open monthly movement dashboard"></a>
       <div class="chart">
-        <!-- netbars chart: monthly AR movement, bars above/below zero -->
-        <svg width="260" height="220" viewBox="0 0 260 220" style="display:block; background:#f4f1ea;">
-          <!-- gridlines -->
-          <line x1="26" y1="67.5" x2="246" y2="67.5" stroke="#d3cec3" stroke-width="1" stroke-dasharray="2 3"/>
-          <line x1="26" y1="117"  x2="246" y2="117"  stroke="#d3cec3" stroke-width="1" stroke-dasharray="2 3"/>
-          <line x1="26" y1="166.5" x2="246" y2="166.5" stroke="#d3cec3" stroke-width="1" stroke-dasharray="2 3"/>
-          <!-- axes -->
-          <line x1="26" y1="18" x2="26" y2="196" stroke="#b8b2a5" stroke-width="1"/>
-          <line x1="26" y1="196" x2="246" y2="196" stroke="#b8b2a5" stroke-width="1"/>
-          <!-- zero line -->
-          <line x1="26" y1="107" x2="246" y2="107" stroke="#b8b2a5" stroke-width="1"/>
-          <!-- bars: +6,+10,-4,+12,-3,+8,+14,-6,+4,+11,-2,+15 (normalized to 85px amplitude per half) -->
-          <rect x="32"  y="75.13" width="11.92" height="31.88" fill="#2ca471"/>
-          <rect x="50.33" y="53.88" width="11.92" height="53.13" fill="#2ca471"/>
-          <rect x="68.67" y="107" width="11.92" height="21.25" fill="#c0b7aa" opacity="0.8"/>
-          <rect x="87"   y="43.25" width="11.92" height="63.75" fill="#2ca471"/>
-          <rect x="105.33" y="107" width="11.92" height="15.94" fill="#c0b7aa" opacity="0.8"/>
-          <rect x="123.67" y="64.5" width="11.92" height="42.5" fill="#2ca471"/>
-          <rect x="142"  y="32.63" width="11.92" height="74.38" fill="#2ca471"/>
-          <rect x="160.33" y="107" width="11.92" height="31.88" fill="#c0b7aa" opacity="0.8"/>
-          <rect x="178.67" y="85.75" width="11.92" height="21.25" fill="#2ca471"/>
-          <rect x="197"  y="48.56" width="11.92" height="58.44" fill="#2ca471"/>
-          <rect x="215.33" y="107" width="11.92" height="10.63" fill="#c0b7aa" opacity="0.8"/>
-          <rect x="233.67" y="27.31" width="11.92" height="79.69" fill="#2ca471"/>
-          <!-- tick labels -->
-          <text x="20" y="24" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="#a59f93" letter-spacing="0.08em">+</text>
-          <text x="20" y="110" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="#a59f93" letter-spacing="0.08em">0</text>
-          <text x="20" y="194" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="#a59f93" letter-spacing="0.08em">−</text>
-        </svg>
+        <img src="reports/gi-broker-movement-april-2026.thumb.jpg" alt="Monthly AR movement dashboard preview" loading="lazy" decoding="async">
       </div>
       <div class="body">
         <div class="meta"><span>MONTHLY</span><span>APR 2026</span></div>
@@ -677,32 +647,7 @@
 
     <a href="reports/gi-broker-ar-profile.html" class="tile tile-data" onclick="trackCta('data_profile_click')">
       <div class="chart">
-        <!-- distribution chart: bell-ish histogram + smooth curve -->
-        <svg width="260" height="220" viewBox="0 0 260 220" style="display:block; background:#f4f1ea;">
-          <!-- gridlines -->
-          <line x1="26" y1="67.5" x2="246" y2="67.5" stroke="#d3cec3" stroke-width="1" stroke-dasharray="2 3"/>
-          <line x1="26" y1="117"  x2="246" y2="117"  stroke="#d3cec3" stroke-width="1" stroke-dasharray="2 3"/>
-          <line x1="26" y1="166.5" x2="246" y2="166.5" stroke="#d3cec3" stroke-width="1" stroke-dasharray="2 3"/>
-          <!-- axes -->
-          <line x1="26" y1="18" x2="26" y2="196" stroke="#b8b2a5" stroke-width="1"/>
-          <line x1="26" y1="196" x2="246" y2="196" stroke="#b8b2a5" stroke-width="1"/>
-          <!-- bins: 2,5,9,14,18,20,17,12,7,3 / 22 * 178 -->
-          <rect x="28.42"  y="179.82" width="17.16" height="16.18" fill="#2ca471" opacity="0.22"/>
-          <rect x="50.42"  y="155.55" width="17.16" height="40.45" fill="#2ca471" opacity="0.22"/>
-          <rect x="72.42"  y="123.18" width="17.16" height="72.82" fill="#2ca471" opacity="0.22"/>
-          <rect x="94.42"  y="82.73"  width="17.16" height="113.27" fill="#2ca471" opacity="0.22"/>
-          <rect x="116.42" y="50.36"  width="17.16" height="145.64" fill="#2ca471" opacity="0.22"/>
-          <rect x="138.42" y="34.18"  width="17.16" height="161.82" fill="#2ca471" opacity="0.22"/>
-          <rect x="160.42" y="58.45"  width="17.16" height="137.55" fill="#2ca471" opacity="0.22"/>
-          <rect x="182.42" y="98.91"  width="17.16" height="97.09" fill="#2ca471" opacity="0.22"/>
-          <rect x="204.42" y="139.36" width="17.16" height="56.64" fill="#2ca471" opacity="0.22"/>
-          <rect x="226.42" y="171.73" width="17.16" height="24.27" fill="#2ca471" opacity="0.22"/>
-          <!-- smooth curve over bin midpoints -->
-          <path d="M37.0,179.8 L59.0,155.5 L81.0,123.2 L103.0,82.7 L125.0,50.4 L147.0,34.2 L169.0,58.5 L191.0,98.9 L213.0,139.4 L235.0,171.7"
-                stroke="#2ca471" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-          <text x="20" y="24" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="#a59f93" letter-spacing="0.08em">MAX</text>
-          <text x="20" y="194" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="#a59f93" letter-spacing="0.08em">0</text>
-        </svg>
+        <img src="reports/gi-broker-ar-profile.thumb.jpg" alt="Average GI broker AR profile preview" loading="lazy" decoding="async">
       </div>
       <div class="body">
         <div class="meta"><span>QUARTERLY</span><span>JAN 2026</span></div>
