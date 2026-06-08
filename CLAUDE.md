@@ -12,6 +12,7 @@ tenzi-resources/
     gi-broker-movement-dashboard.html     # Q1 (Jan→Apr) 3-month window — restyled to match the monthly aesthetic
     gi-broker-movement-april-2026.html    # Monthly cadence (31 Mar → 30 Apr) — deeper-green / DM Sans variant; index tile primary link, Q1 reachable via "Take me to the Q1 report" pill button
     gi-broker-ar-profile.html
+    gi-broker-top20-metrics.html          # UNLISTED (direct-link share only, NOT tiled on index) — top-20 broker metric heatmap, AR/CAR/combined toggle; keeps its own dashboard design (not Terminal Grid); regen from python-scrapbook: generate_review.py --portal --out <this path>
   runbooks/                               # Free operational runbooks
     new-business-quoting-runbook.html
     renewals-runbook.html
@@ -233,6 +234,8 @@ not "fix" them by adding the missing pieces — that would break the
 integration.
 
 Every content page on the site MUST have all of the following. No exceptions.
+
+**Owner-sanctioned exception — unlisted shared pages:** `reports/gi-broker-top20-metrics.html` carries the nav back-link + tracking (rules 1–2) but is deliberately **not** tiled on the index (rule 5 waived) — it is shared via direct link only. It also keeps its source dashboard's own design rather than Terminal Grid. Do not add an index tile or restyle it "to comply". Republish from `python-scrapbook`: `generate_review.py --portal --out tenzi-resources/reports/gi-broker-top20-metrics.html`.
 
 1. **Nav bar** — back-link on left, Tenzi logo SVG on right. Copy from an existing page. Back-link href should use `../index.html` for pages in subfolders.
 2. **Page view tracking + CTA tracking helper** — paste the standard shared-tracker block (see Analytics section above: two `<script>` tags — load `https://tenzi.ai/track.js`, then call `tenziTrack.init({ site: 'resources' })`) at the bottom of the page.
