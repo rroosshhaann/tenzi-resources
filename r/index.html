@@ -66,6 +66,19 @@
     new Image().src = beaconUrl;
   }
 
+  // Hand the recipient through to tenzi.ai destinations as ?tzr= so track.js
+  // on the landing page can attribute the visit (page view, dwell, CTAs) to
+  // the person in column G. Third-party destinations (linkedin.com, cal.com)
+  // never receive the identity param; track.js strips it from the URL on load.
+  var TENZI_HOST = /^https:\/\/([a-z0-9-]+\.)*tenzi\.ai([\/?#]|$)/i;
+  if (recipient && TENZI_HOST.test(to)) {
+    try {
+      var dest = new URL(to);
+      dest.searchParams.set('tzr', recipient);
+      to = dest.toString();
+    } catch (err) {}
+  }
+
   window.location.replace(to);
 })();
 </script>
