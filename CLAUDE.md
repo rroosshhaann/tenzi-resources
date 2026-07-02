@@ -77,12 +77,16 @@ The Apps Script (`apps-script.gs` in this repo — deploy via Apps Script editor
 | `(cta: PREMIUM_linkedin_click)` | Clicked "Join the conversation" LinkedIn button on a premium sample |
 | `(cta: email_click)` | Default action for newsletter click-tracking redirects (when the email-link URL omits an explicit `email` param). Recipient identity in column G; site=`email` |
 | `(cta: email_open)` | Newsletter open-pixel fired (image beacon — no UA captured because email pixels can't run JS). Recipient in column G; campaign id in B |
-| `(cta: email_report_click)` | Clicked the primary "Read the report" CTA in the newsletter email |
-| `(cta: email_premium_health_click)` | Clicked the premium-sample card in the newsletter email |
+| `(cta: email_report_click)` | Clicked the primary "Read the report" CTA button in the newsletter email |
+| `(cta: email_report_image_click)` | Clicked the report thumbnail image in the newsletter email |
+| `(cta: email_premium_sample_click)` | Clicked the premium-sample CTA button in the newsletter email (older campaigns used `email_premium_health_click`) |
+| `(cta: email_premium_sample_image_click)` | Clicked the premium-sample thumbnail image in the newsletter email |
+| `(cta: email_explore_resources_click)` | Clicked the "Browse the library" CTA in the newsletter |
 | `(cta: email_book_chat_click)` | Clicked the "Book a 30-min chat" CTA in the newsletter (Cal.com) |
-| `(cta: email_resources_click)` | Clicked "browse the library" or the footer resources link in the newsletter |
+| `(cta: email_resources_click)` | Clicked the footer resources link in the newsletter |
 | `(cta: email_website_click)` | Clicked the header logo / footer `tenzi.ai` link in the newsletter |
 | `(cta: email_linkedin_click)` | Clicked the LinkedIn link in the newsletter footer |
+| `(cta: email_linkedin_<post>_click)` | Clicked a "Join the conversation" post link in the newsletter body — one action per featured post, changes each campaign; the canonical list lives in the `tenzi-newsletter` README |
 | `(cta: email_unsubscribe_click)` | Newsletter recipient hit the unsubscribe page AND clicked the confirm button. Recipient email in column G; campaign tag in B. Surfaced in the dashboard's Recent unsubscribes panel — filter Events for this action to get the opt-out list |
 | Real email address | Form submission (subscribe or request copy) |
 
