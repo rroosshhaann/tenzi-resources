@@ -8,6 +8,10 @@ Hosted on GitHub Pages at `https://resources.tenzi.ai`.
 ```
 tenzi-resources/
   index.html                              # Central landing page
+  og.png                                  # 2400×1260 social share card — every page's og:image points at it
+  robots.txt                              # permissive (AI crawlers welcome); blocks /r/ + /unsubscribe/; points at sitemap
+  sitemap.xml                             # all content pages EXCEPT unlisted ones (top20) — add new pages here with lastmod
+  llms.txt                                # site summary for AI assistants
   reports/                                # Free analytics reports
     gi-broker-movement-dashboard.html     # Q1 (Jan→Apr) 3-month window — restyled to match the monthly aesthetic
     gi-broker-movement-april-2026.html    # Monthly cadence (31 Mar → 30 Apr) — deeper-green / DM Sans variant; index tile primary link, Q1 reachable via "Take me to the Q1 report" pill button
@@ -240,7 +244,7 @@ integration.
 
 Every content page on the site MUST have all of the following. No exceptions.
 
-**Owner-sanctioned exception — unlisted shared pages:** `reports/gi-broker-top20-metrics.html` carries the nav back-link + tracking (rules 1–2) but is deliberately **not** tiled on the index (rule 5 waived) — it is shared via direct link only. It also keeps its source dashboard's own design rather than Terminal Grid. Do not add an index tile or restyle it "to comply". Republish from `python-scrapbook`: `generate_review.py --portal --out tenzi-resources/reports/gi-broker-top20-metrics.html`.
+**Owner-sanctioned exception — unlisted shared pages:** `reports/gi-broker-top20-metrics.html` carries the nav back-link + tracking (rules 1–2) but is deliberately **not** tiled on the index (rule 5 waived) — it is shared via direct link only. It also keeps its source dashboard's own design rather than Terminal Grid. Do not add an index tile or restyle it "to comply". Republish from `python-scrapbook`: `generate_review.py --portal --out tenzi-resources/reports/gi-broker-top20-metrics.html`. NOTE: republishing overwrites the injected head metadata (canonical / description / OG tags) — re-add the block after each regen (copy from another report, fix title/URL), or patch the generator to emit it.
 
 1. **Nav bar** — back-link on left, Tenzi logo SVG on right. Copy from an existing page. Back-link href should use `../index.html` for pages in subfolders.
 2. **Page view tracking + CTA tracking helper** — paste the standard shared-tracker block (see Analytics section above: two `<script>` tags — load `https://tenzi.ai/track.js`, then call `tenziTrack.init({ site: 'resources' })`) at the bottom of the page.
@@ -256,4 +260,5 @@ Every content page on the site MUST have all of the following. No exceptions.
    - `.tile-runbook` inside `.runbook-grid` — operational runbooks
    - `.tile-premium` inside `.premium-grid` — premium samples (green "Premium" pill in the tile foot)
 6. **Self-contained HTML for layout** — inline CSS, no build step, no external CSS frameworks. The one external JS dependency is `https://tenzi.ai/track.js` (shared analytics); everything else is inline. Follow [`DESIGN_STANDARD.md`](./DESIGN_STANDARD.md) for tokens, type scale, and component patterns.
-7. Commit and push to `main` — GitHub Pages deploys automatically
+7. **Head metadata + sitemap** — every content page carries: `<link rel="canonical">`, a ≤160-char `<meta name="description">`, and the OG/Twitter block pointing at `https://resources.tenzi.ai/og.png` (copy the block from an existing page, adjust title/description/URL). Data reports additionally get a `schema.org/Dataset` JSON-LD block (feeds Google Dataset Search). Add the page's URL + lastmod to `sitemap.xml`. Unlisted pages (e.g. top20) get the head metadata but stay OUT of `sitemap.xml`.
+8. Commit and push to `main` — GitHub Pages deploys automatically

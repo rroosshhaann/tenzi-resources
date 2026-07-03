@@ -1,0 +1,26 @@
+# Tenzi Resources
+
+> Free market data, dashboards, and operational runbooks for Australian general insurance (GI) brokers and licensees, published by Tenzi (tenzi.ai / Tenzi Pty Ltd). The data products are built from the ASIC AFS licensee and Authorised Representative (AR) registers on data.gov.au. No paywall, no sign-up gate. New data lands monthly, announced by a one-email monthly brief.
+
+Key facts:
+
+- Publisher: Tenzi Pty Ltd, Melbourne, Australia — the marketing site is tenzi.ai; this subdomain is the free data arm
+- Coverage: Australian general insurance broking — AR movement (joiners, leavers, AFSL switches), AR demographics, licensee network metrics
+- Cadence: monthly movement reports; dashboards refreshed as ASIC register data lands
+- Contact: roshan@tenzi.ai
+
+## Data & reports
+
+- [GI Broker Movement Dashboard](https://resources.tenzi.ai/reports/gi-broker-movement-dashboard.html): AR movement across Australian GI licensees, January to April 2026
+- [GI Broker AR Movement — monthly reports](https://resources.tenzi.ai/reports/gi-broker-movement-june-2026.html): who joined, left, and switched AFSLs each month (April, May, June 2026 editions live)
+- [Profile of the Average GI Broker AR](https://resources.tenzi.ai/reports/gi-broker-ar-profile.html): tenure, geography, and concentration of Australia's GI broker ARs
+
+## Runbooks
+
+- [New Business / Quoting](https://resources.tenzi.ai/runbooks/new-business-quoting-runbook.html)
+- [Renewals](https://resources.tenzi.ai/runbooks/renewals-runbook.html)
+- [Claims Management](https://resources.tenzi.ai/runbooks/claims-management-runbook.html)
+
+## Premium samples
+
+Samples of paid analyses (network health leaderboard, AR race chart, licensee AR-flow deep dives, senior broker quadrant) are listed at [resources.tenzi.ai](https://resources.tenzi.ai/).

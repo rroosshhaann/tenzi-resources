@@ -1,0 +1,13 @@
+# resources.tenzi.ai
+# All crawlers welcome, including AI assistants and their search crawlers
+# (GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot,
+# Google-Extended, CCBot). Being findable and quotable is deliberate policy.
+# /r/ (newsletter click redirect) and /unsubscribe/ are functional plumbing,
+# not content — keep them out of crawlers.
+
+User-agent: *
+Allow: /
+Disallow: /r/
+Disallow: /unsubscribe/
+
+Sitemap: https://resources.tenzi.ai/sitemap.xml
