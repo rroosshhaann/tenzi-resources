@@ -15,11 +15,14 @@ tenzi-resources/
   r/index.html                     Newsletter click-tracking redirect
   unsubscribe/index.html           Newsletter unsubscribe (with confirm step)
   tenzi-blue-transparent.png       Logo asset used by the newsletter email
+  og.png / og-frame.html           Social share card (og:image on every page) + its source frame
+  robots.txt / sitemap.xml         Crawler policy + sitemap (new pages must be added to the sitemap)
+  llms.txt                         Site summary for AI assistants
 ```
 
 **Free reports** (`reports/`)
-- **GI Broker Movement Dashboard — April 2026** (`gi-broker-movement-april-2026.html`) — Monthly cadence (31 Mar → 30 Apr) with three-way scope toggle (AR / AR + CAR / CAR), headline insights, KPI strip, waterfall, AFSL performance tables, and movement flows. Index tile primary link
-- **GI Broker Movement Dashboard — Q1 2026** (`gi-broker-movement-dashboard.html`) — 3-month window (Jan → Apr) Individual ARs only. Reachable via the "Take me to the Q1 report" pill button on the April page (and the index tile's nested Q1 button)
+- **GI Broker AR Movement — monthly series** (April, May, June 2026 editions) — Monthly cadence with scope toggle (AR / AR + CAR / CAR), headline insights, KPI strip, waterfall, AFSL performance tables, and movement flows. The newest month is the index tile; earlier months stay live at their own URLs
+- **GI Broker Movement Dashboard — Q1 2026** (`gi-broker-movement-dashboard.html`) — 3-month window (Jan → Apr), Individual ARs only
 - **Profile of the Average GI Broker AR** — State distribution, tenure, AFSL loyalty stats, and record holders
 
 **Runbooks** (`runbooks/`)
@@ -32,6 +35,8 @@ tenzi-resources/
 - **GI Broker AFSL Race Chart** — Animated 24-month view of the Top 20 GI broker networks
 - **Resilium AR Flow Analysis** — 48 months of inbound/outbound AR movement for a single AFSL
 - **PSC Connect AR Flow Analysis** — 48 months of AR movement showing McLardy McShane capturing 57% of traceable departures
+- **The Senior Broker Quadrant** — GI networks mapped by broker seniority and scale (May 2026)
+- **Two Licences, One Week — Sphere & Regis** — one week of AR movement across two licences (June 2026)
 
 ## Hosting
 
@@ -140,7 +145,8 @@ Every page must have all of the following:
    - `.tile-data` inside `.data-grid` — free reports/dashboards
    - `.tile-runbook` inside `.runbook-grid` — runbooks
    - `.tile-premium` inside `.premium-grid` — premium samples (green "Premium" pill in the tile foot)
-6. Push to `main`
+6. Add head metadata — canonical, ≤160-char meta description, OG/Twitter block pointing at `og.png` (copy from an existing page); data reports also get a `schema.org/Dataset` JSON-LD block — and add the page to `sitemap.xml` with a lastmod date
+7. Push to `main`
 
 See `CLAUDE.md` for operational detail (tracking script, modal HTML, endpoint) and `DESIGN_STANDARD.md` for visual/layout rules.
 

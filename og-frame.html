@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Inter+Tight:wght@500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { width: 1200px; height: 630px; overflow: hidden; }
+.card {
+  width: 1200px; height: 630px;
+  background: #faf8f4;
+  background-image: radial-gradient(ellipse at 100% 0%, rgba(44,164,113,0.05), transparent 45%);
+  border: 1px solid #e5e1d9;
+  padding: 72px 80px 64px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  font-family: 'Inter Tight', sans-serif;
+}
+.logo { height: 52px; width: auto; display: block; align-self: flex-start; }
+.eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 21px; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: #6b6560;
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 34px;
+}
+.eyebrow::before {
+  content: ''; width: 12px; height: 12px; border-radius: 50%;
+  background: #2ca471;
+}
+h1 {
+  font-size: 100px; font-weight: 500;
+  letter-spacing: -0.03em; line-height: 1.06;
+  color: #0A4A45;
+}
+h1 .mark { color: #2ca471; }
+.foot {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 21px; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.foot .site { color: #1a1a1a; }
+.foot .meta { color: #a59f93; }
+</style>
+</head>
+<body>
+<div class="card">
+  <img class="logo" src="tenzi-blue.svg" alt="Tenzi">
+  <div>
+    <div class="eyebrow">Free for the Australian GI industry · No paywall</div>
+    <h1>Free data &amp; runbooks<br><span class="mark">for GI brokers.</span></h1>
+  </div>
+  <div class="foot">
+    <span class="site">resources.tenzi.ai</span>
+    <span class="meta">ASIC register data · Monthly brief</span>
+  </div>
+</div>
+</body>
+</html>

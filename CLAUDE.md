@@ -9,12 +9,15 @@ Hosted on GitHub Pages at `https://resources.tenzi.ai`.
 tenzi-resources/
   index.html                              # Central landing page
   og.png                                  # 2400×1260 social share card — every page's og:image points at it
+  og-frame.html                           # source frame for og.png — see "Share card & search registration" below
   robots.txt                              # permissive (AI crawlers welcome); blocks /r/ + /unsubscribe/; points at sitemap
   sitemap.xml                             # all content pages EXCEPT unlisted ones (top20) — add new pages here with lastmod
   llms.txt                                # site summary for AI assistants
   reports/                                # Free analytics reports
     gi-broker-movement-dashboard.html     # Q1 (Jan→Apr) 3-month window — restyled to match the monthly aesthetic
-    gi-broker-movement-april-2026.html    # Monthly cadence (31 Mar → 30 Apr) — deeper-green / DM Sans variant; index tile primary link, Q1 reachable via "Take me to the Q1 report" pill button
+    gi-broker-movement-april-2026.html    # Monthly cadence (31 Mar → 30 Apr) — deeper-green / DM Sans variant
+    gi-broker-movement-may-2026.html      # Monthly cadence
+    gi-broker-movement-june-2026.html     # Monthly cadence — current index tile for the monthly series
     gi-broker-ar-profile.html
     gi-broker-top20-metrics.html          # UNLISTED (direct-link share only, NOT tiled on index) — top-20 broker metric heatmap, AR/CAR/combined toggle; keeps its own dashboard design (not Terminal Grid); regen from python-scrapbook: generate_review.py --portal --out <this path>
   runbooks/                               # Free operational runbooks
@@ -22,14 +25,19 @@ tenzi-resources/
     renewals-runbook.html
     claims-management-runbook.html
   premium-samples/                        # Sample of premium paid reports
+    afsl-health-leaderboard.html          # GI broker network health score leaderboard (April 2026)
     gi-broker-race-chart.html             # Top 20 GI broker AFSLs (24mo)
+    psc-connect-ar-flow.html              # PSC Connect AR flow analysis (48mo)
     resilium-ar-flow.html                 # Resilium AR flow analysis (48mo)
+    senior-broker-quadrant.html           # Senior broker quadrant (May 2026)
+    sphere-regis-ar-flow.html             # Sphere & Regis, one week of movement (June 2026)
     *.gif                                 # Embedded chart assets
   unsubscribe/                            # Newsletter unsubscribe landing
     index.html                            # Reads ?recipient= + ?campaign= from URL, requires confirm-button click, then fires (cta: email_unsubscribe_click) with recipient in column G + optional reason/comment in columns I/J
   r/                                      # Newsletter click-tracking redirect
     index.html                            # Reads ?to=&action=&recipient=&campaign=, fires beacon, then location.replace to ?to (allowlisted hosts only)
   tenzi-blue-transparent.png              # 741×291 RGBA logo asset used by the newsletter email header (sits on cream #faf8f4 background cleanly)
+  tenzi-blue.svg                          # logo (arcs + wordmark), used by og-frame.html
 ```
 
 | Page type | CTA pattern |
@@ -223,6 +231,12 @@ Server-side `melbTime` overrides `data.timestamp` for consistency. Show the succ
 - Custom domain: `resources.tenzi.ai` (CNAME file in repo root)
 - HTTPS enforced, cert auto-renewed by GitHub
 - DNS: A records pointing to GitHub Pages IPs (185.199.108-111.153)
+
+## Share card & search registration
+
+- `og.png` (2400×1260) is rendered from `og-frame.html` at 2× — 1× cards come out blurry after LinkedIn's recompression. Procedure: serve the repo root (`python3 -m http.server 8123`), screenshot `http://localhost:8123/og-frame.html` with headless Chrome using `--force-device-scale-factor=2 --window-size=1200,630 --virtual-time-budget=10000`, copy the output over `og.png`. (Full command in the `tenzi-homepage` CLAUDE.md — same pipeline.) LinkedIn caches share images: re-scrape a changed page via LinkedIn Post Inspector.
+- Search state (2026-07-03): covered by the `tenzi.ai` Google Search Console **domain property** (auto-verified via Workspace — no per-subdomain verification needed). `https://resources.tenzi.ai/sitemap.xml` submitted in GSC and Bing Webmaster. The Dataset JSON-LD on listed reports feeds Google Dataset Search; pickup typically takes days to a couple of weeks.
+- `robots.txt` is deliberately permissive (AI crawlers welcome) apart from `/r/` and `/unsubscribe/` — don't add blanket Disallows.
 
 ## Data sources
 
