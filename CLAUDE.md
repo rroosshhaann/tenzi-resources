@@ -20,6 +20,8 @@ tenzi-resources/
     gi-broker-movement-june-2026.html     # Monthly cadence — current index tile for the monthly series
     gi-broker-ar-profile.html
     gi-broker-top20-metrics.html          # UNLISTED (direct-link share only, NOT tiled on index) — top-20 broker metric heatmap, AR/CAR/combined toggle; keeps its own dashboard design (not Terminal Grid); regen from python-scrapbook: generate_review.py --portal --out <this path>
+    gi-broker-whitespace-map.html         # Interactive whitespace map — business growth vs broker coverage by SA4 (linked map + quadrant, state zoom). Keeps its own dashboard design (teal, change-report family). Regen from python-scrapbook: geo-coverage/generate_interactive.py --portal --out <this path> — the generator emits the FULL page standard (nav, tracking, subscribe CTA+modal+strip, head metadata + Dataset JSON-LD), so regens are idempotent, no manual re-patching
+    gi-broker-whitespace-map.thumb.jpg    # index tile thumbnail (cropped from the national whitespace map PNG)
   runbooks/                               # Free operational runbooks
     new-business-quoting-runbook.html
     renewals-runbook.html
@@ -274,5 +276,5 @@ Every content page on the site MUST have all of the following. No exceptions.
    - `.tile-runbook` inside `.runbook-grid` — operational runbooks
    - `.tile-premium` inside `.premium-grid` — premium samples (green "Premium" pill in the tile foot)
 6. **Self-contained HTML for layout** — inline CSS, no build step, no external CSS frameworks. The one external JS dependency is `https://tenzi.ai/track.js` (shared analytics); everything else is inline. Follow [`DESIGN_STANDARD.md`](./DESIGN_STANDARD.md) for tokens, type scale, and component patterns.
-7. **Head metadata + sitemap** — every content page carries: `<link rel="canonical">`, a ≤160-char `<meta name="description">`, and the OG/Twitter block pointing at `https://resources.tenzi.ai/og.png` (copy the block from an existing page, adjust title/description/URL). Data reports additionally get a `schema.org/Dataset` JSON-LD block (feeds Google Dataset Search). Add the page's URL + lastmod to `sitemap.xml`. Unlisted pages (e.g. top20) get the head metadata but stay OUT of `sitemap.xml`.
+7. **Head metadata + sitemap** — every content page carries: the favicon (`<link rel="icon" type="image/svg+xml" href="../tenzi-arcs-small.svg">` — `../` for pages in subfolders), `<link rel="canonical">`, a ≤160-char `<meta name="description">`, and the OG/Twitter block pointing at `https://resources.tenzi.ai/og.png` (copy the block from an existing page, adjust title/description/URL). Data reports additionally get a `schema.org/Dataset` JSON-LD block (feeds Google Dataset Search). Add the page's URL + lastmod to `sitemap.xml`. Unlisted pages (e.g. top20) get the head metadata but stay OUT of `sitemap.xml`.
 8. Commit and push to `main` — GitHub Pages deploys automatically
