@@ -155,39 +155,12 @@
   }
   .premium-badge.green { border-color: var(--accent); color: var(--accent); }
 
-  /* Premium carousel (3 tiles per view on desktop, 1 on mobile, snap per tile) */
-  .premium-carousel { margin-bottom: 8px; position: relative; }
-  .premium-nav {
-    position: absolute; top: 120px; transform: translateY(-50%);
-    width: 40px; height: 40px; border-radius: 50%;
-    background: var(--panel); border: 1px solid var(--border-bright);
-    color: var(--text); cursor: pointer; z-index: 2;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.18s ease, border-color 0.15s, color 0.15s, background 0.15s;
+  /* Premium grid — two rows of tiles (was a single-row carousel) */
+  .premium-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 8px;
   }
-  .premium-nav.prev { left: -20px; }
-  .premium-nav.next { right: -20px; }
-  .premium-carousel:hover .premium-nav:not([aria-disabled="true"]) {
-    opacity: 1; pointer-events: auto;
-  }
-  .premium-nav:hover { border-color: var(--accent); color: var(--accent); background: var(--panel-hover); }
-  .premium-nav[aria-disabled="true"] { opacity: 0; pointer-events: none; }
-  .premium-track {
-    display: flex; gap: 12px;
-    overflow-x: auto; overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    overscroll-behavior-x: contain;
-  }
-  .premium-track::-webkit-scrollbar { display: none; }
-  .premium-track > .tile-premium {
-    flex: 0 0 calc((100% - 24px) / 3);
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-  }
+  @media (max-width: 1100px) { .premium-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .premium-grid { grid-template-columns: 1fr; } }
   .tile-premium {
     flex-direction: column; padding: 24px; min-height: 240px;
     position: relative; overflow: hidden;
@@ -201,10 +174,10 @@
     margin-top: 20px; display: flex; justify-content: space-between; align-items: center;
   }
   /* Thumbnail variant: meta strip at top, full-width chart thumb, then text.
-     Tweakables — change these two values on .premium-track to flip the look:
+     Tweakables — change these two values on .premium-grid to flip the look:
        --thumb-fit:      'contain' = letterbox full chart; 'cover' = fill & crop.
        --thumb-position: 'center' or 'top' (only matters when fit is 'cover'). */
-  .premium-track { --thumb-fit: cover; --thumb-position: top; }
+  .premium-grid { --thumb-fit: cover; --thumb-position: top; }
   .tile-premium-thumb .meta {
     display: flex; justify-content: space-between;
     font-family: 'IBM Plex Mono', ui-monospace, monospace;
@@ -227,22 +200,6 @@
     display: block;
   }
   .tile-premium-thumb .title { margin-top: 0; }
-  .premium-dots {
-    display: flex; justify-content: center; gap: 8px; margin-top: 18px;
-  }
-  .premium-dots button {
-    width: 8px; height: 8px; border-radius: 50%;
-    border: none; padding: 0; cursor: pointer;
-    background: var(--border-bright);
-    transition: background 0.2s, transform 0.2s;
-    font-size: 0;
-  }
-  .premium-dots button:hover { background: var(--dim); }
-  .premium-dots button[aria-current="true"] {
-    background: var(--accent);
-    transform: scale(1.3);
-  }
-
   /* Data row (2 tiles, 260px chart + text) */
   .data-grid {
     display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 8px;
@@ -390,7 +347,6 @@
   /* Responsive */
   @media (max-width: 900px) {
     .data-grid, .runbook-grid { grid-template-columns: 1fr; }
-    .premium-track > .tile-premium { flex: 0 0 100%; }
     .tile-data, .tile-runbook { grid-template-columns: 1fr; }
     .tile-data .chart, .tile-runbook .preview { border-right: none; border-bottom: 1px solid var(--border); min-height: 160px; }
     .about { grid-template-columns: 1fr; }
@@ -550,14 +506,20 @@
     <p class="sec-blurb">Samples from our paid data products — full AR flow and licensee-level movement analysis, refreshed monthly.</p>
   </div>
 
-  <div class="premium-carousel">
-    <button class="premium-nav prev" type="button" aria-label="Previous samples" aria-disabled="true">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-    </button>
-    <button class="premium-nav next" type="button" aria-label="Next samples">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
-    <div class="premium-track">
+  <div class="premium-grid">
+
+    <a href="reports/gi-broker-whitespace-map.html" class="tile tile-premium tile-premium-thumb" onclick="trackCta('premium_whitespace_click')">
+      <div class="meta"><span>JUL 2026</span><span>88 REGIONS</span></div>
+      <div class="thumb">
+        <img src="reports/gi-broker-whitespace-map.thumb.jpg" alt="Broker whitespace map preview" loading="lazy" decoding="async">
+      </div>
+      <h3 class="title">The Broker Whitespace Map</h3>
+      <p class="blurb">Where business growth is outrunning broker coverage. 26 regions captured 52.7% of Australia's net new businesses with 16.7% of its brokers — mapped region by region, with state zoom.</p>
+      <div class="foot">
+        <div class="cta">OPEN DASHBOARD →</div>
+        <span class="premium-badge green">Premium</span>
+      </div>
+    </a>
 
     <a href="premium-samples/sphere-regis-ar-flow.html" class="tile tile-premium tile-premium-thumb" onclick="trackCta('premium_sphere_regis_click')">
       <div class="meta"><span>JUN 2026</span><span>76 REPS IN PLAY</span></div>
@@ -637,8 +599,6 @@
       </div>
     </a>
 
-    </div>
-    <div class="premium-dots" role="tablist" aria-label="Premium samples"></div>
   </div>
 
   <!-- DATA SECTION -->
@@ -677,18 +637,6 @@
         <div class="meta"><span>QUARTERLY</span><span>JAN 2026</span></div>
         <h3 class="title">Profile of the Average GI Broker AR</h3>
         <p class="blurb">Where they work, how long they stay, and how often they move. A data-driven profile from ASIC and ABS data.</p>
-        <div class="cta">OPEN DASHBOARD →</div>
-      </div>
-    </a>
-
-    <a href="reports/gi-broker-whitespace-map.html" class="tile tile-data" onclick="trackCta('data_whitespace_click')">
-      <div class="chart">
-        <img src="reports/gi-broker-whitespace-map.thumb.jpg" alt="Broker whitespace map preview" loading="lazy" decoding="async">
-      </div>
-      <div class="body">
-        <div class="meta"><span>ANNUAL</span><span>JUL 2026</span></div>
-        <h3 class="title">The Broker Whitespace Map</h3>
-        <p class="blurb">Where business growth is outrunning broker coverage. An interactive region-by-region map of ABS business counts against ASIC broker locations.</p>
         <div class="cta">OPEN DASHBOARD →</div>
       </div>
     </a>
@@ -880,68 +828,6 @@
     return false;
   }
 
-  // ── Premium carousel: dots + arrows + scroll sync ─────────────────────
-  (function() {
-    var track = document.querySelector('.premium-track');
-    var dotsContainer = document.querySelector('.premium-dots');
-    var prevBtn = document.querySelector('.premium-nav.prev');
-    var nextBtn = document.querySelector('.premium-nav.next');
-    if (!track || !dotsContainer) return;
-    var tiles = track.querySelectorAll('.tile-premium');
-    if (!tiles.length) return;
-
-    tiles.forEach(function(_, i) {
-      var dot = document.createElement('button');
-      dot.setAttribute('role', 'tab');
-      dot.setAttribute('aria-label', 'Go to premium sample ' + (i + 1));
-      dot.addEventListener('click', function() {
-        track.scrollTo({ left: tiles[i].offsetLeft - tiles[0].offsetLeft, behavior: 'smooth' });
-      });
-      dotsContainer.appendChild(dot);
-    });
-
-    var dots = dotsContainer.querySelectorAll('button');
-
-    function step() { return tiles[0].offsetWidth + 12; }
-
-    function refreshState() {
-      var baseline = tiles[0].offsetLeft;
-      var idx = 0, best = Infinity;
-      tiles.forEach(function(tile, j) {
-        var dist = Math.abs((tile.offsetLeft - baseline) - track.scrollLeft);
-        if (dist < best) { best = dist; idx = j; }
-      });
-      dots.forEach(function(d, j) {
-        if (j === idx) d.setAttribute('aria-current', 'true');
-        else d.removeAttribute('aria-current');
-      });
-
-      var maxScroll = track.scrollWidth - track.clientWidth;
-      if (prevBtn) {
-        if (track.scrollLeft <= 2) prevBtn.setAttribute('aria-disabled', 'true');
-        else prevBtn.removeAttribute('aria-disabled');
-      }
-      if (nextBtn) {
-        if (track.scrollLeft >= maxScroll - 2) nextBtn.setAttribute('aria-disabled', 'true');
-        else nextBtn.removeAttribute('aria-disabled');
-      }
-    }
-    refreshState();
-
-    if (prevBtn) prevBtn.addEventListener('click', function() {
-      track.scrollBy({ left: -step(), behavior: 'smooth' });
-    });
-    if (nextBtn) nextBtn.addEventListener('click', function() {
-      track.scrollBy({ left: step(), behavior: 'smooth' });
-    });
-
-    var scrollTimer;
-    track.addEventListener('scroll', function() {
-      clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(refreshState, 60);
-    });
-    window.addEventListener('resize', refreshState);
-  })();
 </script>
 
 </body>

@@ -20,7 +20,7 @@ tenzi-resources/
     gi-broker-movement-june-2026.html     # Monthly cadence — current index tile for the monthly series
     gi-broker-ar-profile.html
     gi-broker-top20-metrics.html          # UNLISTED (direct-link share only, NOT tiled on index) — top-20 broker metric heatmap, AR/CAR/combined toggle; keeps its own dashboard design (not Terminal Grid); regen from python-scrapbook: generate_review.py --portal --out <this path>
-    gi-broker-whitespace-map.html         # Interactive whitespace map — business growth vs broker coverage by SA4 (linked map + quadrant, state zoom). Keeps its own dashboard design (teal, change-report family). Regen from python-scrapbook: geo-coverage/generate_interactive.py --portal --out <this path> — the generator emits the FULL page standard (nav, tracking, subscribe CTA+modal+strip, head metadata + Dataset JSON-LD), so regens are idempotent, no manual re-patching
+    gi-broker-whitespace-map.html         # Interactive whitespace map — business growth vs broker coverage by SA4 (linked map + quadrant, state zoom). Keeps its own dashboard design (teal, change-report family). Tiled in the PREMIUM grid on the index (first tile, premium_whitespace_click) though the page itself keeps the free-report subscribe CTA; also in sitemap + llms.txt. Regen from python-scrapbook: geo-coverage/generate_interactive.py --portal --out <this path> — the generator emits the FULL page standard (nav, tracking, subscribe CTA+modal+strip, head metadata + Dataset JSON-LD), so regens are idempotent, no manual re-patching
     gi-broker-whitespace-map.thumb.jpg    # index tile thumbnail (cropped from the national whitespace map PNG)
   runbooks/                               # Free operational runbooks
     new-business-quoting-runbook.html
