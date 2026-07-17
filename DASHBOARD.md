@@ -10,7 +10,7 @@ Top to bottom:
 
 1. **Nav** — `tenzi · analytics` brand on the left, window + site summary on the right
 2. **Hero** — `Site analytics` H1 + one-line subtitle
-3. **Filters** — Range buttons (`7D / 30D / 90D / 1Y`) and Site tabs (`All / Marketing / Resources`)
+3. **Filters** — Range buttons (`7D / 30D / 90D / 1Y`) and Site tabs (`All / Marketing / Resources`). When a page filter is active (see Top pages below), a **Page chip** appears here showing the selected page title with an `×` link that clears it. Range and Site buttons carry the page filter through
 4. **KPI strip** — six tiles, all scoped to the current window:
 
    | Tile | Source |
@@ -23,7 +23,7 @@ Top to bottom:
    | Median dwell | Median seconds across all `(dwell: N)` rows |
 
 5. **Daily activity chart** — inline SVG line chart. Page views (green) + unique visitors (grey) per day, gap-filled across the window. Hover anywhere over a column to surface a tooltip (date, page views, unique visitors) plus a vertical guide line and highlighted dots — handled by a small inline `<script>` block, no chart library
-6. **Top pages** — view count + share-of-total bar
+6. **Top pages** — view count + share-of-total bar. Each page name is a link that sets `&page=<title>`, scoping the entire dashboard (KPIs, daily chart, every table) to that one page — this is how you track a single page's views over time. Clear it via the chip in the filter bar
 7. **CTA clicks** — click count bar per action, sorted desc
 8. **Median dwell per page** — Median, P90, sample count, sorted by median desc
 9. **Recent contacts** — full row from Contacts sheet, sorted newest first
@@ -52,6 +52,7 @@ Range and site buttons inside the page carry the token through, so once you load
 | `token` | yes | — | Must match `DASHBOARD_TOKEN` in the script |
 | `days` | no | `30` | Window length in days, 1–365 |
 | `site` | no | `all` | `all`, `marketing`, `resources`, or `partner` |
+| `page` | no | (none) | Exact page title; scopes every section to that page. Set by clicking a page in Top pages, cleared via the chip's `×`. Must match the Events `Page` column (i.e. `document.title`) exactly |
 
 ## Auth
 
@@ -106,7 +107,7 @@ Both reads happen on every dashboard load (no caching yet):
 
 `Contacts` is filtered by date + site separately.
 
-**Date filtering:** rows older than `cutoff = today - (days - 1)` at midnight in the script's runtime timezone are skipped. **Site filtering:** when `site != all`, rows whose Site column doesn't match are skipped.
+**Date filtering:** rows older than `cutoff = today - (days - 1)` at midnight in the script's runtime timezone are skipped. **Site filtering:** when `site != all`, rows whose Site column doesn't match are skipped. **Page filtering:** when `page` is set, Events and Contacts rows whose Page column doesn't exactly match are skipped — every KPI, the daily chart, and every table scope to that single page.
 
 The daily series is **gap-filled** — every date in the window appears even if zero events landed, so the chart x-axis is continuous.
 
@@ -118,12 +119,12 @@ All dashboard code lives in `apps-script.gs` under the comment `// ── DASHBO
 |-|-|
 | `renderDashboard_(e)` | Entry point. Auth → parse params → compute → render |
 | `isAuthorizedForDashboard_(e)` | Token check (refuses the placeholder string) |
-| `computeStats_(days, siteFilter)` | Single-pass aggregation over Events + Contacts |
+| `computeStats_(days, siteFilter, pageFilter)` | Single-pass aggregation over Events + Contacts |
 | `readSheetWithHeaders_(sheet, defaults)` | Returns rows as `{Header: value}` objects, tolerates missing header row |
 | `parseTs_`, `dateKey_`, `pad2_`, `median_`, `percentile_`, `mapToList_` | Small utilities |
 | `escapeHtml_`, `formatNumber_`, `formatDuration_`, `formatTs_` | Output formatters — escape EVERYTHING from the sheet |
 | `buildAccessDeniedHtml_` | Static 403 page |
-| `buildDashboardHtml_(stats, days, siteFilter, token)` | Top-level page template |
+| `buildDashboardHtml_(stats, days, siteFilter, pageFilter, token)` | Top-level page template |
 | `dashboardCss_` | Inline CSS — Terminal Grid tokens copied verbatim from the resources site |
 | `kpi_`, `sectionLabel_` | Markup helpers |
 | `buildLineChart_` | Hand-rolled inline-SVG line chart with per-day hover groups (no Chart.js) |
@@ -198,6 +199,7 @@ Two constants near the top of the newsletter section in `apps-script.gs`:
 - **Legacy rows + site filter** — rows written before `track.js` shipped have an empty `Site` column. They're INCLUDED in `site=all` views but EXCLUDED from `site=marketing` / `site=resources` / `site=partner`.
 - **Clock skew** — timestamps are written as Melbourne-formatted strings (`yyyy-MM-dd HH:mm:ss`) by `Utilities.formatDate(date, 'Australia/Melbourne', …)`, then parsed back as local `Date` objects in the script's runtime timezone. If the script TZ isn't Melbourne (set in Apps Script project settings), events near midnight may bucket on the "wrong" calendar day. Pin the script TZ to `Australia/Melbourne` for accuracy.
 - **Subscriber detection is heuristic** — any Events row whose `Event` cell contains `@` and doesn't start with `(` is counted as a subscriber. False positives are unlikely (event placeholders all start with `(`), but worth knowing if you ever add a non-form event with `@` in the name.
+- **Page filter matches title strings** — pages are keyed by `document.title` (that's what `track.js` sends), so a retitled page splits into two filter targets: its history before the rename lives under the old title, after under the new one. Filter each separately to compare.
 
 ## Roadmap (not built)
 

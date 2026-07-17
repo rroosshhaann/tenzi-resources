@@ -234,6 +234,7 @@ function wrapPaged_(html, totalRows) {
 //   &token=<TOKEN>        — required (must match DASHBOARD_TOKEN)
 //   &days=N               — window length, 1..365 (default 30)
 //   &site=all|marketing|resources|partner  — site filter (default all)
+//   &page=<title>         — scope everything to one page title (default: all pages)
 
 function renderDashboard_(e) {
   if (!isAuthorizedForDashboard_(e)) {
@@ -244,9 +245,10 @@ function renderDashboard_(e) {
   if (days > 365) days = 365;
   var siteFilter = e.parameter.site || 'all';
   if (['all','marketing','resources','partner'].indexOf(siteFilter) === -1) siteFilter = 'all';
+  var pageFilter = String(e.parameter.page || '');
 
-  var stats = computeStats_(days, siteFilter);
-  var html = buildDashboardHtml_(stats, days, siteFilter, e.parameter.token);
+  var stats = computeStats_(days, siteFilter, pageFilter);
+  var html = buildDashboardHtml_(stats, days, siteFilter, pageFilter, e.parameter.token);
   return HtmlService.createHtmlOutput(html)
     .setTitle('Tenzi · Analytics')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
@@ -257,7 +259,9 @@ function isAuthorizedForDashboard_(e) {
   return !!(e.parameter.token && e.parameter.token === DASHBOARD_TOKEN);
 }
 
-function computeStats_(days, siteFilter) {
+// pageFilter is an exact page-title match ('' = all pages), applied to Events
+// and Contacts alike so the KPIs, chart, and every table scope together.
+function computeStats_(days, siteFilter, pageFilter) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var events = readSheetWithHeaders_(ss.getSheetByName(EVENTS_SHEET),
     ['Event','Page','Timestamp','IP','Referrer','Site','Recipient','UserAgent','Reason','Comment']);
@@ -288,6 +292,7 @@ function computeStats_(days, siteFilter) {
     var ip = String(row.IP || '');
     var site = String(row.Site || '');
     if (siteFilter !== 'all' && site !== siteFilter) return;
+    if (pageFilter && page !== pageFilter) return;
 
     var key = dateKey_(ts);
     var entry = byDate[key] || (byDate[key] = { pageViews:0, ips:{}, ctaClicks:0, subscribers:0 });
@@ -344,6 +349,7 @@ function computeStats_(days, siteFilter) {
     if (!ts || ts < cutoff) return;
     var site = String(row.Site || '');
     if (siteFilter !== 'all' && site !== siteFilter) return;
+    if (pageFilter && String(row.Page || '') !== pageFilter) return;
     allContacts.push({
       ts: ts,
       name: String(row.Name||''),
@@ -498,19 +504,24 @@ function buildAccessDeniedHtml_() {
     'If <code>DASHBOARD_TOKEN</code> still says <code>REPLACE_WITH_A_LONG_RANDOM_STRING</code> in the script, set it to something secret first and redeploy.</p></body></html>';
 }
 
-function buildDashboardHtml_(stats, days, siteFilter, token) {
+function buildDashboardHtml_(stats, days, siteFilter, pageFilter, token) {
   var t = stats.totals;
   // Apps Script renders this HTML inside an iframe at script.googleusercontent.com,
   // so relative URLs would resolve to the wrong host. Use the deployed web-app URL.
   var baseUrl = ScriptApp.getService().getUrl();
-  var qs = function(d, s) { return baseUrl + '?view=dashboard&token=' + encodeURIComponent(token) + '&days=' + d + '&site=' + s; };
+  var qs = function(d, s, p) {
+    return baseUrl + '?view=dashboard&token=' + encodeURIComponent(token) + '&days=' + d + '&site=' + s +
+      (p ? '&page=' + encodeURIComponent(p) : '');
+  };
 
   var rangeBtn = function(label, d) {
-    return '<a href="' + qs(d, siteFilter) + '" class="' + (days === d ? 'active' : '') + '">' + label + '</a>';
+    return '<a href="' + qs(d, siteFilter, pageFilter) + '" class="' + (days === d ? 'active' : '') + '">' + label + '</a>';
   };
   var siteBtn = function(label, s) {
-    return '<a href="' + qs(days, s) + '" class="' + (siteFilter === s ? 'active' : '') + '">' + label + '</a>';
+    return '<a href="' + qs(days, s, pageFilter) + '" class="' + (siteFilter === s ? 'active' : '') + '">' + label + '</a>';
   };
+  // Clicking a page name in Top pages sets the filter; the chip's × clears it.
+  var pageUrl = function(p) { return qs(days, siteFilter, p); };
 
   return '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
@@ -535,6 +546,13 @@ function buildDashboardHtml_(stats, days, siteFilter, token) {
         '<div class="range">' + rangeBtn('7D', 7) + rangeBtn('30D', 30) + rangeBtn('90D', 90) + rangeBtn('1Y', 365) + '</div>' +
         '<span class="label">Site</span>' +
         '<div class="site-tabs">' + siteBtn('All', 'all') + siteBtn('Marketing', 'marketing') + siteBtn('Resources', 'resources') + siteBtn('Partner', 'partner') + '</div>' +
+        (pageFilter
+          ? '<span class="label">Page</span>' +
+            '<span class="page-chip" title="' + escapeHtml_(pageFilter) + '">' +
+              '<span class="chip-txt">' + escapeHtml_(pageFilter) + '</span>' +
+              '<a class="chip-x" href="' + escapeHtml_(qs(days, siteFilter, '')) + '" aria-label="Clear page filter">&times;</a>' +
+            '</span>'
+          : '') +
       '</div>' +
 
       '<div class="kpi-row">' +
@@ -552,7 +570,7 @@ function buildDashboardHtml_(stats, days, siteFilter, token) {
       '<div class="grid-2">' +
         '<div>' +
           sectionLabel_('Top pages', stats.topPages.length + ' SHOWN') +
-          '<div class="card">' + buildTopPagesTable_(stats.topPages, t.pageViews) + '</div>' +
+          '<div class="card">' + buildTopPagesTable_(stats.topPages, t.pageViews, pageUrl) + '</div>' +
         '</div>' +
         '<div>' +
           sectionLabel_('CTA clicks', stats.topCtas.length + ' ACTIONS') +
@@ -570,7 +588,7 @@ function buildDashboardHtml_(stats, days, siteFilter, token) {
       '<div class="card">' + buildReferrersTable_(stats.topReferrers) + '</div>' +
 
       '<footer class="foot">' +
-        '<span>Window: last ' + days + ' days · Site: ' + siteFilter + '</span>' +
+        '<span>Window: last ' + days + ' days · Site: ' + siteFilter + (pageFilter ? ' · Page: ' + escapeHtml_(pageFilter) : '') + '</span>' +
         '<span>Refreshed: ' + Utilities.formatDate(new Date(), DASHBOARD_TIMEZONE, 'yyyy-MM-dd HH:mm') + ' Melbourne</span>' +
       '</footer>' +
     '</div>' +
@@ -685,6 +703,12 @@ function dashboardCss_() {
     '.bar{display:flex;align-items:center;gap:8px}' +
     '.bar-track{flex:1;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;min-width:60px}' +
     '.bar-fill{height:100%;background:linear-gradient(90deg,var(--g300),var(--g700));border-radius:3px}' +
+    '.page-link{color:inherit;text-decoration:none;border-bottom:1px dashed var(--border-bright)}' +
+    '.page-link:hover{color:var(--accent);border-bottom-color:var(--accent)}' +
+    '.page-chip{display:inline-flex;align-items:center;gap:8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;padding:6px 10px;border:1px solid rgba(20,163,153,0.35);border-radius:4px;background:var(--g50);color:var(--text);max-width:360px}' +
+    '.page-chip .chip-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+    '.page-chip .chip-x{color:var(--muted);text-decoration:none;font-size:14px;line-height:1}' +
+    '.page-chip .chip-x:hover{color:var(--neg)}' +
     '.paged tr[data-row]:not(.visible){display:none}' +
     '.pager{display:flex;align-items:center;justify-content:center;gap:14px;padding-top:14px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;color:var(--muted);letter-spacing:0.04em}' +
     '.pager button{background:var(--panel);border:1px solid var(--border);padding:5px 12px;border-radius:4px;cursor:pointer;font:inherit;color:var(--text);letter-spacing:0.04em}' +
@@ -789,14 +813,14 @@ function buildLineChart_(daily) {
   '</div>';
 }
 
-function buildTopPagesTable_(rows, total) {
+function buildTopPagesTable_(rows, total, pageUrl) {
   if (!rows.length) return '<div class="empty">No page views in this window.</div>';
   var maxV = rows[0].views;
   var html = '<table><thead><tr><th>Page</th><th class="r">Views</th><th class="r" style="width:120px">Share</th></tr></thead><tbody>';
   rows.forEach(function(r, i) {
     var pct = total > 0 ? Math.round(r.views / total * 100) : 0;
     var pg = Math.floor(i / DASHBOARD_PAGE_SIZE);
-    html += '<tr data-row="' + pg + '"><td class="page">' + escapeHtml_(r.page) + '</td>' +
+    html += '<tr data-row="' + pg + '"><td class="page"><a class="page-link" href="' + escapeHtml_(pageUrl(r.page)) + '">' + escapeHtml_(r.page) + '</a></td>' +
             '<td class="r">' + formatNumber_(r.views) + '</td>' +
             '<td class="r"><div class="bar"><div class="bar-track"><div class="bar-fill" style="width:' + (r.views/maxV*100) + '%"></div></div><span style="font-size:11px;color:var(--dim);font-family:\'IBM Plex Mono\',monospace;min-width:36px;text-align:right">' + pct + '%</span></div></td></tr>';
   });
