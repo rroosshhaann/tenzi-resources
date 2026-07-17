@@ -533,7 +533,9 @@ for (const code of order) {
 
 // ---- linked hover + tooltip ----
 function fmt(n) { return n.toLocaleString('en-AU'); }
-function showTip(code, evt) {
+let tipAbove = false;  // scatter dots anchor the tooltip above the pointer
+function showTip(code, evt, above) {
+  tipAbove = !!above;
   const d = DATA[code];
   tooltip.innerHTML =
     `<div class="tt-name">${d.n}</div>` +
@@ -547,10 +549,19 @@ function showTip(code, evt) {
 }
 function moveTip(evt) {
   const pad = 14;
-  let x = evt.clientX + pad, y = evt.clientY + pad;
   const r = tooltip.getBoundingClientRect();
-  if (x + r.width > innerWidth - 8) x = evt.clientX - r.width - pad;
-  if (y + r.height > innerHeight - 8) y = evt.clientY - r.height - pad;
+  let x, y;
+  if (tipAbove) {
+    x = evt.clientX - r.width / 2;
+    y = evt.clientY - r.height - pad;
+    if (y < 8) y = evt.clientY + pad;  // no room above: flip below
+  } else {
+    x = evt.clientX + pad;
+    y = evt.clientY + pad;
+    if (x + r.width > innerWidth - 8) x = evt.clientX - r.width - pad;
+    if (y + r.height > innerHeight - 8) y = evt.clientY - r.height - pad;
+  }
+  x = Math.max(8, Math.min(x, innerWidth - r.width - 8));
   tooltip.style.left = x + 'px';
   tooltip.style.top = y + 'px';
 }
@@ -569,9 +580,10 @@ function setHover(code) {
 }
 setHover(null);
 for (const collection of [mapPaths, dots]) {
+  const above = collection === dots;
   for (const code in collection) {
     const node = collection[code];
-    node.addEventListener('mouseenter', e => { setHover(code); showTip(code, e); });
+    node.addEventListener('mouseenter', e => { setHover(code); showTip(code, e, above); });
     node.addEventListener('mousemove', moveTip);
     node.addEventListener('mouseleave', () => setHover(null));
   }
