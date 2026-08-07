@@ -200,6 +200,9 @@
     display: block;
   }
   .tile-premium-thumb .title { margin-top: 0; }
+  /* "View all" card: same shell as a thumb tile, glyph in place of the chart */
+  .tile-premium-more .thumb { background: var(--panel); }
+  .tile-premium-more .thumb svg { width: 44px; height: 44px; color: var(--accent); }
   /* Data row (2 tiles, 260px chart + text) */
   .data-grid {
     display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 8px;
@@ -534,6 +537,19 @@
       </div>
     </a>
 
+    <a href="premium-samples/gi-top-network-ar-share.html" class="tile tile-premium tile-premium-thumb" onclick="trackCta('premium_top_network_share_click')">
+      <div class="meta"><span>JUL 2026</span><span>TOP 20 = 80%</span></div>
+      <div class="thumb">
+        <img src="premium-samples/gi-top-network-ar-share.thumb.jpg" alt="Concentration curve preview — share of AR entities by network size" loading="lazy" decoding="async">
+      </div>
+      <h3 class="title">How Much Do the Top Networks Hold?</h3>
+      <p class="blurb">The top 20 networks hold 80.3% of all matched AR entities and it takes 30 to get in. One curve answers it for any number of networks — plus the top 60 ranks.</p>
+      <div class="foot">
+        <div class="cta">VIEW SAMPLE →</div>
+        <span class="premium-badge green">Premium</span>
+      </div>
+    </a>
+
     <a href="premium-samples/sphere-regis-ar-flow.html" class="tile tile-premium tile-premium-thumb" onclick="trackCta('premium_sphere_regis_click')">
       <div class="meta"><span>JUN 2026</span><span>76 REPS IN PLAY</span></div>
       <div class="thumb">
@@ -586,29 +602,18 @@
       </div>
     </a>
 
-    <a href="premium-samples/resilium-ar-flow.html" class="tile tile-premium tile-premium-thumb" onclick="trackCta('premium_resilium_click')">
-      <div class="meta"><span>48 MO</span><span>123 ARs</span></div>
+    <a href="premium-samples/index.html" class="tile tile-premium tile-premium-thumb tile-premium-more" onclick="trackCta('premium_view_all_click')">
+      <div class="meta"><span>ALL SAMPLES</span><span>9 TOTAL</span></div>
       <div class="thumb">
-        <img src="premium-samples/afsl_flow_RESILIUM_INSURANCE_BROKING.thumb.jpg" alt="Resilium AR flow preview" loading="lazy" decoding="async">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14.5 17.5h6M17.5 14.5l3 3-3 3"/>
+        </svg>
       </div>
-      <h3 class="title">Resilium AR Flow Analysis</h3>
-      <p class="blurb">123 departing ARs, 48 months, mapped to every destination. The Steadfast ecosystem dominated before the deal was announced.</p>
+      <h3 class="title">Every premium sample</h3>
+      <p class="blurb">All nine deep dives in one place — network structure and concentration, AR flow licensee by licensee, network health, and the senior broker quadrant.</p>
       <div class="foot">
-        <div class="cta">VIEW SAMPLE →</div>
-        <span class="premium-badge green">Premium</span>
-      </div>
-    </a>
-
-    <a href="premium-samples/psc-connect-ar-flow.html" class="tile tile-premium tile-premium-thumb" onclick="trackCta('premium_psc_click')">
-      <div class="meta"><span>48 MO</span><span>134 ARs</span></div>
-      <div class="thumb">
-        <img src="premium-samples/afsl_flow_PSC_CONNECT.thumb.jpg" alt="PSC Connect AR flow preview" loading="lazy" decoding="async">
-      </div>
-      <h3 class="title">PSC Connect AR Flow Analysis</h3>
-      <p class="blurb">McLardy McShane — not Ausure — quietly captured 57% of traceable leavers well before the Steadfast deal was announced.</p>
-      <div class="foot">
-        <div class="cta">VIEW SAMPLE →</div>
-        <span class="premium-badge green">Premium</span>
+        <div class="cta">VIEW ALL →</div>
       </div>
     </a>
 

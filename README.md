@@ -30,7 +30,7 @@ tenzi-resources/
 - **Renewals** — Identification through market review, recommendation, and binding
 - **Claims Management** — First notice of loss through to resolution and file closure
 
-**Premium samples** (`premium-samples/`)
+**Premium samples** (`premium-samples/`) — all listed at [`/premium-samples/`](https://resources.tenzi.ai/premium-samples/); the index page tiles the most recent seven plus a link to the full library
 - **GI Broker Network Health Score** — Composite 0–100 score across seven signals, ranked within peer size segment. Metrix Connect tops every Dominant; size isn't health
 - **GI Broker AFSL Race Chart** — Animated 24-month view of the Top 20 GI broker networks
 - **Resilium AR Flow Analysis** — 48 months of inbound/outbound AR movement for a single AFSL
@@ -38,6 +38,7 @@ tenzi-resources/
 - **The Senior Broker Quadrant** — GI networks mapped by broker seniority and scale (May 2026)
 - **Two Licences, One Week — Sphere & Regis** — one week of AR movement across two licences (June 2026)
 - **How Many ARs Make a Broking Network?** — where the 5+ threshold falls: 99 of 211 licensees qualify and hold 95.8% of matched AR entities, the top 10 hold 70%, and ten years of licensee size structure (July 2026)
+- **How Much of the Market Do the Top Networks Hold?** — the top 20 networks hold 80.3% of all matched AR entities and it takes 30 to get in; concentration curve readable at any threshold, plus the top-60 rank table (July 2026)
 
 ## Hosting
 
