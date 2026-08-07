@@ -37,6 +37,7 @@ tenzi-resources/
 - **PSC Connect AR Flow Analysis** — 48 months of AR movement showing McLardy McShane capturing 57% of traceable departures
 - **The Senior Broker Quadrant** — GI networks mapped by broker seniority and scale (May 2026)
 - **Two Licences, One Week — Sphere & Regis** — one week of AR movement across two licences (June 2026)
+- **How Many ARs Make a Broking Network?** — where the 5+ threshold falls: 99 of 211 licensees qualify and hold 95.8% of matched AR entities, the top 10 hold 70%, and ten years of licensee size structure (July 2026)
 
 ## Hosting
 

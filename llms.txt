@@ -24,4 +24,4 @@ Key facts:
 
 ## Premium samples
 
-Samples of paid analyses (network health leaderboard, AR race chart, licensee AR-flow deep dives, senior broker quadrant) are listed at [resources.tenzi.ai](https://resources.tenzi.ai/).
+Samples of paid analyses (network health leaderboard, AR race chart, licensee AR-flow deep dives, senior broker quadrant, broking-network size threshold and concentration) are listed at [resources.tenzi.ai](https://resources.tenzi.ai/).
