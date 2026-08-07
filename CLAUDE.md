@@ -17,7 +17,19 @@ tenzi-resources/
     gi-broker-movement-dashboard.html     # Q1 (Jan→Apr) 3-month window — restyled to match the monthly aesthetic
     gi-broker-movement-april-2026.html    # Monthly cadence (31 Mar → 30 Apr) — deeper-green / DM Sans variant
     gi-broker-movement-may-2026.html      # Monthly cadence
-    gi-broker-movement-june-2026.html     # Monthly cadence — current index tile for the monthly series
+    gi-broker-movement-june-2026.html     # Monthly cadence
+    gi-broker-movement-july-2026.html     # Monthly cadence — current index tile for the monthly series
+    gi-broker-movement-july-2026.thumb.jpg # index tile thumbnail (AR + CAR view: KPI strip + population bridge)
+    # Monthly build: the generator (python-scrapbook change-report/<prev>-<next>/<Month> 2026.html) emits
+    # the bare dashboard only. Copy it here, then apply the portal layer — head metadata, Dataset JSON-LD,
+    # nav + logo, header CTA group, prev-report row, Headline insights, subscribe strip + footer, modal,
+    # track.js block. Fastest route: diff the previous month's raw file against its published version to
+    # see the exact additions — but build the new month FROM its own raw file, never by 3-way merging onto
+    # the previous month: the raw files get regenerated in place after publication, so their numbers drift
+    # from what was published (raw June closes at 5,657 ARs+CARs, published June at 5,884).
+    # Thumbnail: serve the repo, strip .nav-bar/.prev-report-row/.cta-group/
+    # insights via injected JS, click the AR + CAR scope button, screenshot 1000x1000 @2x, crop the
+    # 960x832 CSS-px content box and resize to 800px wide.
     gi-broker-ar-profile.html
     gi-broker-top20-metrics.html          # UNLISTED (direct-link share only, NOT tiled on index) — top-20 broker metric heatmap, AR/CAR/combined toggle; keeps its own dashboard design (not Terminal Grid); regen from python-scrapbook: generate_review.py --portal --out <this path>
     gi-broker-whitespace-map.html         # Interactive whitespace map — business growth vs broker coverage by SA4 (linked map + quadrant, state zoom, all/employing-businesses toggle, employing split + top-3 growth industries in hovers). Keeps its own dashboard design (teal, change-report family). Tiled in the PREMIUM grid on the index (first tile, premium_whitespace_click) though the page itself keeps the free-report subscribe CTA; also in sitemap + llms.txt. Regen from python-scrapbook: geo-coverage/generate_interactive.py --portal --out <this path> — the generator emits the FULL page standard (nav, tracking, subscribe CTA+modal+strip, head metadata + Dataset JSON-LD), so regens are idempotent, no manual re-patching

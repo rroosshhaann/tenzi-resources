@@ -12,7 +12,7 @@ Key facts:
 ## Data & reports
 
 - [GI Broker Movement Dashboard](https://resources.tenzi.ai/reports/gi-broker-movement-dashboard.html): AR movement across Australian GI licensees, January to April 2026
-- [GI Broker AR Movement — monthly reports](https://resources.tenzi.ai/reports/gi-broker-movement-june-2026.html): who joined, left, and switched AFSLs each month (April, May, June 2026 editions live)
+- [GI Broker AR Movement — monthly reports](https://resources.tenzi.ai/reports/gi-broker-movement-july-2026.html): who joined, left, and switched AFSLs each month (April, May, June, July 2026 editions live)
 - [Profile of the Average GI Broker AR](https://resources.tenzi.ai/reports/gi-broker-ar-profile.html): tenure, geography, and concentration of Australia's GI broker ARs
 - [GI Broker Whitespace Map](https://resources.tenzi.ai/reports/gi-broker-whitespace-map.html): interactive region map of where Australian business growth is outrunning GI broker coverage (ABS CABEE × ASIC register)
 

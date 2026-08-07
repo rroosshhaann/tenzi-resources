@@ -21,7 +21,7 @@ tenzi-resources/
 ```
 
 **Free reports** (`reports/`)
-- **GI Broker AR Movement — monthly series** (April, May, June 2026 editions) — Monthly cadence with scope toggle (AR / AR + CAR / CAR), headline insights, KPI strip, waterfall, AFSL performance tables, and movement flows. The newest month is the index tile; earlier months stay live at their own URLs
+- **GI Broker AR Movement — monthly series** (April, May, June, July 2026 editions) — Monthly cadence with scope toggle (AR / AR + CAR / CAR), headline insights, KPI strip, waterfall, AFSL performance tables, and movement flows. The newest month is the index tile; earlier months stay live at their own URLs
 - **GI Broker Movement Dashboard — Q1 2026** (`gi-broker-movement-dashboard.html`) — 3-month window (Jan → Apr), Individual ARs only
 - **Profile of the Average GI Broker AR** — State distribution, tenure, AFSL loyalty stats, and record holders
 
