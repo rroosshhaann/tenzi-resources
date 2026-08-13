@@ -271,6 +271,11 @@ function computeStats_(days, siteFilter, pageFilter) {
   var cutoff = new Date();
   cutoff.setHours(0, 0, 0, 0);
   cutoff.setDate(cutoff.getDate() - days + 1);
+  // Preceding equal-length window. Only page views and unique IPs are collected
+  // from it, purely to trend the views-per-unique ratio period over period.
+  var prevCutoff = new Date(cutoff);
+  prevCutoff.setDate(prevCutoff.getDate() - days);
+  var prevPv = 0, prevIps = {};
 
   var byDate = {};
   var viewsByPage = {}, ctaByAction = {}, dwellByPage = {};
@@ -288,11 +293,17 @@ function computeStats_(days, siteFilter, pageFilter) {
     if (!ev) return;
     var page = String(row.Page || '');
     var ts = parseTs_(row.Timestamp);
-    if (!ts || ts < cutoff) return;
+    if (!ts || ts < prevCutoff) return;
     var ip = String(row.IP || '');
     var site = String(row.Site || '');
     if (siteFilter !== 'all' && site !== siteFilter) return;
     if (pageFilter && page !== pageFilter) return;
+    // Previous window: feed the ratio trend, then stop — these rows must not
+    // reach any of the current-window counters, tables or the daily series.
+    if (ts < cutoff) {
+      if (ev === '(page view)') { prevPv++; if (ip) prevIps[ip] = true; }
+      return;
+    }
 
     var key = dateKey_(ts);
     var entry = byDate[key] || (byDate[key] = { pageViews:0, ips:{}, ctaClicks:0, subscribers:0 });
@@ -409,6 +420,10 @@ function computeStats_(days, siteFilter, pageFilter) {
       contacts: allContacts.length,
       medianDwell: median_(allDwell)
     },
+    prevTotals: {
+      pageViews: prevPv,
+      uniqueVisitors: Object.keys(prevIps).length
+    },
     daily: daily,
     topPages: topPages,
     topCtas: topCtas,
@@ -506,6 +521,7 @@ function buildAccessDeniedHtml_() {
 
 function buildDashboardHtml_(stats, days, siteFilter, pageFilter, token) {
   var t = stats.totals;
+  var p = stats.prevTotals || { pageViews: 0, uniqueVisitors: 0 };
   // Apps Script renders this HTML inside an iframe at script.googleusercontent.com,
   // so relative URLs would resolve to the wrong host. Use the deployed web-app URL.
   var baseUrl = ScriptApp.getService().getUrl();
@@ -558,6 +574,9 @@ function buildDashboardHtml_(stats, days, siteFilter, pageFilter, token) {
       '<div class="kpi-row">' +
         kpi_('Page views', formatNumber_(t.pageViews), true) +
         kpi_('Unique visitors', formatNumber_(t.uniqueVisitors), false) +
+        kpi_('Views per unique', formatRatio_(viewsPerUnique_(t.pageViews, t.uniqueVisitors)), false,
+          trendChip_(viewsPerUnique_(t.pageViews, t.uniqueVisitors),
+                     viewsPerUnique_(p.pageViews, p.uniqueVisitors), days)) +
         kpi_('CTA clicks', formatNumber_(t.ctaClicks), false) +
         kpi_('Subscribers', formatNumber_(t.subscribers), false) +
         kpi_('Contacts', formatNumber_(t.contacts), false) +
@@ -565,7 +584,12 @@ function buildDashboardHtml_(stats, days, siteFilter, pageFilter, token) {
       '</div>' +
 
       sectionLabel_('Daily activity', 'PAGE VIEWS · UNIQUE VISITORS · ' + days + ' DAYS') +
-      '<div class="card">' + buildLineChart_(stats.daily) + '</div>' +
+      '<div class="card">' + buildChartCard_(stats.daily, {
+        pv: growthPct_(t.pageViews, p.pageViews),
+        uv: growthPct_(t.uniqueVisitors, p.uniqueVisitors),
+        ratio: growthPct_(viewsPerUnique_(t.pageViews, t.uniqueVisitors),
+                          viewsPerUnique_(p.pageViews, p.uniqueVisitors))
+      }, days) + '</div>' +
 
       '<div class="grid-2">' +
         '<div>' +
@@ -602,12 +626,16 @@ function dashboardJs_() {
     'var tip=wrap.querySelector(".chart-tip");' +
     'var dps=wrap.querySelectorAll(".dp");' +
     'function fmt(n){return String(n).replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")}' +
+    'function ratio(g){var u=parseFloat(g.getAttribute("data-uv"))||0;' +
+      'return u>0?(parseFloat(g.getAttribute("data-pv"))/u).toFixed(1)+"\\u00d7":"\\u2014"}' +
     'function show(g){' +
       'tip.innerHTML="<div class=\\"tip-date\\">"+g.getAttribute("data-date")+"</div>"+' +
         '"<div class=\\"tip-row\\"><span class=\\"tip-lbl\\">Page views</span><span class=\\"tip-val tip-pv\\">"+fmt(g.getAttribute("data-pv"))+"</span></div>"+' +
-        '"<div class=\\"tip-row\\"><span class=\\"tip-lbl\\">Unique</span><span class=\\"tip-val tip-uv\\">"+fmt(g.getAttribute("data-uv"))+"</span></div>";' +
+        '"<div class=\\"tip-row\\"><span class=\\"tip-lbl\\">Unique</span><span class=\\"tip-val tip-uv\\">"+fmt(g.getAttribute("data-uv"))+"</span></div>"+' +
+        // Ratio is derived client-side from the two attributes already present.
+        '"<div class=\\"tip-row\\"><span class=\\"tip-lbl\\">Views/unique</span><span class=\\"tip-val\\">"+ratio(g)+"</span></div>";' +
       'tip.hidden=false;' +
-      'var dot=g.querySelector(".dp-pv");' +
+      'var dot=g.querySelector(".dp-pv")||g.querySelector(".dp-dot");if(!dot)return;' +
       'var dr=dot.getBoundingClientRect();' +
       'var wr=wrap.getBoundingClientRect();' +
       'var half=tip.offsetWidth/2;' +
@@ -620,6 +648,17 @@ function dashboardJs_() {
       'dps[i].addEventListener("mouseenter",function(){show(this)});' +
     '}' +
     'wrap.addEventListener("mouseleave",function(){tip.hidden=true});' +
+    // Series toggle: swap which pre-rendered variant is visible. Each variant
+    // carries its own y-axis, so uniques get the full chart height on its own.
+    'var sbtns=wrap.querySelectorAll("[data-series-btn]");' +
+    'for(var s=0;s<sbtns.length;s++){' +
+      '(function(b){b.addEventListener("click",function(){' +
+        'wrap.setAttribute("data-series",b.getAttribute("data-series-btn"));' +
+        'for(var k=0;k<sbtns.length;k++){sbtns[k].className=""}' +
+        'b.className="active";' +
+        'tip.hidden=true;' +
+      '})})(sbtns[s]);' +
+    '}' +
   '})();' +
   // Per-list pagination — one independent paginator per .paged container.
   '(function(){' +
@@ -669,7 +708,7 @@ function dashboardCss_() {
     '.range a:last-child,.site-tabs a:last-child{border-right:none}' +
     '.range a:hover,.site-tabs a:hover{color:var(--text);background:var(--bg)}' +
     '.range a.active,.site-tabs a.active{background:var(--accent);color:#fff;border-color:var(--accent)}' +
-    '.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px}' +
+    '.kpi-row{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:18px}' +
     '.kpi{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px}' +
     '.kpi.accent{background:linear-gradient(135deg,var(--g50) 0%,var(--panel) 100%);border-color:rgba(20,163,153,0.25)}' +
     '.kpi .lbl{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}' +
@@ -680,6 +719,21 @@ function dashboardCss_() {
     '.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0}' +
     '.chart{width:100%;height:220px;display:block;overflow:visible}' +
     '.chart-wrap{position:relative}' +
+    // Series toggle — same shell as .range/.site-tabs, but buttons: switching is
+    // client-side (all three variants are already in the page), not a reload.
+    '.series-tabs{display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;width:max-content;margin-bottom:10px}' +
+    '.series-tabs button{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;padding:6px 12px;color:var(--muted);background:none;border:none;border-right:1px solid var(--border);letter-spacing:0.08em;text-transform:uppercase;cursor:pointer}' +
+    '.series-tabs button:last-child{border-right:none}' +
+    '.series-tabs button:hover{color:var(--text);background:var(--bg)}' +
+    '.series-tabs button.active{background:var(--accent);color:#fff}' +
+    '.chart-wrap .chart{display:none}' +
+    '.chart-wrap[data-series="both"] .chart[data-mode="both"],' +
+    '.chart-wrap[data-series="views"] .chart[data-mode="views"],' +
+    '.chart-wrap[data-series="unique"] .chart[data-mode="unique"],' +
+    '.chart-wrap[data-series="ratio"] .chart[data-mode="ratio"]{display:block}' +
+    '.kpi-sub{margin-top:6px}' +
+    '.kpi-trend{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:0.06em;color:var(--muted)}' +
+    '.kpi-trend.up,.kpi-trend.down{color:var(--text)}' +
     '.chart .dp:hover .dp-dot,.chart .dp:hover .dp-guide{opacity:1}' +
     '.chart .dp-hit{cursor:crosshair}' +
     '.chart-tip{position:absolute;background:#1a1a1a;color:#f5f0e8;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;line-height:1.4;padding:8px 10px;border-radius:5px;pointer-events:none;white-space:nowrap;transform:translate(-50%,calc(-100% - 10px));box-shadow:0 4px 14px rgba(0,0,0,0.18);z-index:10}' +
@@ -720,43 +774,128 @@ function dashboardCss_() {
     '@media(max-width:600px){.kpi-row{grid-template-columns:repeat(2,1fr)}.filters{flex-direction:column;align-items:stretch}}';
 }
 
-function kpi_(label, value, accent) {
+// `sub` is trusted HTML — only ever pass output of trendChip_, which builds its
+// string from numbers. Never pass sheet-derived text without escaping it first.
+function kpi_(label, value, accent, sub) {
   return '<div class="kpi' + (accent ? ' accent' : '') + '">' +
     '<div class="lbl">' + escapeHtml_(label) + '</div>' +
     '<div class="val">' + escapeHtml_(value) + '</div>' +
+    (sub ? '<div class="kpi-sub">' + sub + '</div>' : '') +
     '</div>';
+}
+
+// Page views per unique visitor. A high number means each visitor loaded a lot
+// of pages — which on this site is usually a link-detonating email gateway
+// rather than a keen reader, so the ratio doubles as a scanner-noise gauge.
+function viewsPerUnique_(pv, uv) { return uv > 0 ? pv / uv : 0; }
+
+function formatRatio_(r) { return r > 0 ? r.toFixed(1) + '×' : '—'; }
+
+// Percentage change against the preceding equal-length window. null when there
+// is no prior window to compare against (first N days of data, or a filter that
+// matches nothing earlier) — callers must render that case rather than show 0%.
+function growthPct_(cur, prev) {
+  if (!prev) return null;
+  return ((cur - prev) / prev) * 100;
+}
+
+function growthDir_(pct) {
+  if (pct === null) return 'flat';
+  return pct > 0.5 ? 'up' : (pct < -0.5 ? 'down' : 'flat');
+}
+
+// e.g. "▲ 52%". Arrow only — the caller adds "vs prev 30d" where it fits.
+function growthLabel_(pct) {
+  if (pct === null) return 'no prior window';
+  var arrow = pct > 0.5 ? '▲' : (pct < -0.5 ? '▼' : '·');
+  return arrow + ' ' + Math.abs(pct).toFixed(0) + '%';
+}
+
+// Deliberately NOT colour-coded good/bad: a rising ratio can mean either
+// deeper real engagement or more scanner traffic, and the chart tells them
+// apart far better than a red/green chip would.
+function trendChip_(cur, prev, days) {
+  var pct = growthPct_(cur, prev);
+  if (pct === null) return '<span class="kpi-trend flat">no prior window</span>';
+  return '<span class="kpi-trend ' + growthDir_(pct) + '">' +
+    growthLabel_(pct) + ' vs prev ' + days + 'd</span>';
 }
 
 function sectionLabel_(left, right) {
   return '<div class="section-label"><span>' + escapeHtml_(left) + '</span><span class="num">' + escapeHtml_(right) + '</span></div>';
 }
 
-function buildLineChart_(daily) {
+// Card wrapper: a segmented toggle plus all three series variants. Each variant
+// is rendered server-side with its own y-axis so switching is a CSS swap rather
+// than a reload — and so uniques get the full height of the chart when page
+// views (which run an order of magnitude higher on scanner-heavy days) are off.
+// `growth` is {pv, uv, ratio} of percentage change vs the preceding window
+// (null where there's no prior window). Each variant prints the figure for its
+// own series in the chart's top-right corner.
+function buildChartCard_(daily, growth, days) {
   if (!daily || !daily.length) return '<div class="empty">No data in this window.</div>';
+  function btn(label, mode, active) {
+    return '<button type="button" data-series-btn="' + mode + '"' +
+      (active ? ' class="active"' : '') + '>' + label + '</button>';
+  }
+  return '<div class="chart-wrap" data-series="both">' +
+    '<div class="series-tabs">' +
+      btn('Both', 'both', true) + btn('Page views', 'views', false) +
+      btn('Unique', 'unique', false) + btn('Ratio', 'ratio', false) +
+    '</div>' +
+    buildLineChart_(daily, 'both', growth, days) +
+    buildLineChart_(daily, 'views', growth, days) +
+    buildLineChart_(daily, 'unique', growth, days) +
+    buildLineChart_(daily, 'ratio', growth, days) +
+    '<div class="chart-tip" hidden></div>' +
+  '</div>';
+}
+
+// mode: 'both' | 'views' | 'unique' | 'ratio'. The y-axis is scaled from the
+// visible series only, which is the whole point of the toggle.
+function buildLineChart_(daily, mode, growth, days) {
+  if (!daily || !daily.length) return '<div class="empty">No data in this window.</div>';
+  mode = mode || 'both';
+
+  var SERIES = {
+    pv:    { label: 'PAGE VIEWS',       colour: '#2ca471', width: 2,   cls: 'dp-dot dp-pv',
+             val: function(d) { return d.pageViews; } },
+    uv:    { label: 'UNIQUE VISITORS',  colour: '#a59f93', width: 1.5, cls: 'dp-dot',
+             val: function(d) { return d.uniqueVisitors; } },
+    ratio: { label: 'VIEWS PER UNIQUE', colour: '#0F766E', width: 2,   cls: 'dp-dot dp-ratio',
+             val: function(d) { return viewsPerUnique_(d.pageViews, d.uniqueVisitors); } }
+  };
+  // Draw order matters: uniques first so the page-views line sits on top.
+  var keys = mode === 'views'  ? ['pv'] :
+             mode === 'unique' ? ['uv'] :
+             mode === 'ratio'  ? ['ratio'] : ['uv', 'pv'];
+  var isRatio = mode === 'ratio';
 
   var w = 1100, h = 220, padL = 50, padR = 14, padT = 28, padB = 30;
   var innerW = w - padL - padR, innerH = h - padT - padB;
   var n = daily.length;
+
   var maxVal = 0;
-  daily.forEach(function(d) {
-    if (d.pageViews > maxVal) maxVal = d.pageViews;
-    if (d.uniqueVisitors > maxVal) maxVal = d.uniqueVisitors;
+  keys.forEach(function(k) {
+    daily.forEach(function(d) { var v = SERIES[k].val(d); if (v > maxVal) maxVal = v; });
   });
   if (maxVal < 4) maxVal = 4;
-  // round up to a clean tick
-  var tick = Math.pow(10, Math.floor(Math.log(maxVal) / Math.log(10)));
-  maxVal = Math.ceil(maxVal / tick) * tick;
+  if (isRatio) {
+    // Ratios are small numbers; the decade tick below would round 12.8 up to 20
+    // and waste half the chart. Round to 4 whole divisions instead.
+    maxVal = Math.ceil(maxVal / 4) * 4;
+  } else {
+    var tick = Math.pow(10, Math.floor(Math.log(maxVal) / Math.log(10)));
+    maxVal = Math.ceil(maxVal / tick) * tick;
+  }
 
   function x(i) { return padL + (n === 1 ? innerW / 2 : (i / (n - 1)) * innerW); }
   function y(v) { return padT + innerH - (v / maxVal) * innerH; }
 
-  var pvPts = daily.map(function(d, i) { return x(i) + ',' + y(d.pageViews); }).join(' ');
-  var uvPts = daily.map(function(d, i) { return x(i) + ',' + y(d.uniqueVisitors); }).join(' ');
-
   var grid = '';
   for (var t = 0; t <= 4; t++) {
     var yy = padT + (t / 4) * innerH;
-    var lbl = Math.round(maxVal * (1 - t / 4));
+    var lbl = Math.round(maxVal * (1 - t / 4)) + (isRatio ? '\u00d7' : '');
     grid += '<line x1="' + padL + '" y1="' + yy + '" x2="' + (w - padR) + '" y2="' + yy +
       '" stroke="#ece8df" stroke-dasharray="2 3"/>' +
       '<text x="' + (padL - 8) + '" y="' + (yy + 3) + '" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="9" fill="#a59f93">' + lbl + '</text>';
@@ -769,48 +908,72 @@ function buildLineChart_(daily) {
     xLabels += '<text x="' + x(i) + '" y="' + (h - 10) + '" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#a59f93">' + dt + '</text>';
   }
 
-  var legend =
-    '<g font-family="IBM Plex Mono,monospace" font-size="9" letter-spacing="0.08em">' +
-      '<rect x="' + padL + '" y="6" width="8" height="8" fill="#2ca471"/>' +
-      '<text x="' + (padL + 14) + '" y="13" fill="#1a1a1a">PAGE VIEWS</text>' +
-      '<rect x="' + (padL + 110) + '" y="6" width="8" height="8" fill="#a59f93"/>' +
-      '<text x="' + (padL + 124) + '" y="13" fill="#1a1a1a">UNIQUE VISITORS</text>' +
-    '</g>';
+  var legend = '<g font-family="IBM Plex Mono,monospace" font-size="9" letter-spacing="0.08em">';
+  var legendX = padL;
+  // Legend reads primary-first, independent of draw order (which puts uniques
+  // underneath so the page-views line stays on top).
+  ['pv', 'uv', 'ratio'].filter(function(k) { return keys.indexOf(k) !== -1; }).forEach(function(k) {
+    legend += '<rect x="' + legendX + '" y="6" width="8" height="8" fill="' + SERIES[k].colour + '"/>' +
+      '<text x="' + (legendX + 14) + '" y="13" fill="#1a1a1a">' + SERIES[k].label + '</text>';
+    legendX += 130;
+  });
+  legend += '</g>';
+
+  // Period-over-period growth, printed top-right opposite the legend. In Both
+  // mode each series is named; in a single-series mode the figure stands alone.
+  var growthText = '';
+  if (growth) {
+    var GLBL = { pv: 'PAGE VIEWS', uv: 'UNIQUE', ratio: 'VIEWS PER UNIQUE' };
+    var parts = ['pv', 'uv', 'ratio'].filter(function(k) { return keys.indexOf(k) !== -1; })
+      .map(function(k) {
+        var g = growth[k];
+        if (g === undefined) g = null;
+        return (keys.length > 1 ? GLBL[k] + ' ' : '') + growthLabel_(g);
+      });
+    if (parts.length) {
+      growthText = '<text x="' + (w - padR) + '" y="13" text-anchor="end" ' +
+        'font-family="IBM Plex Mono,monospace" font-size="10" letter-spacing="0.06em" fill="#1a1a1a">' +
+        // SVG collapses runs of whitespace, so separate with a dot not spaces.
+        escapeHtml_(parts.join(' · ') + (days ? ' · vs prev ' + days + 'd' : '')) +
+        '</text>';
+    }
+  }
+
+  var lines = keys.map(function(k) {
+    var pts = daily.map(function(d, i) { return x(i) + ',' + y(SERIES[k].val(d)); }).join(' ');
+    return '<polyline points="' + pts + '" fill="none" stroke="' + SERIES[k].colour +
+      '" stroke-width="' + SERIES[k].width + '"/>';
+  }).join('');
 
   // Hover overlay — one group per day. Hit-zone rect captures hover for the
   // whole vertical column; dots + guide line fade in via CSS; the tooltip is
-  // positioned by JS using the page-views dot's bounding rect.
+  // positioned by JS off whichever dot the mode renders.
   var colW = n === 1 ? innerW : innerW / (n - 1);
   var hover = '';
   for (var j = 0; j < n; j++) {
     var xi = x(j);
-    var pvY = y(daily[j].pageViews);
-    var uvY = y(daily[j].uniqueVisitors);
     var hitX, hitW;
     if (n === 1)        { hitX = padL;          hitW = innerW; }
     else if (j === 0)   { hitX = padL;          hitW = colW / 2; }
     else if (j === n-1) { hitX = xi - colW / 2; hitW = colW / 2; }
     else                { hitX = xi - colW / 2; hitW = colW; }
+    var dots = keys.map(function(k) {
+      return '<circle class="' + SERIES[k].cls + '" cx="' + xi + '" cy="' + y(SERIES[k].val(daily[j])) +
+        '" r="3.5" fill="' + SERIES[k].colour + '" stroke="#fff" stroke-width="1.5" opacity="0"/>';
+    }).join('');
     hover +=
       '<g class="dp" data-date="' + daily[j].date +
         '" data-pv="' + daily[j].pageViews +
         '" data-uv="' + daily[j].uniqueVisitors + '">' +
         '<line class="dp-guide" x1="' + xi + '" y1="' + padT + '" x2="' + xi + '" y2="' + (padT + innerH) + '" stroke="#1a1a1a" stroke-width="0.6" stroke-dasharray="2 3" opacity="0"/>' +
-        '<circle class="dp-dot" cx="' + xi + '" cy="' + uvY + '" r="3.5" fill="#a59f93" stroke="#fff" stroke-width="1.5" opacity="0"/>' +
-        '<circle class="dp-dot dp-pv" cx="' + xi + '" cy="' + pvY + '" r="3.5" fill="#2ca471" stroke="#fff" stroke-width="1.5" opacity="0"/>' +
+        dots +
         '<rect class="dp-hit" x="' + hitX + '" y="' + padT + '" width="' + hitW + '" height="' + innerH + '" fill="transparent"/>' +
       '</g>';
   }
 
-  return '<div class="chart-wrap">' +
-    '<svg class="chart" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
-      grid +
-      '<polyline points="' + uvPts + '" fill="none" stroke="#a59f93" stroke-width="1.5"/>' +
-      '<polyline points="' + pvPts + '" fill="none" stroke="#2ca471" stroke-width="2"/>' +
-      xLabels + legend + hover +
-    '</svg>' +
-    '<div class="chart-tip" hidden></div>' +
-  '</div>';
+  return '<svg class="chart" data-mode="' + mode + '" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
+      grid + lines + xLabels + legend + growthText + hover +
+    '</svg>';
 }
 
 function buildTopPagesTable_(rows, total, pageUrl) {

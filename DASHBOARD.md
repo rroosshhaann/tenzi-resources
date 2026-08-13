@@ -11,18 +11,24 @@ Top to bottom:
 1. **Nav** — `tenzi · analytics` brand on the left, window + site summary on the right
 2. **Hero** — `Site analytics` H1 + one-line subtitle
 3. **Filters** — Range buttons (`7D / 30D / 90D / 1Y`) and Site tabs (`All / Marketing / Resources`). When a page filter is active (see Top pages below), a **Page chip** appears here showing the selected page title with an `×` link that clears it. Range and Site buttons carry the page filter through
-4. **KPI strip** — six tiles, all scoped to the current window:
+4. **KPI strip** — seven tiles, all scoped to the current window:
 
    | Tile | Source |
    |-|-|
    | Page views | Count of `(page view)` rows |
    | Unique visitors | Distinct IPs across all events in window |
+   | Views per unique | `pageViews ÷ uniqueVisitors`, with a trend chip comparing the preceding equal-length window. **Reads as a scanner-noise gauge**: a high or rising ratio usually means one visitor pulled many pages, which on this site is typically an email security gateway detonating every link rather than a keen reader. The chip is deliberately *not* colour-coded good/bad, because a rising ratio can equally mean deeper real engagement — switch the chart to Ratio to tell them apart |
    | CTA clicks | Count of `(cta: …)` rows |
    | Subscribers | Rows whose Event column contains `@` (form submissions to Events) |
    | Contacts | Rows in the Contacts sheet |
    | Median dwell | Median seconds across all `(dwell: N)` rows |
 
-5. **Daily activity chart** — inline SVG line chart. Page views (green) + unique visitors (grey) per day, gap-filled across the window. Hover anywhere over a column to surface a tooltip (date, page views, unique visitors) plus a vertical guide line and highlighted dots — handled by a small inline `<script>` block, no chart library
+5. **Daily activity chart** — inline SVG line chart. Page views (green) + unique visitors (grey) per day, gap-filled across the window. Hover anywhere over a column to surface a tooltip (date, page views, unique visitors) plus a vertical guide line and highlighted dots — handled by a small inline `<script>` block, no chart library.
+   - **Series toggle (Both / Page views / Unique / Ratio).** A segmented control above the chart. Page views can run an order of magnitude above uniques on scanner-heavy days — a single link-detonating security gateway fetches every URL in a newsletter — which flattens the uniques line onto the x-axis and makes it unreadable. Each mode is scaled independently: **the y-axis maximum is computed from the visible series only**, so Unique gets the full chart height on its own scale.
+   - **Growth figure on the chart.** Every mode prints its own period-over-period change in the top-right corner, opposite the legend — `▲ 76% vs prev 30d`. In Both mode each series is named (`PAGE VIEWS ▲ 76% · UNIQUE ▲ 16% · vs prev 30d`); in a single-series mode the figure stands alone. At `days=30` this is your month-on-month number. It compares the same preceding window as the KPI trend chip, so the two always agree. When there is no prior window it reads `no prior window` rather than showing a misleading 0%.
+   - **Ratio** plots daily **views per unique** (`pageViews ÷ uniqueVisitors`, teal). Because ratios are small numbers, that mode rounds the axis up to four whole divisions instead of the decade tick the other modes use — a decade tick would round a peak of 12.8 up to 20 and waste half the chart. Days with zero uniques plot at zero rather than dividing by zero.
+   - All three variants are rendered server-side and swapped with CSS (`.chart-wrap[data-series]` × `.chart[data-mode]`), so switching is instant and does not re-query the sheet or reload the page. The mode is *not* a URL param and does not persist across reloads — it always opens on Both.
+   - The tooltip always reports both figures regardless of mode, and falls back to the uniques dot for positioning when page views are hidden.
 6. **Top pages** — view count + share-of-total bar. Each page name is a link that sets `&page=<title>`, scoping the entire dashboard (KPIs, daily chart, every table) to that one page — this is how you track a single page's views over time. Clear it via the chip in the filter bar
 7. **CTA clicks** — click count bar per action, sorted desc
 8. **Median dwell per page** — Median, P90, sample count, sorted by median desc
@@ -107,7 +113,7 @@ Both reads happen on every dashboard load (no caching yet):
 
 `Contacts` is filtered by date + site separately.
 
-**Date filtering:** rows older than `cutoff = today - (days - 1)` at midnight in the script's runtime timezone are skipped. **Site filtering:** when `site != all`, rows whose Site column doesn't match are skipped. **Page filtering:** when `page` is set, Events and Contacts rows whose Page column doesn't exactly match are skipped — every KPI, the daily chart, and every table scope to that single page.
+**Date filtering:** rows older than `cutoff = today - (days - 1)` at midnight in the script's runtime timezone are skipped. Rows between `cutoff - days` and `cutoff` are read but feed **only** `prevTotals` (page views + distinct IPs), which backs the Views-per-unique trend chip — they never reach the current-window counters, the daily series or any table. Site and page filters apply to that previous window too, so the comparison is like-for-like. **Site filtering:** when `site != all`, rows whose Site column doesn't match are skipped. **Page filtering:** when `page` is set, Events and Contacts rows whose Page column doesn't exactly match are skipped — every KPI, the daily chart, and every table scope to that single page.
 
 The daily series is **gap-filled** — every date in the window appears even if zero events landed, so the chart x-axis is continuous.
 
@@ -126,9 +132,13 @@ All dashboard code lives in `apps-script.gs` under the comment `// ── DASHBO
 | `buildAccessDeniedHtml_` | Static 403 page |
 | `buildDashboardHtml_(stats, days, siteFilter, pageFilter, token)` | Top-level page template |
 | `dashboardCss_` | Inline CSS — Terminal Grid tokens copied verbatim from the resources site |
-| `kpi_`, `sectionLabel_` | Markup helpers |
-| `buildLineChart_` | Hand-rolled inline-SVG line chart with per-day hover groups (no Chart.js) |
-| `dashboardJs_` | Inline JS injected before `</body>` — wires the line-chart hover tooltip; no other client-side behaviour |
+| `kpi_`, `sectionLabel_` | Markup helpers. `kpi_` takes an optional 4th `sub` argument rendered under the value — it is **trusted HTML**, so only ever pass `trendChip_` output, never sheet-derived text |
+| `viewsPerUnique_`, `formatRatio_` | Views-per-unique ratio and its `12.8×` formatting |
+| `growthPct_`, `growthDir_`, `growthLabel_` | Period-over-period change against the preceding equal-length window. `growthPct_` returns **null** when there's no prior window — callers must render that case, never 0%. Shared by the KPI chip and the on-chart figure so they can't drift |
+| `trendChip_` | HTML wrapper round the growth helpers for the KPI tile |
+| `buildChartCard_` | Wraps the daily chart: emits the Both/Page views/Unique toggle plus all three pre-rendered variants in one `.chart-wrap` |
+| `buildLineChart_(daily, mode)` | Hand-rolled inline-SVG line chart with per-day hover groups (no Chart.js). `mode` is `both`\|`views`\|`unique` and controls which series render **and** what the y-axis scales to; defaults to `both` |
+| `dashboardJs_` | Inline JS injected before `</body>` — wires the line-chart hover tooltip, the series toggle, and the per-list paginators |
 | `buildTopPagesTable_`, `buildCtaTable_`, `buildDwellTable_`, `buildSubscribersTable_`, `buildContactsTable_`, `buildReferrersTable_`, `buildUnsubscribesTable_` | The site-view tables |
 | `renderNewsletterDashboard_(e)`, `computeNewsletterStats_(days)`, `buildNewsletterHtml_`, `buildCampaignSection_`, `buildNewsletterCtaTable_`, `buildNewsletterTimeline_`, `buildNewsletterRecipientsTable_`, `buildSuspiciousTable_`, `buildCampaignOverview_`, `newsletterCss_`, `looksLikeBotUa_` | Newsletter-view stack — see "Newsletter view" below |
 
