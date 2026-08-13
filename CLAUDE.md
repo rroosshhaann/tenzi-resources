@@ -288,7 +288,7 @@ Every content page on the site MUST have all of the following. No exceptions.
 5. **Card on index.html** — add a tile linking to the new page using the matching grid class:
    - `.tile-data` inside `.data-grid` — free reports/dashboards
    - `.tile-runbook` inside `.runbook-grid` — operational runbooks
-   - `.tile-premium` inside `.premium-grid` — premium samples (green "Premium" pill in the tile foot)
+   - `.tile-premium` inside `.premium-grid` — premium samples (green "Premium" pill in the tile foot). **`.premium-grid` is capped at ONE row**: the three newest samples + the "Every premium sample" card. A new sample always gets a card in `premium-samples/index.html` (the library); putting it on the landing page means displacing an existing tile, not appending one
 6. **Self-contained HTML for layout** — inline CSS, no build step, no external CSS frameworks. The one external JS dependency is `https://tenzi.ai/track.js` (shared analytics); everything else is inline. Follow [`DESIGN_STANDARD.md`](./DESIGN_STANDARD.md) for tokens, type scale, and component patterns.
 7. **Head metadata + sitemap** — every content page carries: the favicon (`<link rel="icon" type="image/svg+xml" href="../tenzi-arcs-small.svg">` — `../` for pages in subfolders), `<link rel="canonical">`, a ≤160-char `<meta name="description">`, and the OG/Twitter block pointing at `https://resources.tenzi.ai/og.png` (copy the block from an existing page, adjust title/description/URL). Data reports additionally get a `schema.org/Dataset` JSON-LD block (feeds Google Dataset Search). Add the page's URL + lastmod to `sitemap.xml`. Unlisted pages (e.g. top20) get the head metadata but stay OUT of `sitemap.xml`.
 8. Commit and push to `main` — GitHub Pages deploys automatically

@@ -215,6 +215,17 @@ Five phase badges with the `--phase-*` hues; step cards carry a 4px left border 
 - Cap container at `max-width: 780px; margin-left: auto; margin-right: auto;` so wide assets (flow diagrams at 1100px+) don't dominate the page and smaller assets don't upscale past their native resolution.
 - Captions below the image in `.chart-caption`: mono 10px uppercase, `--dim`, tracked `0.14em`, split label left / date-range right.
 
+### 5.7 Figure slideshow (sections carrying several tall figures)
+
+When a section holds two or more portrait figures, put them in a horizontal scroll-snap track rather than stacking them — three 4:5 charts otherwise run to ~3,000px of scrolling.
+
+- **Track:** `display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scroll-behavior:smooth`, scrollbar hidden. Slides are `flex:0 0 100%` with `scroll-snap-align:center`.
+- **Mini-image tabs above the track** — the primary affordance, and they must sit *above* the figures: tall charts push anything below them off-screen, so bottom dots alone leave the carousel undiscoverable. Reuse the slide's own `src` for the tab image (already loaded, so no extra request) and give the tab the same aspect ratio as the slide so the miniature is uncropped. Active tab takes an `--accent` border and label.
+- **Prev/next arrows** flanking the frame: solid `--accent`, white chevron, `--radius` corners (not circles). Disabled state reverts to `--panel` + `--border`.
+- **One aspect ratio across all slides.** Unequal heights make the frame and arrows jump on navigation. Normalise the source images onto a common canvas — pad symmetrically so the spare space reads as a margin — rather than letterboxing in CSS.
+- **Degrade cleanly:** scroll-snap gives touch swipe for free, arrow keys work on the focused track, and with JS off it stays a plain horizontal scroller. Tabs and arrows are enhancement, never the only route through.
+- Reference: `premium-samples/gi-broking-network-threshold.html`.
+
 ---
 
 ## 6. Icons & imagery
@@ -229,7 +240,7 @@ Five phase badges with the `--phase-*` hues; step cards carry a 4px left border 
 
 - Entry: single `fadeUp` (6–12px, 0.35s ease, opacity 0→1) on cards. Stagger with `nth-child` delays of 30ms if worth it.
 - Hover: 0.15s border/background transitions only.
-- No parallax, no scroll-linked animation, no autoplay video.
+- No parallax, no scroll-linked animation, no autoplay video. A user-driven figure slideshow (§5.7) is fine — the ban is on motion the visitor didn't ask for.
 
 ---
 
@@ -296,5 +307,7 @@ Every resource page MUST include the shared tracking beacon and subscribe endpoi
 | `reports/gi-broker-movement-dashboard.html` | Data dashboard | KPI row + waterfall + tables pattern. |
 | `reports/gi-broker-ar-profile.html` | Data explainer | Record holders + bar-list pattern. |
 | `runbooks/claims-management-runbook.html` | Runbook | Phase badges + actor-coded steps. |
+| `premium-samples/gi-broking-network-threshold.html` | Premium sample | Findings list + figure slideshow (§5.7) + caveats + Cal.com CTA strip. |
+| `premium-samples/index.html` | Catalogue / listing | Card grid over an existing thumbnail set. |
 
-When in doubt, match one of these four files exactly.
+When in doubt, match one of these files exactly.

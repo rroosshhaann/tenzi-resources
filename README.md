@@ -30,7 +30,7 @@ tenzi-resources/
 - **Renewals** — Identification through market review, recommendation, and binding
 - **Claims Management** — First notice of loss through to resolution and file closure
 
-**Premium samples** (`premium-samples/`) — all listed at [`/premium-samples/`](https://resources.tenzi.ai/premium-samples/); the index page tiles the most recent seven plus a link to the full library
+**Premium samples** (`premium-samples/`) — all listed at [`/premium-samples/`](https://resources.tenzi.ai/premium-samples/); the index page tiles the most recent three plus a link to the full library
 - **GI Broker Network Health Score** — Composite 0–100 score across seven signals, ranked within peer size segment. Metrix Connect tops every Dominant; size isn't health
 - **GI Broker AFSL Race Chart** — Animated 24-month view of the Top 20 GI broker networks
 - **Resilium AR Flow Analysis** — 48 months of inbound/outbound AR movement for a single AFSL
@@ -57,7 +57,7 @@ Every page loads the shared **`track.js`** (served from `https://tenzi.ai/track.
 | C | Timestamp | Server-side Melbourne time (`Australia/Melbourne`, formatted in Apps Script) |
 | D | IP | Client-side lookup via `api.ipify.org` |
 | E | Referrer | `document.referrer` |
-| F | Site | `marketing`, `resources`, or `email` (empty for rows written before `track.js` shipped) |
+| F | Site | `marketing`, `resources`, `partner`, or `email` (empty for rows written before `track.js` shipped) |
 | G | Recipient | Email of the newsletter recipient who opened/clicked an email link (empty for site events) |
 | H | UserAgent | `navigator.userAgent` from the visitor's browser. Passed via `&ua=` URL param because Apps Script `doGet` can't read request headers. Used by the newsletter dashboard view to flag scanner traffic. Empty for image-beacon opens (email pixels can't run JS) and rows written before UA capture shipped |
 | I | Reason | Optional unsubscribe-form reason — populated only on `(cta: email_unsubscribe_click)` rows |
@@ -74,7 +74,7 @@ Every page loads the shared **`track.js`** (served from `https://tenzi.ai/track.
 - `(cta: linkedin_click)` — clicked "Join the conversation" on a free report/runbook
 - `(cta: PREMIUM_linkedin_click)` — clicked "Join the conversation" on a premium sample
 - `(cta: email_click)` — default action for newsletter click-tracking redirects (recipient in column G; site=`email`)
-- `(cta: email_open)` / `email_report_click` / `email_premium_health_click` / `email_book_chat_click` / `email_resources_click` / `email_website_click` / `email_linkedin_click` — newsletter-email events (open pixel + the six labelled CTAs); recipient in column G, campaign id in column B
+- `(cta: email_open)` / `email_report_click` / `email_explore_resources_click` / `email_book_chat_click` / `email_resources_click` / `email_website_click` / `email_linkedin_click` — newsletter-email events (open pixel + the labelled CTAs); recipient in column G, campaign id in column B. Body links that vary per campaign use `email_premium_<sample>_click` and `email_linkedin_<post>_click`, each with an `_image_click` variant for the thumbnail; the canonical per-campaign list lives in the `tenzi-newsletter` README. See CLAUDE.md for the full table
 - `(cta: email_unsubscribe_click)` — newsletter recipient hit `/unsubscribe/` and clicked the confirm button (recipient in column G; campaign in B; optional reason/comment in I/J)
 - Real email — form submission (Events sheet) or contact form (Contacts sheet)
 
@@ -143,10 +143,10 @@ Every page must have all of the following:
    - **Free reports** → "Subscribe to updates" modal, `trackCta('subscribe_click')`
    - **Premium samples** → Cal.com link, `trackCta('PREMIUM_get_full_report_click')` or `trackCta('PREMIUM_book_call_click')`
    - **LinkedIn "Join the conversation"** (when a post exists) → secondary button in the header paired with the primary CTA, `trackCta('linkedin_click')` or `trackCta('PREMIUM_linkedin_click')`
-5. Add a tile linking to it in `index.html` inside the matching grid:
-   - `.tile-data` inside `.data-grid` — free reports/dashboards
-   - `.tile-runbook` inside `.runbook-grid` — runbooks
-   - `.tile-premium` inside `.premium-grid` — premium samples (green "Premium" pill in the tile foot)
+5. List it where it belongs:
+   - `.tile-data` inside `.data-grid` in `index.html` — free reports/dashboards
+   - `.tile-runbook` inside `.runbook-grid` in `index.html` — runbooks
+   - **Premium samples** → add a card to `premium-samples/index.html` (the full library). `.premium-grid` on the landing page is capped at ONE row — three newest samples plus the "Every premium sample" card — so putting a new sample on the index means displacing a tile, not appending one
 6. Add head metadata — canonical, ≤160-char meta description, OG/Twitter block pointing at `og.png` (copy from an existing page); data reports also get a `schema.org/Dataset` JSON-LD block — and add the page to `sitemap.xml` with a lastmod date
 7. Push to `main`
 
