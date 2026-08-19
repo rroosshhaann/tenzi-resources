@@ -232,6 +232,36 @@
   .tile-data .meta { margin-bottom: 14px; }
   .tile-data .title { font-size: 20px; margin: 4px 0 10px; }
   .tile-data .cta { margin-top: 20px; }
+  /* ---- Special report: one full-width tile, its own section ---- */
+  .special-grid { display: grid; grid-template-columns: 1fr; margin: 22px 0 8px;
+    --thumb-fit: cover; --thumb-position: top left; }
+  .tile-special {
+    display: grid; grid-template-columns: 460px 1fr; min-height: 260px; overflow: hidden;
+    position: relative;
+  }
+  .tile-special .chart {
+    border-right: 1px solid var(--border); background: var(--chart-bg);
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .tile-special .chart img {
+    width: 100%; height: 100%;
+    object-fit: var(--thumb-fit); object-position: var(--thumb-position); display: block;
+  }
+  .tile-special .body { padding: 28px 30px; display: flex; flex-direction: column; }
+  .tile-special .meta { margin-bottom: 14px; }
+  .tile-special .title { font-size: 24px; margin: 4px 0 12px; }
+  .tile-special .blurb { font-size: 14px; max-width: 620px; }
+  .tile-special .cta { margin-top: 22px; }
+  .special-badge {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 3px 7px; border-radius: 2px;
+    border: 1px solid var(--accent); color: var(--accent);
+  }
+  @media (max-width: 900px) {
+    .tile-special { grid-template-columns: 1fr; }
+    .tile-special .chart { border-right: none; border-bottom: 1px solid var(--border); min-height: 200px; }
+  }
   /* Stretched overlay link makes the whole tile clickable while leaving room
      for inline secondary buttons (z-index lifts them above the overlay). */
   .stretched-link { position: absolute; inset: 0; z-index: 1; }
@@ -500,6 +530,21 @@
       <div><div class="v">weekly</div><div class="l">NEW DATA</div></div>
     </div>
   </section>
+
+  <!-- SPECIAL REPORT — no section header; the card carries the title -->
+  <div class="special-grid">
+    <a href="reports/gi-broker-top20-metrics.html" class="tile tile-special" onclick="trackCta('data_top20_click')">
+      <div class="chart">
+        <img src="reports/gi-broker-top20-metrics.thumb.jpg" alt="Top 20 GI broker networks metric heatmap preview" loading="lazy" decoding="async">
+      </div>
+      <div class="body">
+        <div class="meta"><span>ANNUAL</span><span>JUN 2026</span><span class="special-badge">Special report</span></div>
+        <h3 class="title">Top 20 AR Networks for FY 2026</h3>
+        <p class="blurb">The 20 largest networks ranked three ways &mdash; individual ARs, corporate ARs, and combined &mdash; with mean and median tenure, 3-year and 6-month growth, in/out flow and 12-month turnover side by side. Top 20 of 215 GI-primary networks, data to 1 Jul 2026.</p>
+        <div class="cta">OPEN DASHBOARD &rarr;</div>
+      </div>
+    </a>
+  </div>
 
   <!-- PREMIUM SECTION -->
   <div class="sec-head">

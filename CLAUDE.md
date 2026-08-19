@@ -11,7 +11,7 @@ tenzi-resources/
   og.png                                  # 2400×1260 social share card — every page's og:image points at it
   og-frame.html                           # source frame for og.png — see "Share card & search registration" below
   robots.txt                              # permissive (AI crawlers welcome); blocks /r/ + /unsubscribe/; points at sitemap
-  sitemap.xml                             # all content pages EXCEPT unlisted ones (top20) — add new pages here with lastmod
+  sitemap.xml                             # every content page — add new pages here with lastmod
   llms.txt                                # site summary for AI assistants
   reports/                                # Free analytics reports
     gi-broker-movement-dashboard.html     # Q1 (Jan→Apr) 3-month window — restyled to match the monthly aesthetic
@@ -31,7 +31,8 @@ tenzi-resources/
     # insights via injected JS, click the AR + CAR scope button, screenshot 1000x1000 @2x, crop the
     # 960x832 CSS-px content box and resize to 800px wide.
     gi-broker-ar-profile.html
-    gi-broker-top20-metrics.html          # UNLISTED (direct-link share only, NOT tiled on index) — top-20 broker metric heatmap, AR/CAR/combined toggle; keeps its own dashboard design (not Terminal Grid); regen from python-scrapbook: generate_review.py --portal --out <this path>
+    gi-broker-top20-metrics.html          # "Top 20 AR Networks for FY 2026" — metric heatmap, AR/CAR/combined toggle. Keeps its own dashboard design (not Terminal Grid); the index SPECIAL REPORT section (first section, full-width tile, data_top20_click). Regen: generate_review.py --top 20 --label "FY2026 year-end" --portal --out <this path> — --portal emits the whole page standard, see the design-exception note below
+    gi-broker-top20-metrics.thumb.jpg     # index tile thumbnail (cropped from the metric heatmap)
     gi-broker-whitespace-map.html         # Interactive whitespace map — business growth vs broker coverage by SA4 (linked map + quadrant, state zoom, all/employing-businesses toggle, employing split + top-3 growth industries in hovers). Keeps its own dashboard design (teal, change-report family). Tiled in the PREMIUM grid on the index (first tile, premium_whitespace_click) though the page itself keeps the free-report subscribe CTA; also in sitemap + llms.txt. Regen from python-scrapbook: geo-coverage/generate_interactive.py --portal --out <this path> — the generator emits the FULL page standard (nav, tracking, subscribe CTA+modal+strip, head metadata + Dataset JSON-LD), so regens are idempotent, no manual re-patching
     gi-broker-whitespace-map.thumb.jpg    # index tile thumbnail (cropped from the national whitespace map PNG)
   runbooks/                               # Free operational runbooks
@@ -274,7 +275,7 @@ integration.
 
 Every content page on the site MUST have all of the following. No exceptions.
 
-**Owner-sanctioned exception — unlisted shared pages:** `reports/gi-broker-top20-metrics.html` carries the nav back-link + tracking (rules 1–2) but is deliberately **not** tiled on the index (rule 5 waived) — it is shared via direct link only. It also keeps its source dashboard's own design rather than Terminal Grid. Do not add an index tile or restyle it "to comply". Republish from `python-scrapbook`: `generate_review.py --portal --out tenzi-resources/reports/gi-broker-top20-metrics.html`. NOTE: republishing overwrites the injected head metadata (canonical / description / OG tags) — re-add the block after each regen (copy from another report, fix title/URL), or patch the generator to emit it.
+**Design exception — `reports/gi-broker-top20-metrics.html`:** it keeps its source dashboard's own design rather than Terminal Grid (rule 6 relaxed), because it is generated wholesale by `python-scrapbook`. It IS listed like any other report (index tile, sitemap, llms.txt) as of Aug 2026 — direct-link-only before that. Republish with `generate_review.py --top 20 --label "FY2026 year-end" --portal --out tenzi-resources/reports/gi-broker-top20-metrics.html`. **`--portal` now emits the FULL page standard** — head metadata (favicon / canonical / description / OG), nav bar + logo, LinkedIn + Subscribe CTAs, subscribe strip, modal and the track.js beacon — so regens are idempotent and need no manual re-patching (same model as the whitespace map). Two things to remember: **(a)** without `--top 20` the generator auto-detects the LARGEST top-N set on disk and will silently emit the top-40 page instead, since `top40_*_202606.csv` sit in the same folder; **(b)** the header LinkedIn button defaults to the Tenzi company page — pass `--linkedin <post-url>` once a post exists for the report.
 
 1. **Nav bar** — back-link on left, Tenzi logo SVG on right. Copy from an existing page. Back-link href should use `../index.html` for pages in subfolders.
 2. **Page view tracking + CTA tracking helper** — paste the standard shared-tracker block (see Analytics section above: two `<script>` tags — load `https://tenzi.ai/track.js`, then call `tenziTrack.init({ site: 'resources' })`) at the bottom of the page.
