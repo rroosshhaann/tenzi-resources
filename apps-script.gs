@@ -626,6 +626,7 @@ function dashboardJs_() {
     'var tip=wrap.querySelector(".chart-tip");' +
     'var dps=wrap.querySelectorAll(".dp");' +
     'function fmt(n){return String(n).replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")}' +
+    'function subs(g){return parseInt(g.getAttribute("data-sub"),10)||0}' +
     'function ratio(g){var u=parseFloat(g.getAttribute("data-uv"))||0;' +
       'return u>0?(parseFloat(g.getAttribute("data-pv"))/u).toFixed(1)+"\\u00d7":"\\u2014"}' +
     'function show(g){' +
@@ -633,7 +634,9 @@ function dashboardJs_() {
         '"<div class=\\"tip-row\\"><span class=\\"tip-lbl\\">Page views</span><span class=\\"tip-val tip-pv\\">"+fmt(g.getAttribute("data-pv"))+"</span></div>"+' +
         '"<div class=\\"tip-row\\"><span class=\\"tip-lbl\\">Unique</span><span class=\\"tip-val tip-uv\\">"+fmt(g.getAttribute("data-uv"))+"</span></div>"+' +
         // Ratio is derived client-side from the two attributes already present.
-        '"<div class=\\"tip-row\\"><span class=\\"tip-lbl\\">Views/unique</span><span class=\\"tip-val\\">"+ratio(g)+"</span></div>";' +
+        '"<div class=\\"tip-row\\"><span class=\\"tip-lbl\\">Views/unique</span><span class=\\"tip-val\\">"+ratio(g)+"</span></div>"+' +
+        // Subscribers only appear on days that had one — a zero row is noise.
+        '(subs(g)?"<div class=\\"tip-row\\"><span class=\\"tip-lbl\\">Subscribers</span><span class=\\"tip-val tip-sub\\">"+subs(g)+"</span></div>":"");' +
       'tip.hidden=false;' +
       'var dot=g.querySelector(".dp-pv")||g.querySelector(".dp-dot");if(!dot)return;' +
       'var dr=dot.getBoundingClientRect();' +
@@ -731,6 +734,7 @@ function dashboardCss_() {
     '.chart-wrap[data-series="views"] .chart[data-mode="views"],' +
     '.chart-wrap[data-series="unique"] .chart[data-mode="unique"],' +
     '.chart-wrap[data-series="ratio"] .chart[data-mode="ratio"]{display:block}' +
+    '.tip-sub{color:var(--accent)}' +
     '.kpi-sub{margin-top:6px}' +
     '.kpi-trend{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:0.06em;color:var(--muted)}' +
     '.kpi-trend.up,.kpi-trend.down{color:var(--text)}' +
@@ -908,6 +912,10 @@ function buildLineChart_(daily, mode, growth, days) {
     xLabels += '<text x="' + x(i) + '" y="' + (h - 10) + '" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#a59f93">' + dt + '</text>';
   }
 
+  // Computed before the legend, which needs it to decide on the SUBSCRIBERS entry.
+  var anySubs = false;
+  for (var q = 0; q < n; q++) { if (daily[q].subscribers > 0) { anySubs = true; break; } }
+
   var legend = '<g font-family="IBM Plex Mono,monospace" font-size="9" letter-spacing="0.08em">';
   var legendX = padL;
   // Legend reads primary-first, independent of draw order (which puts uniques
@@ -917,6 +925,10 @@ function buildLineChart_(daily, mode, growth, days) {
       '<text x="' + (legendX + 14) + '" y="13" fill="#1a1a1a">' + SERIES[k].label + '</text>';
     legendX += 130;
   });
+  if (anySubs) {
+    legend += '<circle cx="' + (legendX + 4) + '" cy="10" r="3.4" fill="#2ca471" stroke="#fff" stroke-width="1.2"/>' +
+      '<text x="' + (legendX + 14) + '" y="13" fill="#1a1a1a">SUBSCRIBERS</text>';
+  }
   legend += '</g>';
 
   // Period-over-period growth, printed top-right opposite the legend. In Both
@@ -945,6 +957,25 @@ function buildLineChart_(daily, mode, growth, days) {
       '" stroke-width="' + SERIES[k].width + '"/>';
   }).join('');
 
+  // Subscriber markers — one small dot per subscriber, stacked downward from
+  // the top edge so they read as a separate lane rather than part of a series.
+  // Orthogonal to the toggle, so they render in every mode. White ring keeps
+  // them legible where a peak reaches the top of the plot.
+  var SUB_R = 2.6, SUB_GAP = 7.5, SUB_TOP = padT + 6;
+  var subCap = Math.max(1, Math.floor((innerH - 10) / SUB_GAP));
+  var subDots = '';
+  if (anySubs) {
+    for (var sIdx = 0; sIdx < n; sIdx++) {
+      var cnt = daily[sIdx].subscribers || 0;
+      if (!cnt) continue;
+      var shown = Math.min(cnt, subCap);   // never let a big day overrun the plot
+      for (var k2 = 0; k2 < shown; k2++) {
+        subDots += '<circle class="sub-dot" cx="' + x(sIdx) + '" cy="' + (SUB_TOP + k2 * SUB_GAP) +
+          '" r="' + SUB_R + '" fill="#2ca471" stroke="#fff" stroke-width="1.2"/>';
+      }
+    }
+  }
+
   // Hover overlay — one group per day. Hit-zone rect captures hover for the
   // whole vertical column; dots + guide line fade in via CSS; the tooltip is
   // positioned by JS off whichever dot the mode renders.
@@ -964,7 +995,8 @@ function buildLineChart_(daily, mode, growth, days) {
     hover +=
       '<g class="dp" data-date="' + daily[j].date +
         '" data-pv="' + daily[j].pageViews +
-        '" data-uv="' + daily[j].uniqueVisitors + '">' +
+        '" data-uv="' + daily[j].uniqueVisitors +
+        '" data-sub="' + (daily[j].subscribers || 0) + '">' +
         '<line class="dp-guide" x1="' + xi + '" y1="' + padT + '" x2="' + xi + '" y2="' + (padT + innerH) + '" stroke="#1a1a1a" stroke-width="0.6" stroke-dasharray="2 3" opacity="0"/>' +
         dots +
         '<rect class="dp-hit" x="' + hitX + '" y="' + padT + '" width="' + hitW + '" height="' + innerH + '" fill="transparent"/>' +
@@ -972,7 +1004,7 @@ function buildLineChart_(daily, mode, growth, days) {
   }
 
   return '<svg class="chart" data-mode="' + mode + '" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
-      grid + lines + xLabels + legend + growthText + hover +
+      grid + lines + subDots + xLabels + legend + growthText + hover +
     '</svg>';
 }
 
