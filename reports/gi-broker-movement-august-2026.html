@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="../tenzi-arcs-small.svg">
+<title>GI Broker AR Movement — August 2026</title>
+<link rel="canonical" href="https://resources.tenzi.ai/reports/gi-broker-movement-august-2026.html">
+<meta name="description" content="Monthly read on Australian GI broker AR movement for August 2026 — who joined, left, and switched AFSLs, from the ASIC registers.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Tenzi Resources">
+<meta property="og:title" content="GI Broker AR Movement — August 2026">
+<meta property="og:description" content="Monthly read on Australian GI broker AR movement for August 2026 — who joined, left, and switched AFSLs, from the ASIC registers.">
+<meta property="og:url" content="https://resources.tenzi.ai/reports/gi-broker-movement-august-2026.html">
+<meta property="og:image" content="https://resources.tenzi.ai/og.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1260">
+<meta property="og:image:alt" content="Tenzi Resources — free data and runbooks for Australian GI brokers">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g900: #0C3B2E;
+  --g700: #1A5E45;
+  --g500: #27805C;
+  --g300: #6BBF96;
+  --g100: #D4EDDF;
+  --g50: #EEF7F2;
+  --bg: #FFFFFF;
+  --surface: #F7FAF8;
+  --border: #E2EBE6;
+  --border-light: #EEF3F0;
+  --text: #1A2B23;
+  --text-secondary: #5A7268;
+  --text-muted: #8DA69A;
+  --radius: 10px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+.dashboard { max-width: 960px; margin: 0 auto; padding: 24px 20px 8px; }
+
+/* Nav */
+.nav-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.back-link { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 500; color: var(--text-secondary); text-decoration: none; transition: color 0.15s; }
+.back-link:hover { color: var(--g900); }
+
+/* Header (now flex) */
+.header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.header-content { flex: 1; min-width: 0; }
+.header-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--g500); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.header-eyebrow::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--g500); }
+.header h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.2; margin-bottom: 4px; color: var(--g900); }
+.header-sub { color: var(--text-secondary); font-size: 13px; }
+.header-sub span { color: var(--text); font-weight: 600; }
+
+/* CTA group */
+.cta-group { display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0; }
+.btn-subscribe {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 16px;
+  background: var(--g700); color: #fff;
+  border: none; border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.6px;
+  cursor: pointer; white-space: nowrap;
+  transition: background 0.18s;
+}
+.btn-subscribe:hover { background: var(--g900); }
+.btn-linkedin {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 16px;
+  background: transparent;
+  color: #3d8aa8;
+  border: 1px solid rgba(61,138,168,0.35);
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.6px;
+  cursor: pointer; text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.18s, background 0.18s;
+}
+.btn-linkedin:hover { border-color: rgba(61,138,168,0.7); background: rgba(61,138,168,0.06); }
+
+/* Cross-report nav — standalone row below the header */
+.prev-report-row { margin-bottom: 18px; display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-prev-report {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 16px;
+  background: var(--bg); color: var(--g700);
+  border: 1px solid var(--g700); border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.6px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.18s, color 0.18s;
+}
+.btn-prev-report:hover { background: var(--g700); color: #fff; }
+
+/* Headline insights */
+.insights-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 18px; }
+.insights-list { display: flex; flex-direction: column; gap: 12px; }
+.insight-item { display: flex; gap: 12px; align-items: flex-start; }
+.insight-dot { flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--g500); margin-top: 8px; }
+.insight-body { flex: 1; font-size: 14px; line-height: 1.55; color: var(--text-secondary); }
+.insight-body strong { font-weight: 700; color: var(--g900); margin-right: 4px; }
+
+/* Scope toggle */
+.scope-toggle { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 4px; margin-bottom: 18px; gap: 0; }
+.scope-toggle button { background: transparent; border: 0; padding: 6px 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.6px; color: var(--text-secondary); border-radius: 999px; cursor: pointer; transition: background 0.18s, color 0.18s; }
+.scope-toggle button:hover { color: var(--g700); }
+.scope-toggle button.active { background: var(--g700); color: #fff; }
+.view { display: none; }
+.view.active { display: block; }
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.kpi-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 14px 16px; position: relative; overflow: hidden; }
+.kpi-card.accent { background: linear-gradient(135deg, var(--g50) 0%, #fff 100%); }
+.kpi-label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 6px; }
+.kpi-value { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; margin-bottom: 6px; color: var(--g900); }
+.kpi-delta { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 5px; }
+.kpi-delta.up { color: var(--g700); background: var(--g100); }
+.kpi-delta.down { color: var(--g900); background: rgba(12,59,46,0.08); }
+.kpi-delta.neutral { color: var(--g700); background: var(--g100); }
+.kpi-secondary { margin-top: 6px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-muted); }
+.section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); margin-bottom: 10px; margin-top: 24px; }
+.waterfall-wrap { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+.waterfall-title { font-size: 15px; font-weight: 700; margin-bottom: 2px; color: var(--g900); }
+.waterfall-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
+.waterfall-chart { display: flex; align-items: stretch; gap: 12px; height: 220px; position: relative; }
+.waterfall-chart::after { content: ''; position: absolute; top: 140px; left: 0; right: 0; height: 1px; background: var(--border); }
+.wf-col { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+.wf-upper { height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.wf-lower { height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+.wf-val { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; margin: 4px 0; color: var(--g900); }
+.wf-bar { width: 48px; border-radius: 5px; min-height: 4px; }
+.wf-bar.start, .wf-bar.end { border-radius: 5px 5px 0 0; }
+.wf-bar.negative { border-radius: 0 0 5px 5px; }
+.wf-bar.start { background: linear-gradient(180deg, var(--g300), var(--g700)); }
+.wf-bar.end { background: linear-gradient(180deg, var(--g300), var(--g700)); }
+.wf-bar.positive { background: linear-gradient(180deg, var(--g300), var(--g500)); border-radius: 5px 5px 0 0; }
+.wf-bar.negative { background: linear-gradient(180deg, var(--g900), var(--g700)); }
+.wf-label { font-size: 13px; color: var(--text-secondary); text-align: center; margin-top: 4px; line-height: 1.3; font-weight: 500; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.table-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 16px; overflow: hidden; }
+.table-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 2px; color: var(--g900); }
+.table-card .card-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); text-align: left; padding: 0 0 6px; border-bottom: 1px solid var(--border); }
+.data-table th:last-child { text-align: right; }
+.data-table td { padding: 7px 0; font-size: 13px; border-bottom: 1px solid var(--border-light); }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table td:last-child { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
+.data-table td.pos { color: var(--g500); }
+.data-table td.neg { color: var(--g900); }
+.badge { display: inline-block; font-size: 13px; font-weight: 700; padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; letter-spacing: 0.3px; text-transform: uppercase; }
+.badge.new { background: var(--g100); color: var(--g700); }
+.flow-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; }
+.flow-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 2px; color: var(--g900); }
+.flow-card .card-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; }
+.flow-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; background: var(--bg); border: 1px solid var(--border-light); margin-bottom: 6px; }
+.flow-count { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; color: var(--g700); min-width: 28px; }
+.flow-from, .flow-to { font-size: 13px; font-weight: 500; }
+.flow-arrow { color: var(--text-muted); font-size: 16px; flex-shrink: 0; }
+.flow-tag { margin-left: auto; font-size: 13px; color: var(--text-muted); font-style: italic; }
+.sticky-stat { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+.sticky-stat h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--g900); }
+.progress-track { height: 18px; background: var(--border); border-radius: 9px; overflow: hidden; position: relative; margin-bottom: 8px; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--g700), var(--g300)); border-radius: 9px; }
+.progress-labels { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); }
+.progress-labels span strong { color: var(--g900); font-weight: 700; }
+.net-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.net-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 14px 16px; }
+.net-card h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 10px; }
+.net-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+.net-item:not(:last-child) { border-bottom: 1px solid var(--border-light); }
+.net-item .name { font-size: 13px; }
+.net-item .val { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; }
+.net-item .val.pos { color: var(--g500); }
+.net-item .val.neg { color: var(--g900); }
+
+/* Source & method */
+.source-card { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 18px; }
+.source-card .source-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+.source-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin: 0; }
+
+/* Subscribe inline strip */
+.subscribe { margin-top: 36px; padding: 28px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: radial-gradient(ellipse at 50% 0%, rgba(39,128,92,0.08), transparent 60%); display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.subscribe-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 8px; }
+.subscribe h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.2; margin: 0; color: var(--g900); }
+.subscribe p { font-size: 13px; color: var(--text-secondary); margin: 6px 0 0; line-height: 1.5; }
+.subscribe-form { display: flex; gap: 8px; min-width: 320px; flex: 0 1 360px; }
+.subscribe-form input[type="email"] { flex: 1; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font: 13px 'DM Sans', sans-serif; outline: none; }
+.subscribe-form input[type="email"]:focus { border-color: var(--g500); }
+.subscribe-form button { padding: 10px 16px; background: var(--g700); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.6px; transition: background 0.18s; }
+.subscribe-form button:hover { background: var(--g900); }
+
+/* Footer */
+.page-footer { padding: 28px 0 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.6px; }
+.page-footer .left { color: var(--text-muted); }
+.page-footer .right { display: flex; gap: 18px; }
+.page-footer a { color: var(--text-secondary); text-decoration: none; }
+.page-footer a:hover { color: var(--g900); }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(12,59,46,0.4); z-index: 1000; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(12,59,46,0.18); }
+.modal h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.2px; margin-bottom: 8px; color: var(--g900); }
+.modal p { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.55; }
+.modal input[type="email"] { width: 100%; padding: 10px 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 6px; font: 14px 'DM Sans', sans-serif; margin-bottom: 12px; }
+.modal input[type="email"]:focus { outline: 1px solid var(--g500); border-color: var(--g500); }
+.modal .btn-send { width: 100%; padding: 10px; background: var(--g700); color: #fff; border: none; border-radius: 6px; font: 500 11px 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.6px; cursor: pointer; transition: background 0.18s; }
+.modal .btn-send:hover { background: var(--g900); }
+.modal .close-link { display: block; text-align: center; margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); cursor: pointer; text-decoration: none; }
+.modal .success-view { display: none; text-align: center; }
+.modal .no-spam { font-size: 11px; color: var(--text-muted); margin-top: 12px; margin-bottom: 0; }
+
+@media (max-width: 700px) {
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .two-col, .net-row { grid-template-columns: 1fr; }
+  .source-card { grid-template-columns: 1fr; }
+  .dashboard { padding: 18px 14px 8px; }
+  .header { flex-direction: column; }
+  .cta-group { width: 100%; justify-content: flex-start; }
+  .header h1 { font-size: 20px; }
+  .kpi-value { font-size: 24px; }
+  .flow-row { gap: 6px; padding: 8px 10px; }
+  .wf-bar { width: 36px; }
+  .scope-toggle button { padding: 6px 10px; font-size: 11px; }
+  .subscribe-form { min-width: 0; }
+}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.view.active .kpi-card,
+.view.active .waterfall-wrap,
+.view.active .table-card,
+.view.active .flow-card,
+.view.active .sticky-stat,
+.view.active .net-card { animation: fadeUp 0.4s ease both; }
+.view.active .kpi-card:nth-child(1) { animation-delay: 0.03s; }
+.view.active .kpi-card:nth-child(2) { animation-delay: 0.06s; }
+.view.active .kpi-card:nth-child(3) { animation-delay: 0.09s; }
+.view.active .kpi-card:nth-child(4) { animation-delay: 0.12s; }
+.view.active .waterfall-wrap { animation-delay: 0.15s; }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "GI Broker AR Movement — August 2026",
+  "description": "Monthly read on Australian GI broker AR movement for August 2026 — who joined, left, and switched AFSLs, from the ASIC registers. Source: ASIC AFS licensee and Authorised Representative registers (data.gov.au).",
+  "url": "https://resources.tenzi.ai/reports/gi-broker-movement-august-2026.html",
+  "creator": {
+    "@type": "Organization",
+    "name": "Tenzi",
+    "legalName": "Tenzi Pty Ltd",
+    "url": "https://tenzi.ai/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Tenzi",
+    "legalName": "Tenzi Pty Ltd",
+    "url": "https://tenzi.ai/"
+  },
+  "isAccessibleForFree": true,
+  "spatialCoverage": "Australia",
+  "temporalCoverage": "2026-08"
+}
+</script>
+</head>
+<body>
+<div class="dashboard">
+
+  <!-- Nav -->
+  <div class="nav-bar">
+    <a class="back-link" href="../index.html">&larr; All Resources</a>
+    <svg style="height: 32px; width: auto;"
+         width="201mm"
+         height="65mm"
+         viewBox="0 0 201 65"
+         version="1.1"
+         xml:space="preserve"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns="http://www.w3.org/2000/svg"><defs><linearGradient
+         id="linearGradient16"
+         ><stop style="stop-color:#000000;stop-opacity:0.68644071;" offset="0"/><stop style="stop-color:#333344;stop-opacity:0;" offset="0.89759034"/></linearGradient><linearGradient
+         id="linearGradient11"
+         ><stop style="stop-color:#000000;stop-opacity:0.69491524;" offset="0"/><stop style="stop-color:#333344;stop-opacity:0;" offset="1"/></linearGradient><linearGradient
+         id="linearGradient3"
+         ><stop style="stop-color:#000000;stop-opacity:0.68644071;" offset="0"/><stop style="stop-color:#333344;stop-opacity:0;" offset="1"/></linearGradient><linearGradient
+         id="swatch2"
+         ><stop style="stop-color:#1c233c;stop-opacity:1;" offset="0"/></linearGradient><linearGradient
+         id="arc1Gradient-0"
+         x1="149.5" y1="149.5" x2="50.5" y2="50.5"
+         gradientUnits="userSpaceOnUse"
+         gradientTransform="matrix(0,0.89869949,-0.89869949,0,-36.102721,12.157382)"><stop offset="0%" stop-color="#EC2BA6"/><stop offset="100%" stop-color="#F69068"/></linearGradient><linearGradient
+         id="arc2Gradient-8"
+         x1="50.5" y1="50.5" x2="149.5" y2="149.5"
+         gradientUnits="userSpaceOnUse"
+         gradientTransform="matrix(0,0.89869949,-0.89869949,0,-36.102721,12.157382)"><stop offset="0%" stop-color="#762BB7"/><stop offset="100%" stop-color="#2FC2EF"/></linearGradient><linearGradient
+         xlink:href="#swatch2"
+         id="linearGradient2"
+         x1="-2.8328218" y1="92.10894" x2="416.86349" y2="92.10894"
+         gradientUnits="userSpaceOnUse" /><linearGradient
+         xlink:href="#linearGradient11"
+         id="linearGradient5"
+         gradientUnits="userSpaceOnUse"
+         x1="-27.169992" y1="-18.921135" x2="21.284372" y2="26.60606"
+         gradientTransform="matrix(3.7795276,0,0,3.7795276,65.969434,83.760759)" /><linearGradient
+         xlink:href="#linearGradient3"
+         id="linearGradient6"
+         gradientUnits="userSpaceOnUse"
+         gradientTransform="matrix(3.7795276,0,0,3.7795276,233.06248,147.61726)"
+         x1="-32.250378" y1="-37.501045" x2="5.193779" y2="-4.243432" /><linearGradient
+         xlink:href="#linearGradient3"
+         id="linearGradient7"
+         gradientUnits="userSpaceOnUse"
+         gradientTransform="matrix(3.7795276,0,0,3.7795276,312.8453,207.36522)"
+         x1="-46.659107" y1="-53.039654" x2="-2.5366766" y2="-12.746933" /><linearGradient
+         xlink:href="#linearGradient3"
+         id="linearGradient8"
+         gradientUnits="userSpaceOnUse"
+         gradientTransform="matrix(3.7795276,0,0,3.7795276,311.02784,193.23495)"
+         x1="-31.21965" y1="-48.581367" x2="21.057957" y2="-2.5410306" /><linearGradient
+         xlink:href="#linearGradient3"
+         id="linearGradient9"
+         gradientUnits="userSpaceOnUse"
+         gradientTransform="matrix(3.7795276,0,0,3.7795276,28.97537,-41.67961)"
+         x1="79.068192" y1="13.262281" x2="122.32156" y2="29.68215" /><linearGradient
+         xlink:href="#linearGradient16"
+         id="linearGradient12"
+         gradientUnits="userSpaceOnUse"
+         x1="2.0645993" y1="1.6469805" x2="49.38686" y2="48.166054" /></defs><g
+         style="display:inline"><g
+           transform="matrix(0.26458333,0,0,0.26458333,57.148859,-3.1761411)"
+           style="display:inline"><path style="display:inline;fill:url(#linearGradient5);stroke-width:1.00157;stroke-dasharray:none" d="M 23.117139,152.90878 132.19569,258.09166 242.51315,229.99668 39.977494,48.147816 -3.0887291,88.245002 14.412068,102.15302 Z"/><path style="display:inline;fill:url(#linearGradient12);stroke-width:0.265;stroke-dasharray:none" d="M 9.5342283,40.19837 50.734283,77.970866 84.431227,50.453847 40.19837,7.4727738 14.565788,14.34826 Z" transform="matrix(3.7795276,0,0,3.7795276,-215.99569,12.004313)" /><path style="display:inline;fill:url(#linearGradient6);stroke-width:1.00157;stroke-dasharray:none" d="M 86.97513,144.69552 198.00151,247.93057 261.57102,204.25294 146.44429,69.882457 81.221486,101.57097 Z"/><path style="display:inline;fill:url(#linearGradient7);stroke-width:1.00157;stroke-dasharray:none" d="m 182.70582,157.69553 84.73065,81.8089 72.16766,-70.9186 L 255.67288,68.863833 227.43,74.863155 208.81837,64.134579 185.23046,68.309985 Z"/><path style="display:inline;fill:url(#linearGradient8);stroke-width:1.00157;stroke-dasharray:none" d="m 290.94083,157.20008 72.06975,67.20016 86.7764,-61.17944 -81.43739,-98.699134 c -26.76816,0.539024 -47.94299,4.787227 -73.9102,4.02331 l -4.15021,19.896481 28.45065,22.392543 z"/><path style="display:inline;fill:url(#linearGradient9);stroke-width:1.00157;stroke-dasharray:none" d="m 391.63723,156.9992 71.40976,62.39979 65.39079,-75.97554 -117.39677,-116.732874 -22.64459,23.2315 19.2757,14.842666 -16.68654,23.475841 z"/><path d="M -170.45829,146.51296 A 62.912174,62.912174 0 0 1 -81.487046,57.541706" fill="none" stroke-width="46.7324" style="display:inline;stroke:url(#arc1Gradient-0)" /><path d="M -81.487046,57.541706 A 62.912174,62.912174 0 0 1 -170.45829,146.51296" fill="none" stroke-width="46.7324" style="display:inline;stroke:url(#arc2Gradient-8)" /><path d="m 39.583,126.27798 c 0,3.584 0.82655,6.19256 2.381331,8.45273 2.900177,4.0254 7.716717,2.77592 9.41032,2.80066 0.937305,0.0137 4.473398,-0.64583 8.569739,-2.29026 l 8.499084,17.63907 c -6.312247,5.85502 -20.541608,7.83505 -24.596805,7.32864 -10.66913,-1.33235 -16.750013,-2.54016 -22.126013,-7.27616 -5.248,-4.864 -9.593656,-12.25468 -9.593656,-24.92668 V 88.837979 H -2.8328219 l 10e-8,-19.453551 c 0,0 9.8829521,0.242069 12.3588309,-2.51327 C 11.844938,64.290484 11.93455,62.376588 12.127,48.634171 L 39.339521,48.305151 39.583,67.862684 H 63.874974 V 88.837979 H 39.583 Z m 81.40821,-64.320001 c 9.344,0 17.664,2.24 24.96,6.72 7.424,4.48 13.184,10.56 17.28,18.24 4.096,7.680001 6.144,16.192001 6.144,25.536001 0,3.584 -0.256,5.38713 -0.768,8.33113 l -69.335648,-0.73044 c 2.431998,5.888 5.695998,10.304 9.791998,13.248 4.096,2.816 9.408,4.224 15.936,4.224 3.968,0 7.808,-0.832 11.52,-2.496 3.84,-1.664 10.98714,-6.09531 13.16314,-8.91131 l 14.40555,14.23583 c -5.69739,6.528 -10.304,11.52 -17.472,14.976 -7.04,3.456 -15.168,5.184 -24.384,5.184 -10.368,0 -19.52,-2.176 -27.455998,-6.528 -7.936,-4.48 -14.08,-10.56 -18.432,-18.24 -4.352,-7.68 -6.041042,-13.82121 -6.041042,-23.29321 0,-9.472 2.112,-18.048 6.336,-25.728001 4.352,-7.68 10.368,-13.696 18.048,-18.048 7.68,-4.48 16.448,-6.72 26.304,-6.72 z m 20.95165,42.384701 c -0.896,-4.863996 -3.456,-12.048701 -7.68,-14.736701 -4.096,-2.688 -7.44765,-4.032 -13.46365,-4.032 -6.272,0 -10.00765,1.536 -14.61565,4.608 -4.608,2.944 -7.039998,9.936701 -7.295998,14.160701 z m 95.00657,-39.898432 c 5.632,0 11.328,1.216 17.088,3.648 5.76,2.432 10.688,5.502605 14.784,11.646605 4.096,6.144 6.144,14.4 6.144,24.767997 l 0.73044,53.51234 h -27.456 l -0.73044,-53.51234 c -0.0839,-6.143425 -2.21496,-8.855645 -5.67096,-11.543645 -3.328,-2.688 -7.11652,-4.275478 -11.85252,-4.275478 -4.736,0 -11.38227,1.907478 -14.58227,5.235478 -3.072,3.328 -6.31235,5.474774 -6.31235,12.770775 l 0.97392,51.32521 h -27.456 l -0.97392,-93.565211 h 27.456 l 0.24348,9.206268 c 7.296,-6.144 19.42262,-9.215999 27.61462,-9.215999 z m 132.43751,17.673731 -43.17547,53.876871 h 46.42089 l 0.73044,22.02434 h -84.42423 l -0.97392,-14.88488 45.09462,-54.309821 h -43.27041 l 0.17217,-24.37051 79.42591,-0.344331 z m 31.15654,-27.311295 c -5.12,0 -9.152,-1.344 -12.096,-4.032 -2.816,-2.816 -4.224,-6.592 -4.224,-11.328 0,-4.864 1.408,-8.704 4.224,-11.52 2.944,-2.816 6.976,-4.224 12.096,-4.224 4.992,0 8.96,1.408 11.904,4.224 2.944,2.816 4.416,6.656 4.416,11.52 0,4.736 -1.472,8.512 -4.416,11.328 -2.944,2.688 -6.912,4.032 -11.904,4.032 z M 387.6934,158.01919 386.71948,64.453979 h 27.456 l 0.97392,93.565211 z" style="font-size:192px;fill:url(#linearGradient2)" aria-label="tenzi"/></g></g></svg>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div class="header-eyebrow">General Insurance &middot; Authorised Representatives</div>
+      <h1>AR Market Movement Dashboard</h1>
+      <div class="header-sub"><span>31 Jul 2026 &rarr; 31 Aug 2026</span> &middot; August 2026</div>
+    </div>
+    <div class="cta-group">
+      <a class="btn-linkedin" href="https://www.linkedin.com/company/tenzi-ai" target="_blank" rel="noopener" onclick="trackCta('linkedin_click')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        Join the conversation
+      </a>
+      <button class="btn-subscribe" onclick="trackCta('subscribe_click'); document.getElementById('subscribeModal').classList.add('open')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Subscribe
+      </button>
+    </div>
+  </div>
+
+  <div class="prev-report-row">
+    <a class="btn-prev-report" href="gi-broker-movement-july-2026.html" onclick="trackCta('july_report_click')">
+      Take me to the July report
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+    <a class="btn-prev-report" href="gi-broker-movement-dashboard.html" onclick="trackCta('q1_report_click')">
+      Take me to the Q1 report
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+
+  <div class="section-title">Headline insights</div>
+  <div class="insights-card">
+    <div class="insights-list">
+      <div class="insight-item">
+        <div class="insight-dot"></div>
+        <div class="insight-body"><strong>The consolidation is complete: Resilium 16 &rarr; 0 and PSC Connect 105 &rarr; 8, with Ausure up 542 &rarr; 636 ARs + CARs.</strong>Of the 97 who left PSC Connect, 83 went to Ausure and 7 to PSC Reliance; Resilium's last 16 went to Aviso (5), Ausure (3) or off the register. Since January, 94% of Ausure's additions have come from those two books. PSC Connect appears in the tables below under its licence name, Fermer Insurance Brokers.</div>
+      </div>
+      <div class="insight-item">
+        <div class="insight-dot"></div>
+        <div class="insight-body"><strong>Ausure is now the third-largest network: 636 ARs + CARs against McLardy McShane's 587, and 419 v 417 on individual ARs.</strong>It sat 6th in May at 229, and it is the only single-state network at the top &mdash; 88% of its ARs are in Queensland. The top four now hold 57% of all appointments, up from 53% in December.</div>
+      </div>
+      <div class="insight-item">
+        <div class="insight-dot"></div>
+        <div class="insight-body"><strong>Strip out the two book transfers and August shows how sticky the market is: 68 ARs changed licence, 64 of them out of PSC Connect or Resilium.</strong>The other four were single moves. Organic net change across 214 networks came to about +25, led by McLardy McShane +10 and Metrix Connect +7, with Oracle Group &minus;8 and Multi Secure &minus;6 the largest falls.</div>
+      </div>
+      <div class="insight-item">
+        <div class="insight-dot"></div>
+        <div class="insight-body"><strong>Two routes into the top four: McLardy McShane recruits, Ausure acquires.</strong>McLardy McShane has added 103 appointments since January, 65% of them new to the register. Ausure's 435 additions are 94% acquired, and by register age its roster is the most tenured of the top four &mdash; median 9.0 years, against 4.8 at McLardy McShane.</div>
+      </div>
+      <div class="insight-item">
+        <div class="insight-dot"></div>
+        <div class="insight-body"><strong>New entrants keep going to the biggest networks: the four with 250+ reps took 29 of August's 46 first-time ARs.</strong>That is 0.9% of their base, against 0.6&ndash;0.7% elsewhere; McLardy McShane (13), Community Broker Network (8) and Ausure (5) were the top destinations. The 12 re-entrants are long-absence comebacks rather than event fallout, returning after a median 37 months away.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scope-toggle" role="tablist" aria-label="Scope">
+    <button data-scope="individuals" class="active">AR</button><button data-scope="both">AR + CAR</button><button data-scope="cars">CAR</button>
+  </div>
+
+<div class="view active" data-scope="individuals">
+  <div class="kpi-row">
+    <div class="kpi-card accent">
+      <div class="kpi-label">Total Individual ARs</div>
+      <div class="kpi-value">3,790</div>
+      <span class="kpi-delta up">&#9650; +17 (+0.5%)</span>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Stayed at Same AFSL</div>
+      <div class="kpi-value">3,663</div>
+      <span class="kpi-delta neutral">97% retention</span>
+      <div class="kpi-secondary">64 ARs switched AFSL</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">New Individual ARs</div>
+      <div class="kpi-value">59</div>
+      <span class="kpi-delta up">&#9650; new ARs in window</span>
+      <div class="kpi-secondary">46 new &middot; 12 re-entering &middot; 1 from other AFSLs &middot; +4 transferred in (re-papering), shown separately</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ceased / Left</div>
+      <div class="kpi-value">46</div>
+      <span class="kpi-delta down">&#9660; ARs ceased in window</span>
+    </div>
+  </div>
+
+  <div class="waterfall-wrap">
+    <div class="waterfall-title">Population Bridge &middot; Individual ARs only</div>
+    <div class="waterfall-subtitle">+59 ARs entered, +4 transferred in, &minus;46 ceased or left</div>
+    <div class="waterfall-chart">
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">3,773</div>
+          <div class="wf-bar start" style="height:159px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">31 Jul 2026<br>Baseline</div></div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">+59</div>
+          <div class="wf-bar positive" style="height:103px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">New<br>Entrants</div></div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">+4</div>
+          <div class="wf-bar positive" style="height:7px;opacity:0.62"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">Transferred<br>In</div></div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper"><div class="wf-label">Ceased /<br>Left</div></div>
+        <div class="wf-lower">
+          <div class="wf-bar negative" style="height:80px"></div>
+          <div class="wf-val">&minus;46</div>
+        </div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">3,790</div>
+          <div class="wf-bar end" style="height:160px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">31 Aug 2026<br>Result</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sticky-stat">
+    <h3>Market Stickiness</h3>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:97%"></div>
+    </div>
+    <div class="progress-labels">
+      <span><strong>97%</strong> stayed at same AFSL</span>
+      <span><strong>1.7%</strong> switched AFSL</span>
+    </div>
+  </div>
+
+  <div class="section-title">AFSL Performance</div>
+  <div class="two-col">
+    <div class="table-card">
+      <h3>Biggest Growers</h3>
+      <div class="card-sub">Absolute net change</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
+        <tbody>
+<tr><td>Ausure</td><td class="pos">+62</td></tr>
+<tr><td>McLardy McShane Partners</td><td class="pos">+10</td></tr>
+<tr><td>PSC Reliance</td><td class="pos">+5</td></tr>
+<tr><td>Community Broker Network</td><td class="pos">+5</td></tr>
+<tr><td>Metrix Connect</td><td class="pos">+5</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <h3>Biggest Shrinkers</h3>
+      <div class="card-sub">Absolute net change</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
+        <tbody>
+<tr><td>Fermer Insurance Brokers</td><td class="neg">-63</td></tr>
+<tr><td>Resilium Insurance Broking</td><td class="neg">-13</td></tr>
+<tr><td>Oracle Group (australia)</td><td class="neg">-7</td></tr>
+<tr><td>Multi Secure Insurance Solutions</td><td class="neg">-3</td></tr>
+<tr><td>Insurance Advisernet Australia</td><td class="neg">-3</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="table-card">
+      <h3>Fastest Growing</h3>
+      <div class="card-sub">Percentage change (min 5 ARs)</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>%</th></tr></thead>
+        <tbody>
+<tr><td>Needcover Group <span style="color:var(--text-muted);font-size:13px">7&rarr;11</span></td><td class="pos">+57%</td></tr>
+<tr><td>PSC Reliance <span style="color:var(--text-muted);font-size:13px">21&rarr;26</span></td><td class="pos">+24%</td></tr>
+<tr><td>Ausure <span style="color:var(--text-muted);font-size:13px">357&rarr;419</span></td><td class="pos">+17%</td></tr>
+<tr><td>Webber Insurance Group <span style="color:var(--text-muted);font-size:13px">8&rarr;9</span></td><td class="pos">+12%</td></tr>
+<tr><td>EBN Holdings <span style="color:var(--text-muted);font-size:13px">28&rarr;31</span></td><td class="pos">+11%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <h3>Fastest Shrinking</h3>
+      <div class="card-sub">Percentage change (min 5 ARs)</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>%</th></tr></thead>
+        <tbody>
+<tr><td>Resilium Insurance Broking <span style="color:var(--text-muted);font-size:13px">13&rarr;0</span></td><td class="neg">-100%</td></tr>
+<tr><td>Fermer Insurance Brokers <span style="color:var(--text-muted);font-size:13px">68&rarr;5</span></td><td class="neg">-93%</td></tr>
+<tr><td>General Insurance Brokers Of Australia <span style="color:var(--text-muted);font-size:13px">8&rarr;7</span></td><td class="neg">-12%</td></tr>
+<tr><td>Brookvale Insurance Brokers <span style="color:var(--text-muted);font-size:13px">17&rarr;15</span></td><td class="neg">-12%</td></tr>
+<tr><td>Scott & Broad <span style="color:var(--text-muted);font-size:13px">11&rarr;10</span></td><td class="neg">-9%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Movement Flows</div>
+  <div class="flow-card">
+    <h3>AFSL Transfers &middot; Individual ARs only</h3>
+    <div class="card-sub">68 ARs moved between AFSLs within the GI-primary set (64 in-window switches + 4 boundary re-papering)</div>
+<div class="flow-row"><div class="flow-count">52</div><div class="flow-from">Fermer Insurance Brokers</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Ausure</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">5</div><div class="flow-from">Fermer Insurance Brokers</div><div class="flow-arrow">&rarr;</div><div class="flow-to">PSC Reliance</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">3</div><div class="flow-from">Resilium Insurance Broking</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Ausure</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">3</div><div class="flow-from">Resilium Insurance Broking</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Aviso Group Partners</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Community Broker Network</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Aviso Group Partners</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">M.g.a. Insurance Brokers</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Community Broker Network</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Fermer Insurance Brokers</div><div class="flow-arrow">&rarr;</div><div class="flow-to">McLardy McShane Partners</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">McLardy McShane Partners</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Metrix Connect</div><div class="flow-tag">transfer</div></div>
+  </div>
+
+  <div class="net-row">
+    <div class="net-card">
+      <h4>Top Net Importers (from moves)</h4>
+<div class="net-item"><span class="name">Ausure</span><span class="val pos">+55</span></div>
+<div class="net-item"><span class="name">PSC Reliance</span><span class="val pos">+5</span></div>
+<div class="net-item"><span class="name">Aviso Group Partners</span><span class="val pos">+4</span></div>
+    </div>
+    <div class="net-card">
+      <h4>Top Net Exporters (from moves)</h4>
+<div class="net-item"><span class="name">Fermer Insurance Brokers</span><span class="val neg">-58</span></div>
+<div class="net-item"><span class="name">Resilium Insurance Broking</span><span class="val neg">-6</span></div>
+<div class="net-item"><span class="name">M.g.a. Insurance Brokers</span><span class="val neg">-1</span></div>
+    </div>
+  </div>
+</div><div class="view" data-scope="both">
+  <div class="kpi-row">
+    <div class="kpi-card accent">
+      <div class="kpi-label">Total Registered ARs + CARs</div>
+      <div class="kpi-value">5,645</div>
+      <span class="kpi-delta up">&#9650; +19 (+0.3%)</span>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Stayed at Same AFSL</div>
+      <div class="kpi-value">5,465</div>
+      <span class="kpi-delta neutral">97% retention</span>
+      <div class="kpi-secondary">102 ARs + CARs switched AFSL</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">New Entrants</div>
+      <div class="kpi-value">74</div>
+      <span class="kpi-delta up">&#9650; new ARs + CARs in window</span>
+      <div class="kpi-secondary">59 new &middot; 13 re-entering &middot; 2 from other AFSLs &middot; +4 transferred in (re-papering), shown separately</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ceased / Left</div>
+      <div class="kpi-value">59</div>
+      <span class="kpi-delta down">&#9660; ARs + CARs ceased in window</span>
+    </div>
+  </div>
+
+  <div class="waterfall-wrap">
+    <div class="waterfall-title">Population Bridge &middot; Individual ARs + CARs</div>
+    <div class="waterfall-subtitle">+74 ARs + CARs entered, +4 transferred in, &minus;59 ceased or left</div>
+    <div class="waterfall-chart">
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">5,626</div>
+          <div class="wf-bar start" style="height:159px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">31 Jul 2026<br>Baseline</div></div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">+74</div>
+          <div class="wf-bar positive" style="height:104px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">New<br>Entrants</div></div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">+4</div>
+          <div class="wf-bar positive" style="height:6px;opacity:0.62"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">Transferred<br>In</div></div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper"><div class="wf-label">Ceased /<br>Left</div></div>
+        <div class="wf-lower">
+          <div class="wf-bar negative" style="height:83px"></div>
+          <div class="wf-val">&minus;59</div>
+        </div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">5,645</div>
+          <div class="wf-bar end" style="height:160px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">31 Aug 2026<br>Result</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sticky-stat">
+    <h3>Market Stickiness</h3>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:97%"></div>
+    </div>
+    <div class="progress-labels">
+      <span><strong>97%</strong> stayed at same AFSL</span>
+      <span><strong>1.8%</strong> switched AFSL</span>
+    </div>
+  </div>
+
+  <div class="section-title">AFSL Performance</div>
+  <div class="two-col">
+    <div class="table-card">
+      <h3>Biggest Growers</h3>
+      <div class="card-sub">Absolute net change</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
+        <tbody>
+<tr><td>Ausure</td><td class="pos">+94</td></tr>
+<tr><td>McLardy McShane Partners</td><td class="pos">+10</td></tr>
+<tr><td>PSC Reliance</td><td class="pos">+7</td></tr>
+<tr><td>Needcover Group</td><td class="pos">+7</td></tr>
+<tr><td>Metrix Connect</td><td class="pos">+7</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <h3>Biggest Shrinkers</h3>
+      <div class="card-sub">Absolute net change</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
+        <tbody>
+<tr><td>Fermer Insurance Brokers</td><td class="neg">-97</td></tr>
+<tr><td>Resilium Insurance Broking</td><td class="neg">-16</td></tr>
+<tr><td>Oracle Group (australia)</td><td class="neg">-8</td></tr>
+<tr><td>Multi Secure Insurance Solutions</td><td class="neg">-6</td></tr>
+<tr><td>Insurance Advisernet Australia</td><td class="neg">-4</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="table-card">
+      <h3>Fastest Growing</h3>
+      <div class="card-sub">Percentage change (min 5 ARs + CARs)</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>%</th></tr></thead>
+        <tbody>
+<tr><td>Needcover Group <span style="color:var(--text-muted);font-size:13px">10&rarr;17</span></td><td class="pos">+70%</td></tr>
+<tr><td>PSC Reliance <span style="color:var(--text-muted);font-size:13px">30&rarr;37</span></td><td class="pos">+23%</td></tr>
+<tr><td>Ausure <span style="color:var(--text-muted);font-size:13px">542&rarr;636</span></td><td class="pos">+17%</td></tr>
+<tr><td>Citycover (aust) <span style="color:var(--text-muted);font-size:13px">8&rarr;9</span></td><td class="pos">+12%</td></tr>
+<tr><td>Benton Insurance Services <span style="color:var(--text-muted);font-size:13px">8&rarr;9</span></td><td class="pos">+12%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <h3>Fastest Shrinking</h3>
+      <div class="card-sub">Percentage change (min 5 ARs + CARs)</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>%</th></tr></thead>
+        <tbody>
+<tr><td>Resilium Insurance Broking <span style="color:var(--text-muted);font-size:13px">16&rarr;0</span></td><td class="neg">-100%</td></tr>
+<tr><td>Fermer Insurance Brokers <span style="color:var(--text-muted);font-size:13px">105&rarr;8</span></td><td class="neg">-92%</td></tr>
+<tr><td>Multi Secure Insurance Solutions <span style="color:var(--text-muted);font-size:13px">8&rarr;2</span></td><td class="neg">-75%</td></tr>
+<tr><td>Honan Insurance Group <span style="color:var(--text-muted);font-size:13px">11&rarr;10</span></td><td class="neg">-9%</td></tr>
+<tr><td>Brookvale Insurance Brokers <span style="color:var(--text-muted);font-size:13px">26&rarr;24</span></td><td class="neg">-8%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Movement Flows</div>
+  <div class="flow-card">
+    <h3>AFSL Transfers &middot; Individual ARs + CARs</h3>
+    <div class="card-sub">106 ARs + CARs moved between AFSLs within the GI-primary set (102 in-window switches + 4 boundary re-papering)</div>
+<div class="flow-row"><div class="flow-count">83</div><div class="flow-from">Fermer Insurance Brokers</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Ausure</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">7</div><div class="flow-from">Fermer Insurance Brokers</div><div class="flow-arrow">&rarr;</div><div class="flow-to">PSC Reliance</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">5</div><div class="flow-from">Resilium Insurance Broking</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Aviso Group Partners</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">3</div><div class="flow-from">Resilium Insurance Broking</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Ausure</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">2</div><div class="flow-from">McLardy McShane Partners</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Metrix Connect</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Fermer Insurance Brokers</div><div class="flow-arrow">&rarr;</div><div class="flow-to">McLardy McShane Partners</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Community Broker Network</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Aviso Group Partners</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">McLardy McShane Partners</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Focus Insurance Brokers</div><div class="flow-tag">transfer</div></div>
+  </div>
+
+  <div class="net-row">
+    <div class="net-card">
+      <h4>Top Net Importers (from moves)</h4>
+<div class="net-item"><span class="name">Ausure</span><span class="val pos">+86</span></div>
+<div class="net-item"><span class="name">PSC Reliance</span><span class="val pos">+7</span></div>
+<div class="net-item"><span class="name">Aviso Group Partners</span><span class="val pos">+6</span></div>
+    </div>
+    <div class="net-card">
+      <h4>Top Net Exporters (from moves)</h4>
+<div class="net-item"><span class="name">Fermer Insurance Brokers</span><span class="val neg">-91</span></div>
+<div class="net-item"><span class="name">Resilium Insurance Broking</span><span class="val neg">-8</span></div>
+<div class="net-item"><span class="name">Multi Secure Insurance Solutions</span><span class="val neg">-2</span></div>
+    </div>
+  </div>
+</div><div class="view" data-scope="cars">
+  <div class="kpi-row">
+    <div class="kpi-card accent">
+      <div class="kpi-label">Total Corporate ARs</div>
+      <div class="kpi-value">1,855</div>
+      <span class="kpi-delta up">&#9650; +2 (+0.1%)</span>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Stayed at Same AFSL</div>
+      <div class="kpi-value">1,802</div>
+      <span class="kpi-delta neutral">97% retention</span>
+      <div class="kpi-secondary">38 CARs switched AFSL</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">New Corporate ARs</div>
+      <div class="kpi-value">15</div>
+      <span class="kpi-delta up">&#9650; new CARs in window</span>
+      <div class="kpi-secondary">13 new &middot; 1 re-entering &middot; 1 from other AFSLs</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ceased / Left</div>
+      <div class="kpi-value">13</div>
+      <span class="kpi-delta down">&#9660; CARs ceased in window</span>
+    </div>
+  </div>
+
+  <div class="waterfall-wrap">
+    <div class="waterfall-title">Population Bridge &middot; Corporate ARs only</div>
+    <div class="waterfall-subtitle">+15 CARs entered, &minus;13 ceased or left</div>
+    <div class="waterfall-chart">
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">1,853</div>
+          <div class="wf-bar start" style="height:160px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">31 Jul 2026<br>Baseline</div></div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">+15</div>
+          <div class="wf-bar positive" style="height:110px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">New<br>Entrants</div></div>
+      </div>
+      
+      <div class="wf-col">
+        <div class="wf-upper"><div class="wf-label">Ceased /<br>Left</div></div>
+        <div class="wf-lower">
+          <div class="wf-bar negative" style="height:95px"></div>
+          <div class="wf-val">&minus;13</div>
+        </div>
+      </div>
+      <div class="wf-col">
+        <div class="wf-upper">
+          <div class="wf-val">1,855</div>
+          <div class="wf-bar end" style="height:160px"></div>
+        </div>
+        <div class="wf-lower"><div class="wf-label">31 Aug 2026<br>Result</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sticky-stat">
+    <h3>Market Stickiness</h3>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:97%"></div>
+    </div>
+    <div class="progress-labels">
+      <span><strong>97%</strong> stayed at same AFSL</span>
+      <span><strong>2.1%</strong> switched AFSL</span>
+    </div>
+  </div>
+
+  <div class="section-title">AFSL Performance</div>
+  <div class="two-col">
+    <div class="table-card">
+      <h3>Biggest Growers</h3>
+      <div class="card-sub">Absolute net change</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
+        <tbody>
+<tr><td>Ausure</td><td class="pos">+32</td></tr>
+<tr><td>Needcover Group</td><td class="pos">+3</td></tr>
+<tr><td>Westminster Coverforce <span class="badge new">NEW</span></td><td class="pos">+2</td></tr>
+<tr><td>PSC Reliance</td><td class="pos">+2</td></tr>
+<tr><td>Sirius Insurance</td><td class="pos">+2</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <h3>Biggest Shrinkers</h3>
+      <div class="card-sub">Absolute net change</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>Change</th></tr></thead>
+        <tbody>
+<tr><td>Fermer Insurance Brokers</td><td class="neg">-34</td></tr>
+<tr><td>Multi Secure Insurance Solutions</td><td class="neg">-3</td></tr>
+<tr><td>Resilium Insurance Broking</td><td class="neg">-3</td></tr>
+<tr><td>Insurance Advisernet Australia</td><td class="neg">-1</td></tr>
+<tr><td>Professional Services Corporation</td><td class="neg">-1</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="table-card">
+      <h3>Fastest Growing</h3>
+      <div class="card-sub">Percentage change (min 5 CARs)</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>%</th></tr></thead>
+        <tbody>
+<tr><td>PSC Reliance <span style="color:var(--text-muted);font-size:13px">9&rarr;11</span></td><td class="pos">+22%</td></tr>
+<tr><td>Ausure <span style="color:var(--text-muted);font-size:13px">185&rarr;217</span></td><td class="pos">+17%</td></tr>
+<tr><td>All Risk Protection <span style="color:var(--text-muted);font-size:13px">8&rarr;9</span></td><td class="pos">+12%</td></tr>
+<tr><td>EBN Holdings <span style="color:var(--text-muted);font-size:13px">18&rarr;20</span></td><td class="pos">+11%</td></tr>
+<tr><td>BMIA Broker Network <span style="color:var(--text-muted);font-size:13px">11&rarr;12</span></td><td class="pos">+9%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <h3>Fastest Shrinking</h3>
+      <div class="card-sub">Percentage change (min 5 CARs)</div>
+      <table class="data-table">
+        <thead><tr><th>AFSL</th><th>%</th></tr></thead>
+        <tbody>
+<tr><td>Fermer Insurance Brokers <span style="color:var(--text-muted);font-size:13px">37&rarr;3</span></td><td class="neg">-92%</td></tr>
+<tr><td>Honan Insurance Group <span style="color:var(--text-muted);font-size:13px">11&rarr;10</span></td><td class="neg">-9%</td></tr>
+<tr><td>Professional Services Corporation <span style="color:var(--text-muted);font-size:13px">13&rarr;12</span></td><td class="neg">-8%</td></tr>
+<tr><td>Sureinsure <span style="color:var(--text-muted);font-size:13px">26&rarr;25</span></td><td class="neg">-4%</td></tr>
+<tr><td>Oracle Group (australia) <span style="color:var(--text-muted);font-size:13px">45&rarr;44</span></td><td class="neg">-2%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Movement Flows</div>
+  <div class="flow-card">
+    <h3>AFSL Transfers &middot; Corporate ARs only</h3>
+    <div class="card-sub">38 CARs moved between AFSLs within the GI-primary set</div>
+<div class="flow-row"><div class="flow-count">31</div><div class="flow-from">Fermer Insurance Brokers</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Ausure</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">2</div><div class="flow-from">Fermer Insurance Brokers</div><div class="flow-arrow">&rarr;</div><div class="flow-to">PSC Reliance</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">2</div><div class="flow-from">Resilium Insurance Broking</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Aviso Group Partners</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">McLardy McShane Partners</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Metrix Connect</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Multi Secure Insurance Solutions</div><div class="flow-arrow">&rarr;</div><div class="flow-to">McLardy McShane Partners</div><div class="flow-tag">transfer</div></div>
+<div class="flow-row"><div class="flow-count">1</div><div class="flow-from">Multi Secure Insurance Solutions</div><div class="flow-arrow">&rarr;</div><div class="flow-to">Westminster Coverforce</div><div class="flow-tag">transfer</div></div>
+  </div>
+
+  <div class="net-row">
+    <div class="net-card">
+      <h4>Top Net Importers (from moves)</h4>
+<div class="net-item"><span class="name">Ausure</span><span class="val pos">+31</span></div>
+<div class="net-item"><span class="name">Aviso Group Partners</span><span class="val pos">+2</span></div>
+<div class="net-item"><span class="name">PSC Reliance</span><span class="val pos">+2</span></div>
+    </div>
+    <div class="net-card">
+      <h4>Top Net Exporters (from moves)</h4>
+<div class="net-item"><span class="name">Fermer Insurance Brokers</span><span class="val neg">-33</span></div>
+<div class="net-item"><span class="name">Multi Secure Insurance Solutions</span><span class="val neg">-2</span></div>
+<div class="net-item"><span class="name">Resilium Insurance Broking</span><span class="val neg">-2</span></div>
+    </div>
+  </div>
+</div>
+
+  <!-- Subscribe -->
+  <section class="subscribe">
+    <div>
+      <div class="subscribe-eyebrow">Monthly brief</div>
+      <h2>One email a month. New data, zero noise.</h2>
+      <p>The latest AR movement dashboard and any new resources.</p>
+    </div>
+    <form class="subscribe-form" onsubmit="return submitSubscribe(event)">
+      <input type="email" id="subscribeEmail" required placeholder="you@yourbrokerage.com.au">
+      <button type="submit">Subscribe</button>
+    </form>
+  </section>
+
+  <footer class="page-footer">
+    <div class="left">&copy; 2026 TENZI &middot; RESOURCES.TENZI.AI</div>
+    <div class="right">
+      <a href="https://tenzi.ai">TENZI.AI</a>
+      <a href="https://www.linkedin.com/company/tenzi-ai" target="_blank" rel="noopener">LINKEDIN</a>
+      <a href="mailto:roshan@tenzi.ai">EMAIL</a>
+    </div>
+  </footer>
+
+</div>
+
+<!-- Subscribe modal -->
+<div id="subscribeModal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="form-view">
+      <h3>Subscribe to monthly updates</h3>
+      <p>We publish this dashboard every month using the latest ASIC register data. Enter your email and we'll send it straight to your inbox.</p>
+      <form onsubmit="return submitSubscription(event)">
+        <input type="email" id="subEmail" placeholder="you@yourbrokerage.com.au" required>
+        <button type="submit" class="btn-send">Subscribe</button>
+      </form>
+      <p class="no-spam">No spam, no marketing. Unsubscribe anytime.</p>
+      <a class="close-link" onclick="document.getElementById('subscribeModal').classList.remove('open')">No thanks</a>
+    </div>
+    <div class="success-view">
+      <h3>You're in!</h3>
+      <p>We'll send you the next dashboard as soon as it's ready.</p>
+      <a class="close-link" onclick="document.getElementById('subscribeModal').classList.remove('open')">Close</a>
+    </div>
+  </div>
+</div>
+
+<script src="https://tenzi.ai/track.js"></script>
+<script>
+tenziTrack.init({ site: 'resources' });
+
+function submitSubscription(e) {
+  e.preventDefault();
+  tenziTrack.postForm({ email: document.getElementById('subEmail').value, source: 'subscribe_modal' });
+  tenziTrack.trackCta('subscribe_submit');
+  document.querySelector('#subscribeModal .form-view').style.display = 'none';
+  document.querySelector('#subscribeModal .success-view').style.display = 'block';
+  return false;
+}
+
+function submitSubscribe(e) {
+  e.preventDefault();
+  tenziTrack.postForm({ email: document.getElementById('subscribeEmail').value, source: 'subscribe_inline' });
+  tenziTrack.trackCta('subscribe_submit');
+  e.target.innerHTML = '<div style="flex:1;padding:10px 0;font-family:\'JetBrains Mono\',monospace;font-size:12px;color:var(--g700);letter-spacing:0.6px;text-transform:uppercase;">&#10003; Subscribed &mdash; thanks.</div>';
+  return false;
+}
+</script>
+<script>
+(function() {
+  const buttons = document.querySelectorAll('.scope-toggle button');
+  const views = document.querySelectorAll('.view');
+  buttons.forEach(btn => btn.addEventListener('click', () => {
+    const s = btn.dataset.scope;
+    buttons.forEach(b => b.classList.toggle('active', b === btn));
+    views.forEach(v => v.classList.toggle('active', v.dataset.scope === s));
+  }));
+})();
+</script>
+</body>
+</html>

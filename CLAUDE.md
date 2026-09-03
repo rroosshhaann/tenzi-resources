@@ -18,8 +18,9 @@ tenzi-resources/
     gi-broker-movement-april-2026.html    # Monthly cadence (31 Mar → 30 Apr) — deeper-green / DM Sans variant
     gi-broker-movement-may-2026.html      # Monthly cadence
     gi-broker-movement-june-2026.html     # Monthly cadence
-    gi-broker-movement-july-2026.html     # Monthly cadence — current index tile for the monthly series
-    gi-broker-movement-july-2026.thumb.jpg # index tile thumbnail (AR + CAR view: KPI strip + population bridge)
+    gi-broker-movement-july-2026.html     # Monthly cadence
+    gi-broker-movement-august-2026.html   # Monthly cadence (31 Jul → 31 Aug) — current index tile for the monthly series
+    gi-broker-movement-august-2026.thumb.jpg # index tile thumbnail (AR + CAR view: KPI strip + population bridge)
     # Monthly build: the generator (python-scrapbook change-report/<prev>-<next>/<Month> 2026.html) emits
     # the bare dashboard only. Copy it here, then apply the portal layer — head metadata, Dataset JSON-LD,
     # nav + logo, header CTA group, prev-report row, Headline insights, subscribe strip + footer, modal,
