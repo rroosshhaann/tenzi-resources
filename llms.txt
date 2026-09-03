@@ -25,4 +25,4 @@ Key facts:
 
 ## Premium samples
 
-Samples of paid analyses (network health leaderboard, AR race chart, licensee AR-flow deep dives, senior broker quadrant, broking-network size threshold, top-network AR share and concentration) are all listed at [Premium samples](https://resources.tenzi.ai/premium-samples/); the most recent also appear on [resources.tenzi.ai](https://resources.tenzi.ai/).
+Samples of paid analyses (network health leaderboard, AR race chart, licensee AR-flow deep dives, senior broker quadrant, broking-network size threshold, top-network AR share and concentration, and where AR network growth came from between 2023 and 2026 — incumbent growers and emerging networks) are all listed at [Premium samples](https://resources.tenzi.ai/premium-samples/); the most recent also appear on [resources.tenzi.ai](https://resources.tenzi.ai/).
