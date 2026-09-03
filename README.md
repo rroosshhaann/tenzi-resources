@@ -42,6 +42,7 @@ tenzi-resources/
 - **How Much of the Market Do the Top Networks Hold?** — the top 20 networks hold 80.3% of all matched AR entities and it takes 30 to get in; concentration curve readable at any threshold, plus the top-60 rank table (July 2026)
 - **Who Are the Emerging Networks?** — 29 networks crossed the five-AR line after July 2023 and grew from 37 ARs to 680; seven of them delivered 82% of that growth, and with the top three incumbent growers, ten networks account for three quarters of all AR gains (July 2026)
 - **How Skewed Is AR Network Growth?** — networks added 1,605 ARs in three years and kept 558; three incumbents took 72% of incumbent growth while 47 shrinking networks gave back 1,047 (July 2026)
+- **How Did the Top 20 AR Networks Change Each Month?** — animated top 20 by combined headcount, recomputed at every month-end December 2025 to June 2026; the acquisition-driven moves versus the organic builds, companion to the Insurance News special report (June 2026)
 
 ## Hosting
 

@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="../tenzi-arcs-small.svg">
-<title>Premium Samples · Tenzi Resources</title>
-<link rel="canonical" href="https://resources.tenzi.ai/premium-samples/">
-<meta name="description" content="Every Tenzi premium sample in one place — GI broker network structure and concentration, AR flow by licensee, network health, and the senior broker quadrant.">
-<meta property="og:type" content="website">
+<title>How Did the Top 20 AR Networks Change Each Month? · June 2026</title>
+<link rel="canonical" href="https://resources.tenzi.ai/premium-samples/gi-top20-monthly-headcount.html">
+<meta name="description" content="Premium sample — the top 20 AR networks by combined headcount, recomputed every month-end from December 2025 to June 2026, animated. Deals vs organic growth.">
+<meta property="og:type" content="article">
 <meta property="og:site_name" content="Tenzi Resources">
-<meta property="og:title" content="Premium Samples · Tenzi Resources">
-<meta property="og:description" content="Every Tenzi premium sample in one place — GI broker network structure and concentration, AR flow by licensee, network health, and the senior broker quadrant.">
-<meta property="og:url" content="https://resources.tenzi.ai/premium-samples/">
+<meta property="og:title" content="How Did the Top 20 AR Networks Change Each Month? · June 2026">
+<meta property="og:description" content="Premium sample — the top 20 AR networks by combined headcount, recomputed every month-end from December 2025 to June 2026, animated. Deals vs organic growth.">
+<meta property="og:url" content="https://resources.tenzi.ai/premium-samples/gi-top20-monthly-headcount.html">
 <meta property="og:image" content="https://resources.tenzi.ai/og.png">
 <meta property="og:image:width" content="2400">
 <meta property="og:image:height" content="1260">
@@ -40,31 +40,58 @@ a { color: var(--accent); }
 .eyebrow { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; display: inline-flex; align-items: center; gap: 8px; }
 .eyebrow::before { content:''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
 h1 { font-size: 28px; letter-spacing: -0.02em; line-height: 1.2; font-weight: 500; color: var(--g900); margin-bottom: 6px; }
+.badge-sample { display: inline-block; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 9.5px; font-weight: 500; padding: 3px 7px; border-radius: 2px; letter-spacing: 0.14em; text-transform: uppercase; color: #ffffff; background: linear-gradient(135deg, #EC2BA6, #F69068 40%, #762BB7 75%, #2FC2EF); margin-left: 10px; vertical-align: 3px; }
 .subtitle { font-size: 13px; color: var(--muted); line-height: 1.6; }
 .subtitle strong { color: var(--text); font-weight: 500; }
 .meta-line { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px; }
 .cta-group { display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0; justify-content: flex-end; }
+.btn-linkedin { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; background: transparent; color: #3d8aa8; border: 1px solid rgba(61,138,168,0.35); border-radius: var(--radius); font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; text-decoration: none; white-space: nowrap; transition: border-color 0.15s, background 0.15s; }
+.btn-linkedin:hover { border-color: rgba(61,138,168,0.7); background: rgba(61,138,168,0.06); }
 .btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font: 500 11px 'IBM Plex Mono', ui-monospace, monospace; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; white-space: nowrap; text-decoration: none; transition: background 0.15s; }
 .btn-primary:hover { background: var(--accent-hover); }
 .section-label { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; justify-content: space-between; }
 .section-label .section-num { color: var(--dim); }
-.sample-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.sample-card { display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; text-decoration: none; color: inherit; transition: border-color 0.15s; }
-.sample-card:hover { border-color: var(--border-bright); }
-.sample-card .meta { display: flex; justify-content: space-between; gap: 10px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); margin-bottom: 12px; }
-.sample-card .shot { height: 150px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: var(--panel-hover); margin-bottom: 14px; }
-.sample-card .shot img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
-.sample-card h3 { font-size: 16px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.3; color: var(--g900); margin: 0 0 8px; }
-.sample-card p { font-size: 12.5px; line-height: 1.55; color: var(--muted); margin: 0; flex: 1; }
-.sample-card .foot { margin-top: 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.sample-card .cta { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
-.premium-badge { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; padding: 3px 7px; border-radius: 2px; border: 1px solid var(--accent); color: var(--accent); white-space: nowrap; }
-@media (max-width: 940px) { .sample-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 620px) { .sample-grid { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; transition: border-color 0.15s; }
+.card:hover { border-color: var(--border-bright); }
+.card-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; gap: 12px; }
+.card h3 { font-size: 15px; font-weight: 500; letter-spacing: -0.01em; margin: 0; line-height: 1.35; color: var(--g900); }
+.card-index { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; color: var(--dim); letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; }
+.card-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+.insights { list-style: none; padding: 0; margin: 0; counter-reset: ins; }
+.insights li { position: relative; padding: 14px 0 14px 34px; border-bottom: 1px dashed var(--border); font-size: 13.5px; line-height: 1.65; color: var(--muted); }
+.insights li:last-child { border-bottom: none; padding-bottom: 4px; }
+.insights li::before { content: counter(ins, decimal-leading-zero); counter-increment: ins; position: absolute; left: 0; top: 14px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; color: var(--dim); letter-spacing: 0.08em; padding-top: 2px; }
+.insights strong { color: var(--text); font-weight: 500; }
+.chart-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px; overflow: hidden; position: relative; max-width: 780px; margin-left: auto; margin-right: auto; }
+.chart-wrap img { display: block; max-width: 100%; width: 100%; height: auto; border-radius: 4px; }
+.chart-caption { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 14px 4px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; color: var(--dim); letter-spacing: 0.14em; text-transform: uppercase; }
+.slideshow { position: relative; max-width: 780px; margin: 0 auto; }
+.slide-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none; border-radius: var(--radius); }
+.slide-track::-webkit-scrollbar { display: none; }
+.slide-track:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.slide { flex: 0 0 100%; align-self: flex-start; scroll-snap-align: center; margin: 0; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.slide img { display: block; width: 100%; height: auto; }
+.slide-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--accent); border: 1px solid var(--accent); border-radius: var(--radius); color: #fff; cursor: pointer; transition: background 0.15s, border-color 0.15s, opacity 0.15s; }
+.slide-nav:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.slide-nav:focus-visible { outline: 2px solid var(--g700); outline-offset: 3px; }
+.slide-nav[disabled] { background: var(--panel); border-color: var(--border); color: var(--dim); cursor: default; }
+.slide-nav.prev { left: -22px; }
+.slide-nav.next { right: -22px; }
+.slide-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.slide-tab { flex: 0 0 104px; min-width: 0; padding: 5px; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; text-align: left; opacity: 0.55; transition: opacity 0.15s, border-color 0.15s; }
+.slide-tab:hover { opacity: 1; border-color: var(--border-bright); }
+.slide-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.slide-tab[aria-current="true"] { opacity: 1; border-color: var(--accent); }
+.slide-tab img { display: block; width: 100%; aspect-ratio: 1500 / 1828; height: auto; object-fit: cover; border-radius: 3px; background: var(--panel-hover); }
+.slide-tab span { display: block; margin-top: 6px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 9.5px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slide-tab[aria-current="true"] span { color: var(--accent); }
 .cta-strip { margin-top: 40px; padding: 32px; border: 1px solid var(--border); border-radius: var(--radius); background: radial-gradient(ellipse at 50% 0%, rgba(44,164,113,0.08), transparent 60%), var(--panel); display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; }
 .cta-strip h3 { font-size: 19px; font-weight: 500; letter-spacing: -0.01em; margin: 0 0 6px; color: var(--text); }
 .cta-strip p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.55; max-width: 640px; }
 .cta-strip .btn-primary { padding: 12px 18px; }
+.caveats { margin-top: 24px; padding: 18px 20px; border: 1px dashed var(--border); border-radius: var(--radius); background: var(--panel-hover); }
+.caveats-eyebrow { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.caveats p { font-size: 12.5px; color: var(--muted); line-height: 1.65; margin: 0; }
 .page-footer { padding: 36px 0 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.12em; }
 .page-footer .left { color: var(--dim); }
 .page-footer .right { display: flex; gap: 20px; }
@@ -82,7 +109,7 @@ h1 { font-size: 28px; letter-spacing: -0.02em; line-height: 1.2; font-weight: 50
   .cta-strip { grid-template-columns: 1fr; }
 }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-.sample-card, .cta-strip { animation: fadeUp 0.35s ease both; }
+.card, .chart-wrap, .cta-strip { animation: fadeUp 0.35s ease both; }
 </style>
 </head>
 <body>
@@ -205,165 +232,76 @@ h1 { font-size: 28px; letter-spacing: -0.02em; line-height: 1.2; font-weight: 50
 
   <div class="header-row">
     <div>
-      <div class="eyebrow">Premium Analytics · Sample Library</div>
-      <h1>Premium samples</h1>
-      <div class="subtitle">Every deep dive we've published as a sample, in one place. Each one is a real extract of the paid service, built from the <strong>ASIC AFS Licensee and Representative registers</strong> — market structure and growth, licensee-level AR flow, network health and concentration.</div>
-      <div class="meta-line">12 SAMPLES · APR 2026 → JUL 2026 · NO EMAIL REQUIRED</div>
+      <div class="eyebrow">Premium Analytics · Top 20 Networks · Sample</div>
+      <h1>How Did the Top 20 AR Networks Change Each Month? <span class="badge-sample">Sample</span></h1>
+      <div class="subtitle">Companion to the Insurance News Top 20 AR Networks special report: the top 20 by <strong>combined headcount</strong>, recomputed at every month-end from December 2025 to June 2026, with individual ARs and corporate ARs shown separately. Acquisitions reshuffled the middle of the table; the two at the top just kept going. The static metric review is on the <a href="../reports/gi-broker-top20-metrics.html">Top 20 dashboard</a>.</div>
+      <div class="meta-line">TOP 20 BY ARS + CARS · DEC 2025 → JUN 2026 · 4,376 IN THE TOP 20 AT 30 JUN</div>
     </div>
     <div class="cta-group">
-      <a class="btn-primary" href="https://cal.com/roshan-khozouei/30min" target="_blank" onclick="trackCta('PREMIUM_book_call_click')">
+      <a class="btn-linkedin" href="https://www.linkedin.com/posts/roshan-khozouei_how-have-the-top-20-ar-networks-changed-each-share-7496421456516415489-awap" target="_blank" rel="noopener" onclick="trackCta('PREMIUM_linkedin_click')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        Join the conversation
+      </a>
+      <a class="btn-primary" href="https://cal.com/roshan-khozouei/30min" target="_blank" onclick="trackCta('PREMIUM_get_full_report_click')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Book a call
+        Get the full report
       </a>
     </div>
   </div>
 
-  <div class="section-label"><span>All samples</span><span class="section-num">12 TOTAL</span></div>
+  <div class="section-label"><span>The headline moves</span><span class="section-num">01 / 04</span></div>
 
-  <div class="sample-grid">
+  <div class="card">
+    <div class="card-head"><h3>A big year for AR networks, and it is only June</h3><span class="card-index">6 MOVES</span></div>
+    <div class="card-sub">The acquisitions, migrations and launches that moved the table between December 2025 and 30 June 2026.</div>
+    <ol class="insights">
+      <li><strong>Steadfast's acquisition of Resilium and PSC, announced in April.</strong> The deal that reshaped the middle of the table. By 30 June the chart shows Resilium at 170 and PSC Connect at 201, with the migrations still under way.</li>
+      <li><strong>Envest's equity-held businesses moved into Aviso Group Partners.</strong> Aviso enters the top 20 inside the window and finishes June at 209, fifth by combined headcount.</li>
+      <li><strong>Resilium and PSC migrations landing at Ausure.</strong> Ausure finishes the window at 338 and fourth, and the transfers continue beyond June.</li>
+      <li><strong>Howden's acquisition of Unicorn Risk Solutions, a long-term AR of Apollo.</strong> A move at the AR level rather than the network level; Apollo Risk Services finishes the window at 62.</li>
+      <li><strong>Sphere Insurance Group wound up.</strong> Sphere leaves the top 20 in June, one of two exits that month alongside Professional Services Corporation.</li>
+      <li><strong>The launch of Regis Licensing.</strong> Regis enters the top 20 in June at 27, alongside BMIA Broker Network, also at 27.</li>
+    </ol>
+  </div>
 
-    <a class="sample-card" href="../reports/gi-broker-whitespace-map.html" onclick="trackCta('premium_whitespace_click')">
-      <div class="meta"><span>JUL 2026</span><span>88 REGIONS</span></div>
-      <div class="shot"><img src="../reports/gi-broker-whitespace-map.thumb.jpg" alt="Broker whitespace map preview" loading="lazy" decoding="async"></div>
-      <h3>The Broker Whitespace Map</h3>
-      <p>Where business growth is outrunning broker coverage. 26 regions captured 52.7% of Australia's net new businesses with 16.7% of its brokers — mapped region by region, with state zoom.</p>
-      <div class="foot">
-        <span class="cta">View sample →</span>
-        <span class="premium-badge">Premium</span>
-      </div>
-    </a>
+  <div class="section-label"><span>The chart, animated</span><span class="section-num">02 / 04</span></div>
 
-    <a class="sample-card" href="gi-top20-monthly-headcount.html" onclick="trackCta('premium_top20_monthly_click')">
-      <div class="meta"><span>JUN 2026</span><span>TOP 20 · ANIMATED</span></div>
-      <div class="shot"><img src="gi-top20-monthly-headcount.thumb.jpg" alt="Top 20 AR networks headcount bar chart preview — June 2026 frame of the monthly animation" loading="lazy" decoding="async"></div>
-      <h3>How Did the Top 20 Change Each Month?</h3>
-      <p>The top 20 AR networks by combined headcount, recomputed every month-end from December 2025 to June 2026 — acquisitions reshuffle the middle of the table while the two at the top keep growing. Companion to the Insurance News special report.</p>
-      <div class="foot">
-        <span class="cta">View sample →</span>
-        <span class="premium-badge">Premium</span>
-      </div>
-    </a>
+  <div class="chart-wrap">
+    <img src="top20_headcount_202512_202606_phone.gif" loading="lazy" alt="Animated bar chart of the top 20 AR networks by combined headcount at each month-end from December 2025 to June 2026. Each bar splits into individual ARs and corporate ARs. Networks enter and leave the frame on their own numbers, with entries and exits captioned each month. The final frame, June 2026, has Community Broker Network at 1,133, Insurance Advisernet at 879, McLardy McShane Partners at 579 and Ausure at 338, with 4,376 registered ARs and CARs in the top 20.">
+    <div class="chart-caption">
+      <span>FIG 01 · TOP 20 BY COMBINED HEADCOUNT, RECOMPUTED MONTHLY</span>
+      <span>DEC 2025 → JUN 2026</span>
+    </div>
+  </div>
 
-    <a class="sample-card" href="gi-emerging-network-growth.html" onclick="trackCta('premium_emerging_growth_click')">
-      <div class="meta"><span>JUL 2026</span><span>7 OF 29 = 82%</span></div>
-      <div class="shot"><img src="gi-emerging-network-growth.thumb.jpg" alt="Emerging networks stacked area chart preview — 37 to 680 ARs, 2023 to 2026" loading="lazy" decoding="async"></div>
-      <h3>Who Are the Emerging Networks?</h3>
-      <p>29 networks crossed the five-AR line after July 2023 and grew from 37 ARs to 680 — but seven of them delivered 82% of it. With the top three incumbent growers, ten networks are the engine room of the AR industry.</p>
-      <div class="foot">
-        <span class="cta">View sample →</span>
-        <span class="premium-badge">Premium</span>
-      </div>
-    </a>
+  <div class="section-label"><span>Growth that was not an acquisition</span><span class="section-num">03 / 04</span></div>
 
-    <a class="sample-card" href="gi-incumbent-network-growth.html" onclick="trackCta('premium_incumbent_growth_click')">
-      <div class="meta"><span>JUL 2026</span><span>TOP 3 = 72%</span></div>
-      <div class="shot"><img src="gi-incumbent-network-growth.thumb.jpg" alt="Incumbent growers bar chart preview — net AR gain by network rank, 2023 to 2026" loading="lazy" decoding="async"></div>
-      <h3>How Skewed Is AR Network Growth?</h3>
-      <p>Networks added 1,605 ARs in three years and kept 558. Of the networks that existed in July 2023, three took 72% of all growth — and are home to close to one in two ARs today.</p>
-      <div class="foot">
-        <span class="cta">View sample →</span>
-        <span class="premium-badge">Premium</span>
-      </div>
-    </a>
+  <div class="card">
+    <div class="card-head"><h3>The organic builds</h3><span class="card-index">4 NOTES</span></div>
+    <div class="card-sub">Set the deals aside and a second story runs underneath: networks adding ARs one appointment at a time.</div>
+    <ol class="insights">
+      <li><strong>McLardy McShane Partners +59, the largest organic build of any network.</strong> It finishes the window at 579 and third, clear of every network below it.</li>
+      <li><strong>Metrix Connect +47, up 52%.</strong> The strongest mid-table build, finishing June at 138 and eighth.</li>
+      <li><strong>By percentage: EBN +86%, Better Broker Network +71%, Sirius Insurance +50%, BMIA Broker Network +29%, SMS Insurance (repX) +24%.</strong> The fastest growers sit in the lower half of the table, where a few dozen ARs move a network several places.</li>
+      <li><strong>The two at the top just kept going.</strong> Community Broker Network +15 to 1,133 and Insurance Advisernet Australia +26 to 879: the stable giants that drive the sector.</li>
+    </ol>
+  </div>
 
-    <a class="sample-card" href="gi-broking-network-threshold.html" onclick="trackCta('premium_network_threshold_click')">
-      <div class="meta"><span>JUL 2026</span><span>211 LICENSEES</span></div>
-      <div class="shot"><img src="gi-broking-network-threshold.thumb.jpg" alt="Licensee concentration curve preview" loading="lazy" decoding="async"></div>
-      <h3>How Many ARs Make a Network?</h3>
-      <p>Draw the line at five ARs and 99 of 211 GI broker licensees qualify — but those 99 hold 95.8% of every matched AR entity. The top 10 alone hold 70%.</p>
-      <div class="foot">
-        <span class="cta">View sample →</span>
-        <span class="premium-badge">Premium</span>
-      </div>
-    </a>
+  <div class="section-label"><span>Source &amp; method</span><span class="section-num">04 / 04</span></div>
 
-    <a class="sample-card" href="gi-top-network-ar-share.html" onclick="trackCta('premium_top_network_share_click')">
-      <div class="meta"><span>JUL 2026</span><span>TOP 20 = 80%</span></div>
-      <div class="shot"><img src="gi-top-network-ar-share.thumb.jpg" alt="Concentration curve preview — share of AR entities by network size" loading="lazy" decoding="async"></div>
-      <h3>How Much Do the Top Networks Hold?</h3>
-      <p>The top 20 networks hold 80.3% of all matched AR entities and it takes 30 to get in. One curve answers it for any number of networks — plus the top 60 ranks.</p>
-      <div class="foot">
-        <span class="cta">View sample →</span>
-        <span class="premium-badge">Premium</span>
-      </div>
-    </a>
-
-    <a class="sample-card" href="sphere-regis-ar-flow.html" onclick="trackCta('premium_sphere_regis_click')">
-      <div class="meta"><span>JUN 2026</span><span>76 REPS IN PLAY</span></div>
-      <div class="shot"><img src="sphere_regis_two_licences_202101_202606.thumb.jpg" alt="Sphere vs Regis licence headcount chart preview" loading="lazy" decoding="async"></div>
-      <h3>Two Licences, One Week</h3>
-      <p>Sphere Insurance Group unwound in the ASIC register — 31 reps ceased in a single day — and dormant Regis Licensing refilled the next morning. 48 of the 76 reps in play have a new licence.</p>
-      <div class="foot">
-        <span class="cta">View sample →</span>
-        <span class="premium-badge">Premium</span>
-      </div>
-    </a>
-
-    <a class="sample-card" href="senior-broker-quadrant.html" onclick="trackCta('premium_tenure_quadrant_click')">
-      <div class="meta"><span>MAY 2026</span><span>22 NETWORKS</span></div>
-      <div class="shot"><img src="tenure_quadrant_202506_202605.thumb.jpg" alt="Senior broker quadrant chart preview" loading="lazy" decoding="async"></div>
-      <h3>The Senior Broker Quadrant</h3>
-      <p>Senior bench depth vs 12-month senior flow, plotted across 22 GI broker networks. M.G.A. is the only network in the top-right quadrant — 42% senior bench AND growing seniors.</p>
-      <div class="foot">
-        <span class="cta">View sample →</span>
-        <span class="premium-badge">Premium</span>
-      </div>
-    </a>
-
-    <a class="sample-card" href="afsl-health-leaderboard.html" onclick="trackCta('premium_health_click')">
-      <div class="meta"><span>APR 2026</span><span>7 SIGNALS</span></div>
-      <div class="shot"><img src="afsl_health_leaderboard_segment_202604.thumb.jpg" alt="GI broker network health leaderboard preview" loading="lazy" decoding="async"></div>
-      <h3>GI Broker Network Health Score</h3>
-      <p>Composite 0–100 score across seven signals of network health. Metrix Connect (108 ARs) tops the list, outscoring every Dominant in the country. Size isn't health.</p>
-      <div class="foot">
-        <span class="cta">View sample →</span>
-        <span class="premium-badge">Premium</span>
-      </div>
-    </a>
-
-    <a class="sample-card" href="gi-broker-race-chart.html" onclick="trackCta('premium_race_click')">
-      <div class="meta"><span>24 MO</span><span>1,180 ARs</span></div>
-      <div class="shot"><img src="ar_race_chart.thumb.jpg" alt="GI broker AFSL race chart preview" loading="lazy" decoding="async"></div>
-      <h3>GI Broker AFSL Race Chart</h3>
-      <p>Animated 24-month view of the Top 20 GI broker networks. See who's growing, shrinking, and how the Envest/Steadfast story played out in real-time AR data.</p>
-      <div class="foot">
-        <span class="cta">View sample →</span>
-        <span class="premium-badge">Premium</span>
-      </div>
-    </a>
-
-    <a class="sample-card" href="resilium-ar-flow.html" onclick="trackCta('premium_resilium_click')">
-      <div class="meta"><span>48 MO</span><span>123 ARs</span></div>
-      <div class="shot"><img src="afsl_flow_RESILIUM_INSURANCE_BROKING.thumb.jpg" alt="Resilium AR flow preview" loading="lazy" decoding="async"></div>
-      <h3>Resilium AR Flow Analysis</h3>
-      <p>123 departing ARs across 48 months, mapped to every destination. The Steadfast ecosystem dominated before the deal was announced.</p>
-      <div class="foot">
-        <span class="cta">View sample →</span>
-        <span class="premium-badge">Premium</span>
-      </div>
-    </a>
-
-    <a class="sample-card" href="psc-connect-ar-flow.html" onclick="trackCta('premium_psc_click')">
-      <div class="meta"><span>48 MO</span><span>134 ARs</span></div>
-      <div class="shot"><img src="afsl_flow_PSC_CONNECT.thumb.jpg" alt="PSC Connect AR flow preview" loading="lazy" decoding="async"></div>
-      <h3>PSC Connect AR Flow Analysis</h3>
-      <p>McLardy McShane — not Ausure — quietly captured 57% of traceable leavers well before the Steadfast deal was announced.</p>
-      <div class="foot">
-        <span class="cta">View sample →</span>
-        <span class="premium-badge">Premium</span>
-      </div>
-    </a>
-
+  <div class="caveats">
+    <div class="caveats-eyebrow">Data notes</div>
+    <p>Source: ASIC AFS Licensee and Authorised Representative registers (data.gov.au). GI-primary AFSLs, individual ARs plus corporate ARs at each month-end from December 2025 to June 2026. Only the month-end positions are real: the animation's in-between frames are tweens. Top 20 membership is recomputed every month, so networks enter and leave on their own numbers rather than tracking a fixed list. An AR that moves between networks is counted once, at the newer network, which is why totals here can sit below the headline counts in the monthly movers reports while a migration is in progress. Data to 30 June 2026; the Resilium and PSC migrations into Ausure continue beyond the window. These numbers are one view and a starting point for a conversation: every network has a culture, offering and capability the register cannot capture.</p>
   </div>
 
   <section class="cta-strip">
     <div>
-      <h3>These are extracts. The full service is a standing feed.</h3>
-      <p>Everything on this page is a snapshot of one question at one register cut. The paid service runs the same analysis continuously — every licensee, every month, with movement matching, size-band transitions and alerts when a book starts moving. Refreshed with every ASIC register release.</p>
+      <h3>Want the animation for your own peer set?</h3>
+      <p>The full service tracks headcount for every GI-primary licensee month by month: any top-N or custom peer group, the AR and CAR split, entries and exits, and the movement behind each change. Refreshed with every ASIC register release.</p>
     </div>
-    <a class="btn-primary" href="https://cal.com/roshan-khozouei/30min" target="_blank" onclick="trackCta('PREMIUM_get_full_report_click')">
+    <a class="btn-primary" href="https://cal.com/roshan-khozouei/30min" target="_blank" onclick="trackCta('PREMIUM_book_call_click')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Get the full report
+      Book a call
     </a>
   </section>
 
