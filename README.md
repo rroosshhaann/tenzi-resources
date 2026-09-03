@@ -9,6 +9,7 @@ Live at **https://resources.tenzi.ai**
 ```
 tenzi-resources/
   index.html                       Central landing page
+  about.html                       About Roshan — Insurance News Top 20 profile page + background, linked from the index nav
   reports/                         Free analytics reports
   runbooks/                        Free operational runbooks
   premium-samples/                 Samples of premium paid reports

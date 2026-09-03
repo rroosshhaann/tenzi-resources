@@ -8,6 +8,8 @@ Hosted on GitHub Pages at `https://resources.tenzi.ai`.
 ```
 tenzi-resources/
   index.html                              # Central landing page
+  about.html                              # About Roshan — Terminal Grid page: header CTAs (LinkedIn profile + Book a chat), the Insurance News Top 20 Authorised Rep Networks 2026 profile page (about-insurance-news-top20-2026.jpg, page 38, 758×913 native) in a .chart-wrap, a 4-item background card condensed from that interview, subscribe strip, footer, track.js. Linked from the index nav "About" button (about_click) and the index About section
+  about-insurance-news-top20-2026.jpg     # magazine page scan for about.html — source: Windows Screenshots folder, 2026-08-20
   og.png                                  # 2400×1260 social share card — every page's og:image points at it
   og-frame.html                           # source frame for og.png — see "Share card & search registration" below
   robots.txt                              # permissive (AI crawlers welcome); blocks /r/ + /unsubscribe/; points at sitemap
