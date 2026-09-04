@@ -44,6 +44,7 @@ tenzi-resources/
 - **Who Are the Emerging Networks?** — 29 networks crossed the five-AR line after July 2023 and grew from 37 ARs to 680; seven of them delivered 82% of that growth, and with the top three incumbent growers, ten networks account for three quarters of all AR gains (July 2026)
 - **How Skewed Is AR Network Growth?** — networks added 1,605 ARs in three years and kept 558; three incumbents took 72% of incumbent growth while 47 shrinking networks gave back 1,047 (July 2026)
 - **How Did the Top 20 AR Networks Change Each Month?** — animated top 20 by combined headcount, recomputed at every month-end December 2025 to June 2026; the acquisition-driven moves versus the organic builds, companion to the Insurance News special report (June 2026)
+- **Top 20 Authorised Rep Networks 2026 — the Insurance News special report** — hub page for the 40-page report Tenzi supplied the data and methodology for: what is inside, where to get it, and every companion analysis on this site (August 2026)
 
 ## Hosting
 
