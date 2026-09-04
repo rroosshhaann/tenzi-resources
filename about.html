@@ -111,9 +111,11 @@ h1 { font-size: 28px; letter-spacing: -0.02em; line-height: 1.2; font-weight: 50
 @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 .card, .chart-wrap, .cta-strip { animation: fadeUp 0.35s ease both; }
 .intro { font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0 0 14px; }
-.profile-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+.profile-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: stretch; }
 .profile-grid .chart-wrap { max-width: none; margin: 0; }
 .chart-wrap a { display: block; }
+.enlarge { position: absolute; bottom: 56px; right: 16px; display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; background: rgba(255,255,255,0.92); color: var(--text); border: 1px solid var(--border-bright); border-radius: var(--radius); font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+.enlarge:hover { border-color: var(--accent); color: var(--accent); }
 @media (max-width: 960px) { .profile-grid { grid-template-columns: 1fr; } .profile-grid .chart-wrap { max-width: 780px; margin: 0 auto; } }
   .subscribe {
     padding: 32px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
@@ -298,6 +300,7 @@ h1 { font-size: 28px; letter-spacing: -0.02em; line-height: 1.2; font-weight: 50
   <div class="profile-grid">
   <div class="chart-wrap">
     <a href="about-insurance-news-top20-2026.jpg" target="_blank" rel="noopener" title="Open the page at full size"><img src="about-insurance-news-top20-2026.jpg" width="754" height="913" alt="Page 38 of the Insurance News Top 20 Authorised Rep Networks 2026 report, headed 'Data cruncher': an interview with Roshan Khozouei alongside his portrait. It covers Tenzi and his career, why he focused on insurance broking and authorised representatives, how the AR statistics shared on LinkedIn are produced from ASIC's registers, and how he sees technology affecting the sector."></a>
+    <a class="enlarge" href="about-insurance-news-top20-2026.jpg" target="_blank" rel="noopener" aria-label="Open the magazine page at full size in a new tab">Click to enlarge <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
     <div class="chart-caption">
       <span>INSURANCE NEWS · TOP 20 AUTHORISED REP NETWORKS 2026 · PAGE 38</span>
       <span>AUGUST 2026</span>
@@ -306,7 +309,7 @@ h1 { font-size: 28px; letter-spacing: -0.02em; line-height: 1.2; font-weight: 50
 
   <div class="card">
     <div class="card-head"><h3>The short version</h3><span class="card-index">FROM THE INTERVIEW</span></div>
-    <div class="card-sub">Condensed from the profile above.</div>
+    <div class="card-sub">Condensed from the interview alongside.</div>
     <ol class="insights">
       <li><strong>Tenzi.</strong> Automation and analytics for brokers and networks. Tenzi works on top of whatever systems are already in place and automates the admin around them: the emails, chasing, filing, re-keying and document wrangling.</li>
       <li><strong>This year.</strong> More than 50 conversations with independent brokers, ARs and network leaders, mapping how the work actually gets done across new business, renewals, remarketing and claims.</li>
