@@ -27,6 +27,10 @@ Key facts:
 
 [About Roshan Khozouei](https://resources.tenzi.ai/about.html): founder of Tenzi, the company behind these resources, with his profile from the Insurance News Top 20 Authorised Rep Networks 2026 report.
 
+## Guides
+
+[General Insurance Licensee & AR Obligations](https://resources.tenzi.ai/compliance/): a free directory of the official Australian GI resources for licensees and authorised representatives, with draft explanations and activity filters. Early draft, not independently reviewed; feedback invited on every entry.
+
 ## Premium samples
 
 Samples of paid analyses (network health leaderboard, AR race chart, licensee AR-flow deep dives, senior broker quadrant, broking-network size threshold, top-network AR share and concentration, and where AR network growth came from between 2023 and 2026 — incumbent growers and emerging networks, and the top 20 networks' month-by-month headcount through June 2026, animated, plus a hub page for the Insurance News Top 20 Authorised Rep Networks 2026 special report — Tenzi supplied its data and methodology — at https://resources.tenzi.ai/premium-samples/insurance-news-top20-report.html) are all listed at [Premium samples](https://resources.tenzi.ai/premium-samples/); the most recent also appear on [resources.tenzi.ai](https://resources.tenzi.ai/).
