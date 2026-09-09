@@ -98,6 +98,16 @@ Compare CTA click counts vs actual form submissions to measure drop-off per page
 2. Paste the new contents into the Apps Script editor (linked Google Sheet > Extensions > Apps Script).
 3. Deploy > Manage deployments > edit existing > set version to "New version" > Deploy.
 
+## Compliance guide feedback
+
+The sibling [`tenzi-compliance`](../tenzi-compliance/index.html) guide uses this same Apps Script deployment for feedback. `source: 'compliance_feedback'` writes to a **Compliance Feedback** tab in [the existing spreadsheet](https://docs.google.com/spreadsheets/d/1Jd2EuDMTh59fCRFQcvcOeKvBD1xMgVbcowTOTjlokPY/edit). The tab is created on the first valid submission, or by running `setupComplianceFeedback()` in the Apps Script editor.
+
+Each row contains the timestamp, submission ID, entry ID/title/link, official source, feedback type/message, supporting source, optional reply email, status (`New`) and review notes. Feedback does not create subscriber/contact records or send notification emails. The tab has the spreadsheet's existing sharing permissions.
+
+The guide loads `https://tenzi.ai/track.js` with `site: 'resources'` for page views, dwell and `compliance_*` CTA events. Its document title distinguishes it from other resource pages. Feedback content is sent separately using a versioned JSON response: the UI confirms success only after the matching submission ID is acknowledged. It does not use the tracker's fire-and-forget `postForm` helper. A failed request preserves the note; unchanged retries reuse the same ID to prevent duplicate rows.
+
+**Deploy the updated receiver before publishing the guide.** The existing deployment URL is reused. Follow [FEEDBACK.md](./FEEDBACK.md) for setup, request fields, tracking events, tests and the live verification steps. Updating this repository alone does not deploy Apps Script.
+
 ## Newsletter integration
 
 The `tenzi-newsletter` repo (separate, private) sends a monthly HTML email

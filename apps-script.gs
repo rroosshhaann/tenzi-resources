@@ -1,4 +1,4 @@
-// Tenzi tracking + contact-form endpoint + analytics dashboard.
+// Tenzi tracking + contact/feedback endpoints + analytics dashboard.
 // Lives in the Google Sheet linked to resources.tenzi.ai and tenzi.ai.
 // Canonical source-of-truth: this file. Paste into Apps Script after edits,
 // then Deploy > Manage deployments > New version > Deploy.
@@ -10,6 +10,10 @@
 
 var EVENTS_SHEET = 'Events';
 var CONTACTS_SHEET = 'Contacts';
+var FEEDBACK_SHEET = 'Compliance Feedback';
+var FEEDBACK_SPREADSHEET_ID = '1Jd2EuDMTh59fCRFQcvcOeKvBD1xMgVbcowTOTjlokPY';
+var FEEDBACK_PROTOCOL = 'tenzi-compliance-feedback-v1';
+var FEEDBACK_HEADERS = ['Timestamp', 'Submission ID', 'Entry ID', 'Entry', 'Entry URL', 'Official source', 'Feedback type', 'Message', 'Supporting source', 'Email', 'Status', 'Review notes'];
 var NOTIFY_EMAIL = 'roshan@tenzi.ai';
 var CONTACT_RATE_LIMIT = 5;             // contact submissions per IP per window
 var CONTACT_RATE_WINDOW_MS = 3600000;   // 1 hour
@@ -29,6 +33,7 @@ var DASHBOARD_TIMEZONE = 'Australia/Melbourne';
 
 function doPost(e) {
   var data = JSON.parse(e.postData.contents);
+  if (data.source === 'compliance_feedback') return receiveComplianceFeedback_(data);
   if (isExcludedIp_(data.ip)) return ContentService.createTextOutput('ok');
   var melbTime = Utilities.formatDate(new Date(), DASHBOARD_TIMEZONE, 'yyyy-MM-dd HH:mm:ss');
 
@@ -48,6 +53,10 @@ function doPost(e) {
 }
 
 function doGet(e) {
+  // Read-only capability check. No feedback content is returned or logged.
+  if (e && e.parameter && e.parameter.view === 'compliance-feedback') {
+    return feedbackResponse_({ ready: true });
+  }
   if (e && e.parameter && e.parameter.view === 'dashboard') {
     return renderDashboard_(e);
   }
@@ -190,6 +199,104 @@ function withinRateLimit_(ip, limit, windowMs) {
 function getOrCreate_(name) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   return ss.getSheetByName(name) || ss.insertSheet(name);
+}
+
+function feedbackResponse_(result) {
+  result.protocol = FEEDBACK_PROTOCOL;
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function feedbackField_(data, name, max, required) {
+  var value = data[name];
+  if (value === undefined || value === null) value = '';
+  if (typeof value !== 'string' || value.length > max || (required && !value.trim())) {
+    throw new Error('Invalid ' + name);
+  }
+  return value.trim();
+}
+
+function feedbackUrl_(data, name) {
+  var value = feedbackField_(data, name, 2048, false);
+  if (value && !/^https?:\/\/[^\s]+$/i.test(value)) throw new Error('Invalid ' + name);
+  return value;
+}
+
+function feedbackCell_(value) {
+  // Sheets interprets leading '=' as a formula; store visitor input as text.
+  return /^[=+\-@]/.test(value) ? "'" + value : value;
+}
+
+function complianceFeedbackSheet_() {
+  var ss = SpreadsheetApp.openById(FEEDBACK_SPREADSHEET_ID);
+  var sheet = ss.getSheetByName(FEEDBACK_SHEET) || ss.insertSheet(FEEDBACK_SHEET);
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(FEEDBACK_HEADERS);
+    sheet.setFrozenRows(1);
+    sheet.getRange(1, 1, 1, FEEDBACK_HEADERS.length).setFontWeight('bold');
+    sheet.setColumnWidth(8, 420);
+    sheet.setColumnWidth(12, 300);
+  } else {
+    var headers = sheet.getRange(1, 1, 1, FEEDBACK_HEADERS.length).getValues()[0];
+    if (headers.join('\t') !== FEEDBACK_HEADERS.join('\t')) throw new Error('Unexpected feedback sheet headers');
+  }
+  return sheet;
+}
+
+// Optional editor-only setup; the first valid submission also creates the tab.
+function setupComplianceFeedback() {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    complianceFeedbackSheet_();
+    SpreadsheetApp.flush();
+  } finally { lock.releaseLock(); }
+}
+
+function receiveComplianceFeedback_(data) {
+  var note;
+  try {
+    note = {
+      submissionId: feedbackField_(data, 'submissionId', 36, true),
+      entryId: feedbackField_(data, 'entryId', 80, true),
+      entryTitle: feedbackField_(data, 'entryTitle', 200, true),
+      entryUrl: feedbackUrl_(data, 'entryUrl'),
+      officialSource: feedbackUrl_(data, 'officialSource'),
+      kind: feedbackField_(data, 'kind', 40, true),
+      message: feedbackField_(data, 'message', 5000, true),
+      supportingSource: feedbackUrl_(data, 'supportingSource'),
+      email: feedbackField_(data, 'email', 254, false),
+      ip: feedbackField_(data, 'ip', 64, false)
+    };
+    if (!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(note.submissionId) ||
+        !/^[a-z0-9-]+$/.test(note.entryId) ||
+        ['Possible error', 'Unclear explanation', 'Missing resource', 'General feedback'].indexOf(note.kind) === -1 ||
+        (note.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(note.email))) throw new Error('Invalid feedback');
+  } catch (err) {
+    return feedbackResponse_({ ok: false, error: 'invalid_feedback' });
+  }
+  if (data.website || isExcludedIp_(note.ip)) return feedbackResponse_({ ok: false, error: 'not_accepted' });
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) return feedbackResponse_({ ok: false, error: 'busy' });
+  try {
+    var sheet = complianceFeedbackSheet_();
+    // A retry after a lost response must not create a second feedback row.
+    if (sheet.getLastRow() > 1 && sheet.getRange(2, 2, sheet.getLastRow() - 1, 1)
+        .createTextFinder(note.submissionId).matchEntireCell(true).findNext()) {
+      return feedbackResponse_({ ok: true, submissionId: note.submissionId });
+    }
+    if (!withinRateLimit_(note.ip ? 'compliance-feedback:' + note.ip : '', 10, CONTACT_RATE_WINDOW_MS)) {
+      return feedbackResponse_({ ok: false, error: 'rate_limited' });
+    }
+    var timestamp = Utilities.formatDate(new Date(), DASHBOARD_TIMEZONE, 'yyyy-MM-dd HH:mm:ss');
+    sheet.appendRow([timestamp, note.submissionId, note.entryId, note.entryTitle, note.entryUrl,
+      note.officialSource, note.kind, note.message, note.supportingSource, note.email, 'New', ''].map(feedbackCell_));
+    SpreadsheetApp.flush();
+    return feedbackResponse_({ ok: true, submissionId: note.submissionId });
+  } catch (err) {
+    // Do not include visitor content in logs or error responses.
+    console.log('Compliance feedback save failed. Check the target sheet and permissions.');
+    return feedbackResponse_({ ok: false, error: 'save_failed' });
+  } finally { lock.releaseLock(); }
 }
 
 // Extract the bare domain from a referrer URL: 'https://www.linkedin.com/x' → 'linkedin.com'.
