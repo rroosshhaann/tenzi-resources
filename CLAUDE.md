@@ -23,8 +23,9 @@ tenzi-resources/
     gi-broker-movement-may-2026.html      # Monthly cadence
     gi-broker-movement-june-2026.html     # Monthly cadence
     gi-broker-movement-july-2026.html     # Monthly cadence
-    gi-broker-movement-august-2026.html   # Monthly cadence (31 Jul → 31 Aug) — current index tile for the monthly series
-    gi-broker-movement-august-2026.thumb.jpg # index tile thumbnail (AR + CAR view: KPI strip + population bridge)
+    gi-broker-movement-august-2026.html   # Monthly cadence (31 Jul → 31 Aug)
+    gi-broker-movement-september-2026.html # Monthly cadence (31 Aug → 30 Sep) — current index tile for the monthly series
+    gi-broker-movement-september-2026.thumb.jpg # index tile thumbnail (AR + CAR view: KPI strip + population bridge); earlier months' thumbs are kept
     # Monthly build: the generator (python-scrapbook change-report/<prev>-<next>/<Month> 2026.html) emits
     # the bare dashboard only. Copy it here, then apply the portal layer — head metadata, Dataset JSON-LD,
     # nav + logo, header CTA group, prev-report row, Headline insights, subscribe strip + footer, modal,
@@ -34,7 +35,9 @@ tenzi-resources/
     # from what was published (raw June closes at 5,657 ARs+CARs, published June at 5,884).
     # Thumbnail: serve the repo, strip .nav-bar/.prev-report-row/.cta-group/
     # insights via injected JS, click the AR + CAR scope button, screenshot 1000x1000 @2x, crop the
-    # 960x832 CSS-px content box and resize to 800px wide.
+    # 960x832 CSS-px content box and resize to 800px wide. Also inject
+    # *{animation-duration:0s!important;animation-delay:0s!important}: the cards' fadeUp animation
+    # otherwise gets captured mid-fade and the thumb comes out washed out.
     gi-broker-ar-profile.html
     gi-broker-top20-metrics.html          # "Top 20 GI Broker Networks — Metric Review (August 2026)" — metric heatmap with size bars behind the network names, AR/CAR/combined toggle, Jul/Jun month-end headcount columns behind a hide/show button (Aug 2026 refresh of the FY2026 year-end edition). Keeps its own dashboard design (not Terminal Grid); the index SPECIAL REPORT section (first section, full-width tile, data_top20_click). REGEN, in full: generate_review.py --ref-month 2026-08 --top 20 --title "Top 20 GI Broker Networks — Metric Review (August 2026)" --portal --linkedin https://www.linkedin.com/posts/roshan-khozouei_if-youre-interested-into-some-additional-share-7495730625019301888-v9S7 --out <this path> — every flag matters, see the design-exception note below
     gi-broker-top20-metrics.thumb.jpg     # index tile thumbnail (cropped from the metric heatmap)
