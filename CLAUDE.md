@@ -38,9 +38,13 @@ tenzi-resources/
     # 960x832 CSS-px content box and resize to 800px wide. Also inject
     # *{animation-duration:0s!important;animation-delay:0s!important}: the cards' fadeUp animation
     # otherwise gets captured mid-fade and the thumb comes out washed out.
+    # Headline insights condense the month's LinkedIn post (`LinkedIn Post.txt` beside the raw file);
+    # wait for it rather than drafting from the CSVs, then check its figures against data/*.csv.
+    # List the new month in: index tile (href, thumb, MON YYYY meta), sitemap (url + lastmod), and the
+    # llms.txt + README editions lists. The previous month's page stays as is (reports only link back).
     gi-broker-ar-profile.html
     gi-broker-top20-metrics.html          # "Top 20 GI Broker Networks — Metric Review (September 2026)" — metric heatmap with size bars behind the network names, AR/CAR/combined toggle, Aug/Jul month-end headcount columns behind a hide/show button (Sep 2026 refresh of the FY2026 year-end edition). Keeps its own dashboard design (not Terminal Grid); the index SPECIAL REPORT section (first section, full-width tile, data_top20_click). REGEN, in full: generate_review.py --ref-month 2026-09 --top 20 --title "Top 20 GI Broker Networks — Metric Review (September 2026)" --portal --linkedin https://www.linkedin.com/posts/roshan-khozouei_if-youre-interested-into-some-additional-share-7495730625019301888-v9S7 --out <this path> — every flag matters, see the design-exception note below
-    gi-broker-top20-metrics.thumb.jpg     # index tile thumbnail (cropped from the metric heatmap)
+    gi-broker-top20-metrics.thumb.jpg     # index tile thumbnail: top-left of the Individual ARs heatmap. Recipe: temp copy with injected CSS — body{margin:0}, .dashboard{width:1000px;max-width:1000px;margin:0;padding:0}, hide .nav-bar/.header/.scope-toggle/.legend, animations off — headless shot at --window-size=1000,500 @2x with tenzi.ai blocked, resized to 800x400 progressive JPEG q82
     gi-broker-whitespace-map.html         # Interactive whitespace map — business growth vs broker coverage by SA4 (linked map + quadrant, state zoom, all/employing-businesses toggle, employing split + top-3 growth industries in hovers). Keeps its own dashboard design (teal, change-report family). Tiled in the PREMIUM grid on the index (first tile, premium_whitespace_click) though the page itself keeps the free-report subscribe CTA; also in sitemap + llms.txt. Regen from python-scrapbook: geo-coverage/generate_interactive.py --portal --out <this path> — the generator emits the FULL page standard (nav, tracking, subscribe CTA+modal+strip, head metadata + Dataset JSON-LD), so regens are idempotent, no manual re-patching
     gi-broker-whitespace-map.thumb.jpg    # index tile thumbnail (cropped from the national whitespace map PNG)
   runbooks/                               # Free operational runbooks
@@ -233,9 +237,9 @@ Full reference — what's on each page, parameters, auth model, filter logic, co
 - **Honeypot:** The contact form on `tenzi.ai` includes a hidden `website` field. Real users never see it; bots auto-filling all fields will populate it. Submissions where `data.website` is non-empty are silently dropped (return `ok` so bots don't retry).
 - **Rate limit:** Contact submissions are capped at 5 per IP per hour using `PropertiesService`. Excess submissions silently drop. Page views and CTA tracking are not rate-limited.
 - **MailApp try/catch:** Notification emails are best-effort. If `MailApp` quota is exhausted (1,500/day on Workspace), the contact row still saves — only the email notification is lost. Errors land in the Apps Script Executions log.
-- **IP exclusion:** Add IPs to `EXCLUDED_IPS` to silently drop all events from those addresses (page views, CTAs, contact submissions). Useful for keeping personal/internal testing out of the sheets. Find your current IP in the existing Events sheet IP column, or visit `https://api.ipify.org` in your browser. Note that home ISPs often rotate IPs — re-check periodically.
+- **IP exclusion:** Add IPs to `EXCLUDED_IPS` to silently drop all events from those addresses (page views, CTAs, contact submissions). Useful for keeping personal/internal testing out of the sheets. Find your current IP in the existing Events sheet IP column, or visit `https://api.ipify.org` in your browser. Note that home ISPs often rotate IPs — re-check periodically. Each entry is a quoted string — `var EXCLUDED_IPS = ['203.0.113.7', '198.51.100.22'];` (unquoted, the script won't save) — matched exactly against the IP column: no ranges or wildcards, and rows with a blank IP can't be excluded. It only stops new rows; existing ones still count in the dashboard.
 
-After editing the script: Deploy > Manage deployments > edit > New version > Deploy (keeps same URL).
+After editing the script: paste it into the editor, put your real `DASHBOARD_TOKEN` and `EXCLUDED_IPS` back (the repo copy keeps the placeholder token and an empty list, so pasting resets both), then Deploy > Manage deployments > edit > New version > Deploy (keeps same URL).
 
 ### Compliance guide integration
 

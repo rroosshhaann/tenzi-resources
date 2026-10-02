@@ -46,12 +46,21 @@ find . -name "*.html" -not -path "./.git/*" -not -path "./.claude/*" -print0 | x
 
 ## Step 3: Apps Script deploy lag
 
-`apps-script.gs` is the source of truth. The deployed copy in the linked Google Sheet must be updated manually after edits. The skill can't read the live deployment, but it can flag when local changes have been committed since the last "Apps Script deployed" marker (a commit with the word `deployed` in the message — convention, not enforced).
+`apps-script.gs` is the source of truth. The deployed copy in the linked Google Sheet must be updated manually after edits. The skill can't read the live deployment, but it can flag when local changes have been committed since the last "Apps Script deployed" marker — a commit whose SUBJECT contains `deployed` (convention, not enforced). Match subjects only: bodies often say the script still needs deploying, which a whole-message grep misreads as a marker. Record a deploy with `git commit --allow-empty -m "Apps Script deployed: <what changed>"`.
 
 ```bash
 cd /home/rosie/code/tenzi-resources
 echo "Last 3 commits touching apps-script.gs:"
 git log -3 --oneline -- apps-script.gs
+echo
+marker=$(git log --format='%H %s' | grep -i -m1 'deployed' | cut -d' ' -f1)
+if [ -n "$marker" ]; then
+  echo "Last deploy marker: $(git log -1 --format='%h (%cr) %s' "$marker")"
+  echo "apps-script.gs commits since then:"
+  git log --format='  %h (%cr) %s' "$marker"..HEAD -- apps-script.gs
+else
+  echo "No deploy marker found — treat every apps-script.gs change as possibly undeployed."
+fi
 echo
 last_apps_change=$(git log -1 --format='%cr — %s' -- apps-script.gs)
 echo "Most recent apps-script.gs change: $last_apps_change"
