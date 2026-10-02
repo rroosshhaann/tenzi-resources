@@ -46,6 +46,7 @@ tenzi-resources/
 - **How Skewed Is AR Network Growth?** — networks added 1,605 ARs in three years and kept 558; three incumbents took 72% of incumbent growth while 47 shrinking networks gave back 1,047 (July 2026)
 - **How Did the Top 20 AR Networks Change Each Month?** — animated top 20 by combined headcount, recomputed at every month-end December 2025 to June 2026; the acquisition-driven moves versus the organic builds, companion to the Insurance News special report (June 2026)
 - **Top 20 Authorised Rep Networks 2026 — the Insurance News special report** — hub page for the 40-page report Tenzi supplied the data and methodology for: what is inside, where to get it, and every companion analysis on this site (August 2026)
+- **The Top 20 Broker Networks, State by State** — each top 20 network's ARs and CARs by registered state at 23 September 2026, as a count and a share of the network's total; CBN, licensed in Victoria, holds more WA ARs than WA's three home-grown networks combined, and only four networks reach all eight states and territories (September 2026)
 
 ## Hosting
 
