@@ -335,8 +335,8 @@ function wrapPaged_(html, totalRows) {
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────
 // Server-rendered HTML. Read Events + Contacts, aggregate, return a single
-// page with KPIs, a daily activity chart, top pages, CTA breakdown, dwell
-// stats, and recent subscribers/contacts. URL params:
+// page with KPIs, a daily activity chart, top pages with their subscribers,
+// CTA breakdown, dwell stats, recent contacts and top referrers. URL params:
 //   ?view=dashboard       — required
 //   &token=<TOKEN>        — required (must match DASHBOARD_TOKEN)
 //   &days=N               — window length, 1..365 (default 30)
@@ -392,6 +392,9 @@ function computeStats_(days, siteFilter, pageFilter) {
   // occurrence so the row reflects the latest action. Contacts aren't deduped — each
   // contact-form submission is a distinct conversation worth seeing.
   var subscribersByEmail = {}, unsubscribesByRecipient = {}, allContacts = [];
+  // Top pages' Subscribers column credits each address to the page of its earliest
+  // sign-up in the window, so the column adds up to the Subscribers tile.
+  var firstSignupByEmail = {};
   var totalPv = 0, totalCta = 0;
   var ipsAllTime = {};
 
@@ -459,6 +462,8 @@ function computeStats_(days, siteFilter, pageFilter) {
       if (!existingSub || existingSub.ts < ts) {
         subscribersByEmail[ekey] = { email: ev, page: page, ts: ts, site: site };
       }
+      var firstSignup = firstSignupByEmail[ekey];
+      if (!firstSignup || ts < firstSignup.ts) firstSignupByEmail[ekey] = { page: page, ts: ts };
     }
   });
 
@@ -495,8 +500,16 @@ function computeStats_(days, siteFilter, pageFilter) {
     });
   }
 
+  var subscribersByPage = {};
+  Object.keys(firstSignupByEmail).forEach(function(k) {
+    var p = firstSignupByEmail[k].page;
+    subscribersByPage[p] = (subscribersByPage[p] || 0) + 1;
+    viewsByPage[p] = viewsByPage[p] || 0; // a sign-up page with no views in the window still gets a row
+  });
+
   // Caps bumped from earlier 20/50 limits — pagination handles display.
   var topPages = mapToList_(viewsByPage, 'page', 'views').slice(0, 200);
+  topPages.forEach(function(r) { r.subscribers = subscribersByPage[r.page] || 0; });
   var topCtas = mapToList_(ctaByAction, 'action', 'clicks').slice(0, 200);
   var topReferrers = mapToList_(refByDomain, 'source', 'visits').slice(0, 200);
 
@@ -1117,14 +1130,16 @@ function buildLineChart_(daily, mode, growth, days) {
 
 function buildTopPagesTable_(rows, total, pageUrl) {
   if (!rows.length) return '<div class="empty">No page views in this window.</div>';
-  var maxV = rows[0].views;
-  var html = '<table><thead><tr><th>Page</th><th class="r">Views</th><th class="r" style="width:120px">Share</th></tr></thead><tbody>';
+  var maxV = rows[0].views || 1; // every row can be a zero-view sign-up page
+  var html = '<table><thead><tr><th>Page</th><th class="r">Views</th><th class="r" style="width:120px">Share</th><th class="r" style="padding-left:14px">Subscribers</th></tr></thead><tbody>';
   rows.forEach(function(r, i) {
     var pct = total > 0 ? Math.round(r.views / total * 100) : 0;
     var pg = Math.floor(i / DASHBOARD_PAGE_SIZE);
     html += '<tr data-row="' + pg + '"><td class="page"><a class="page-link" href="' + escapeHtml_(pageUrl(r.page)) + '">' + escapeHtml_(r.page) + '</a></td>' +
             '<td class="r">' + formatNumber_(r.views) + '</td>' +
-            '<td class="r"><div class="bar"><div class="bar-track"><div class="bar-fill" style="width:' + (r.views/maxV*100) + '%"></div></div><span style="font-size:11px;color:var(--dim);font-family:\'IBM Plex Mono\',monospace;min-width:36px;text-align:right">' + pct + '%</span></div></td></tr>';
+            '<td class="r"><div class="bar"><div class="bar-track"><div class="bar-fill" style="width:' + (r.views/maxV*100) + '%"></div></div><span style="font-size:11px;color:var(--dim);font-family:\'IBM Plex Mono\',monospace;min-width:36px;text-align:right">' + pct + '%</span></div></td>' +
+            // Accent like the chart's subscriber dots; zeros stay dim so pages with sign-ups stand out.
+            '<td class="r" style="color:var(--' + (r.subscribers ? 'accent' : 'dim') + ')">' + formatNumber_(r.subscribers) + '</td></tr>';
   });
   return wrapPaged_(html + '</tbody></table>', rows.length);
 }

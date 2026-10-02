@@ -214,14 +214,14 @@ Canonical source is [`apps-script.gs`](./apps-script.gs). The deployed script li
 - `writeContact_(data, melbTime)` — appends to Contacts (11 cols including site).
 - `isExcludedIp_` / `EXCLUDED_IPS` — silently drop rows from listed IPs.
 - `withinRateLimit_` — PropertiesService-backed per-IP cap on contact submissions (5/hour).
-- `renderDashboard_` and helpers — server-rendered Site-view HTML analytics built from Events + Contacts. Auth = secret token in URL (`DASHBOARD_TOKEN` constant). Hit at `<web-app-url>?view=dashboard&token=<TOKEN>&days=30&site=all`.
+- `renderDashboard_` and helpers — server-rendered Site-view HTML analytics built from Events + Contacts. Auth = secret token in URL (`DASHBOARD_TOKEN` constant). Hit at `<web-app-url>?view=dashboard&token=<TOKEN>&days=30&site=all`. Tests: `node --test tests/apps-script-dashboard.test.cjs` (per-page subscriber counts + an end-to-end Site-view render); `node --test tests/*.test.cjs` runs every suite (a bare `tests/` directory argument fails on Node 22).
 - `renderNewsletterDashboard_` / `computeNewsletterStats_` / `looksLikeBotUa_` and the `buildCampaign*` / `buildNewsletter*` / `buildSuspiciousTable_` helpers — Newsletter-view stack. Same auth, same CSS, scoped to `Site=email`. Filters scanner noise via three derived sets (`realSubscribers`, `realCampaigns` ≥ `NEWSLETTER_REAL_CAMPAIGN_THRESHOLD`, `NEWSLETTER_BOT_UA_REGEX`). Hit at `<web-app-url>?view=newsletter&token=<TOKEN>&days=90&campaign=<id>`.
 - See "Dashboard" section below + [`DASHBOARD.md`](./DASHBOARD.md) for the full reference on both views.
 
 ### Dashboard
 
 The deployed web app doubles as a private analytics dashboard with two views:
-- **Site** — `?view=dashboard&token=<TOKEN>` (page views, dwell, CTAs, contacts, referrers). Default landing.
+- **Site** — `?view=dashboard&token=<TOKEN>` (page views, subscribers per page, dwell, CTAs, contacts, referrers). Default landing.
 - **Newsletter** — `?view=newsletter&token=<TOKEN>` (per-campaign opens, clicks, unsubscribes, recipient activity, suspicious-rows panel — scoped to `Site=email`, cross-validated against the subscribe set + bot-UA regex). Recent subscribers + Recent unsubscribes lists live here.
 
 A "View: Site / Newsletter" toggle in either view's filter bar links across. Token (`DASHBOARD_TOKEN` constant in the script) must NOT appear in `track.js`, page HTML, or commits — only in the bookmark.

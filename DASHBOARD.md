@@ -19,7 +19,7 @@ Top to bottom:
    | Unique visitors | Distinct IPs across all events in window |
    | Views per unique | `pageViews ÷ uniqueVisitors`, with a trend chip comparing the preceding equal-length window. **Reads as a scanner-noise gauge**: a high or rising ratio usually means one visitor pulled many pages, which on this site is typically an email security gateway detonating every link rather than a keen reader. The chip is deliberately *not* colour-coded good/bad, because a rising ratio can equally mean deeper real engagement — switch the chart to Ratio to tell them apart |
    | CTA clicks | Count of `(cta: …)` rows |
-   | Subscribers | Rows whose Event column contains `@` (form submissions to Events) |
+   | Subscribers | Distinct addresses among rows whose Event column contains `@` (form submissions to Events) |
    | Contacts | Rows in the Contacts sheet |
    | Median dwell | Median seconds across all `(dwell: N)` rows |
 
@@ -30,7 +30,7 @@ Top to bottom:
    - **Ratio** plots daily **views per unique** (`pageViews ÷ uniqueVisitors`, teal). Because ratios are small numbers, that mode rounds the axis up to four whole divisions instead of the decade tick the other modes use — a decade tick would round a peak of 12.8 up to 20 and waste half the chart. Days with zero uniques plot at zero rather than dividing by zero.
    - All four variants are rendered server-side and swapped with CSS (`.chart-wrap[data-series]` × `.chart[data-mode]`), so switching is instant and does not re-query the sheet or reload the page. The mode is *not* a URL param and does not persist across reloads — it always opens on Both.
    - The tooltip always reports both figures regardless of mode, and falls back to the uniques dot for positioning when page views are hidden.
-6. **Top pages** — view count + share-of-total bar. Each page name is a link that sets `&page=<title>`, scoping the entire dashboard (KPIs, daily chart, every table) to that one page — this is how you track a single page's views over time. Clear it via the chip in the filter bar
+6. **Top pages** — view count + share-of-total bar, plus a **Subscribers** column (accent where non-zero). Each address counts once, on the page of its earliest sign-up in the window, so the column adds up to the Subscribers tile, and a page with sign-ups but no views in the window still gets a row. Credit goes to the page where the form was submitted: a reader convinced by a report who then subscribes on the index strip counts for the index. Each page name is a link that sets `&page=<title>`, scoping the entire dashboard (KPIs, daily chart, every table) to that one page — this is how you track a single page's views over time. Clear it via the chip in the filter bar
 7. **CTA clicks** — click count bar per action, sorted desc
 8. **Median dwell per page** — Median, P90, sample count, sorted by median desc
 9. **Recent contacts** — full row from Contacts sheet, sorted newest first
@@ -110,7 +110,7 @@ Both reads happen on every dashboard load (no caching yet):
 | Page view | `Event === '(page view)'` | Total / daily PV, unique visitors, top pages |
 | CTA click | starts with `(cta: ` | Total / daily CTA, action breakdown |
 | Dwell | starts with `(dwell: ` | Median/P90/N per page, overall median |
-| Subscriber | contains `@` and doesn't start with `(` | Daily + recent subscriber list |
+| Subscriber | contains `@` and doesn't start with `(` | Daily + recent subscriber list, Top pages' Subscribers column (earliest sign-up per address) |
 
 `Contacts` is filtered by date + site separately.
 
@@ -144,6 +144,8 @@ All dashboard code lives in `apps-script.gs` under the comment `// ── DASHBO
 | `renderNewsletterDashboard_(e)`, `computeNewsletterStats_(days)`, `buildNewsletterHtml_`, `buildCampaignSection_`, `buildNewsletterCtaTable_`, `buildNewsletterTimeline_`, `buildNewsletterRecipientsTable_`, `buildSuspiciousTable_`, `buildCampaignOverview_`, `newsletterCss_`, `looksLikeBotUa_` | Newsletter-view stack — see "Newsletter view" below |
 
 After any code change: paste the updated `apps-script.gs` into the Apps Script editor and **Deploy → New version**. The script is the deployment unit — there's no separate dashboard hosting.
+
+Tests: `node --test tests/*.test.cjs`. `tests/apps-script-dashboard.test.cjs` loads the script in a Node VM with a stubbed Events sheet, checks the per-page subscriber counts and renders the Site view end to end, so a broken render shows up before a deploy.
 
 ### URL building
 
@@ -209,7 +211,7 @@ Two constants near the top of the newsletter section in `apps-script.gs`:
 - **Missing IPs** — when `api.ipify.org` fails or is blocked, the IP cell is empty. Those rows still count as page views but don't contribute to unique-visitor counts.
 - **Legacy rows + site filter** — rows written before `track.js` shipped have an empty `Site` column. They're INCLUDED in `site=all` views but EXCLUDED from `site=marketing` / `site=resources` / `site=partner`.
 - **Clock skew** — timestamps are written as Melbourne-formatted strings (`yyyy-MM-dd HH:mm:ss`) by `Utilities.formatDate(date, 'Australia/Melbourne', …)`, then parsed back as local `Date` objects in the script's runtime timezone. If the script TZ isn't Melbourne (set in Apps Script project settings), events near midnight may bucket on the "wrong" calendar day. Pin the script TZ to `Australia/Melbourne` for accuracy.
-- **Subscriber detection is heuristic** — any Events row whose `Event` cell contains `@` and doesn't start with `(` is counted as a subscriber. False positives are unlikely (event placeholders all start with `(`), but worth knowing if you ever add a non-form event with `@` in the name.
+- **Subscriber detection is heuristic** — any Events row whose `Event` cell contains `@` and doesn't start with `(` is counted as a subscriber. False positives are unlikely (event placeholders all start with `(`), but worth knowing if you ever add a non-form event with `@` in the name. It also counts runbook Request-a-Copy submissions: that form posts a bare email and Events doesn't store which form a row came from, so on runbook pages copy requests count as subscribers, in the tile and in the Top pages column alike.
 - **Page filter matches title strings** — pages are keyed by `document.title` (that's what `track.js` sends), so a retitled page splits into two filter targets: its history before the rename lives under the old title, after under the new one. Filter each separately to compare.
 
 ## Roadmap (not built)

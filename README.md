@@ -139,7 +139,7 @@ clicks don't go through them.
 
 The same Apps Script web app exposes a private analytics dashboard with two views, switchable via a "View: Site / Newsletter" toggle in the filter bar of either page:
 
-- **Site** (`?view=dashboard&token=<TOKEN>`) — KPIs, daily activity chart with hover tooltips, top pages, CTA breakdown, dwell stats, recent contacts, top external referrers.
+- **Site** (`?view=dashboard&token=<TOKEN>`) — KPIs, daily activity chart with hover tooltips, top pages with per-page subscribers, CTA breakdown, dwell stats, recent contacts, top external referrers.
 - **Newsletter** (`?view=newsletter&token=<TOKEN>`) — campaign selector, per-campaign KPI strip (real + raw side-by-side: engaged subscribers, opens, clicks, unsubscribes, plus open rate + click-through), CTA breakdown, hour-by-hour activity for the first 48h after send, recipient activity, suspicious-rows panel, cross-campaign overview, and the Recent subscribers + Recent unsubscribes lists. Filters scanner noise via the `realSubscribers`/`realCampaigns`/UA cross-validation described in [`DASHBOARD.md`](./DASHBOARD.md).
 
 Every list paginates at 15 rows. Token-gated, server-rendered HTML in the same Terminal Grid (Light) style as the rest of the site. Full reference: [`DASHBOARD.md`](./DASHBOARD.md).
