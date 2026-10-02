@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>General Insurance Licensee &amp; AR Compliance Obligations — Draft</title>
+<title>General Insurance Licensee &amp; AR Compliance Obligations Guide — Draft</title>
 <meta name="description" content="A free directory of official Australian general insurance resources for licensees and authorised representatives, with draft explanations shared for feedback. Expert review is pending." />
 <link rel="icon" type="image/svg+xml" href="tenzi-arcs-small.svg">
 <link rel="canonical" href="https://resources.tenzi.ai/compliance/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Tenzi Resources">
-<meta property="og:title" content="General Insurance Licensee &amp; AR Compliance Obligations">
+<meta property="og:title" content="General Insurance Licensee &amp; AR Compliance Obligations Guide">
 <meta property="og:description" content="A free directory of official Australian general insurance resources for licensees and authorised representatives, with draft explanations shared for feedback.">
 <meta property="og:url" content="https://resources.tenzi.ai/compliance/">
 <meta property="og:image" content="https://resources.tenzi.ai/og.png">
@@ -407,7 +407,7 @@ button, .panel, .stat, a { transition: border-color .15s, background-color .15s,
   <main>
     <header class="header-row">
       <div class="header-inner">
-        <div class="title-wrap"><div class="eyebrow">Australia · General insurance · Free resource</div><h1>General Insurance <span class="mark">Licensee &amp; AR Compliance Obligations</span></h1></div>
+        <div class="title-wrap"><div class="eyebrow">Australia · General insurance · Free resource</div><h1>General Insurance <span class="mark">Licensee &amp; AR Compliance Obligations Guide</span></h1></div>
         <div class="header-side">
           <div class="asof"><strong>Draft · Expert review pending</strong>Guide updated <time datetime="2026-09-09">9 Sep 2026</time></div>
           <button class="primary-button" id="open-subscribe" type="button">Subscribe to updates</button>
@@ -628,7 +628,7 @@ let currentFeedbackEntry=null;
 function feedbackText(){
   const id=byId('feedback-entry').value;
   const entry=obligations.find(item=>item.id===id);
-  const lines=['General Insurance Licensee & AR Compliance Obligations — draft feedback',`Entry: ${entry?entry.title:'The guide as a whole / a missing resource'}`,`Link: ${entryURL(id)}`,`Type: ${byId('feedback-kind').value}`];
+  const lines=['General Insurance Licensee & AR Compliance Obligations Guide — draft feedback',`Entry: ${entry?entry.title:'The guide as a whole / a missing resource'}`,`Link: ${entryURL(id)}`,`Type: ${byId('feedback-kind').value}`];
   if(entry) lines.push(`Official source: ${sources[entry.src].url}`);
   lines.push('',byId('feedback-detail').value.trim());
   if(byId('feedback-source').value.trim()) lines.push('',`Supporting source: ${byId('feedback-source').value.trim()}`);
