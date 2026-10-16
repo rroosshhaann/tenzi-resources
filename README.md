@@ -168,7 +168,7 @@ Every page must have all of the following:
 6. Add head metadata — canonical, ≤160-char meta description, OG/Twitter block pointing at `og.png` (copy from an existing page); data reports also get a `schema.org/Dataset` JSON-LD block — and add the page to `sitemap.xml` with a lastmod date
 7. Push to `main`
 
-See `CLAUDE.md` for operational detail (tracking script, modal HTML, endpoint) and `DESIGN_STANDARD.md` for visual/layout rules.
+See `DESIGN_STANDARD.md` for visual/layout rules.
 
 ## Design notes
 
