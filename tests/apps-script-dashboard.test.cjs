@@ -30,6 +30,9 @@ function ago(days) {
 const view = (page, days, ip) => ['(page view)', page, ago(days), ip, '', 'resources'];
 const signup = (email, page, days, site = 'resources') => [email, page, ago(days), '192.0.2.9', '', site];
 const topPages = stats => Array.from(stats.topPages, r => ({...r}));
+const dateKey = days => ago(days).slice(0, 10);
+// Days ago of the Monday that starts the most recent complete Monday-to-Sunday week.
+const lastFullWeekMonday = () => (new Date().getDay() + 6) % 7 + 7;
 
 test('top pages credits each subscriber once, to the page of their earliest sign-up in the window', () => {
   const stats = dashboard([
@@ -65,4 +68,32 @@ test('the top pages table renders a subscribers column', () => {
   assert.match(table, /<th[^>]*>Subscribers<\/th><\/tr>/);
   assert.match(table, />1<\/td><\/tr>/);
   assert.doesNotMatch(html, /Subscribers by page/);
+});
+
+test('the weekly series totals each complete Monday-to-Sunday week and counts a returning visitor once', () => {
+  const mon = lastFullWeekMonday();
+  const stats = dashboard([
+    view('Report', mon, '192.0.2.1'), view('Report', mon - 6, '192.0.2.1'), // Monday and Sunday, same visitor
+    view('Index', mon - 2, '192.0.2.2'), signup('a@example.com', 'Index', mon - 1)
+  ]).computeStats_(90, 'all', '');
+  const week = stats.weekly.find(w => w.date === dateKey(mon));
+  assert.deepEqual({...week}, {date: dateKey(mon), pageViews: 3, uniqueVisitors: 2, ctaClicks: 0, subscribers: 1});
+});
+
+test('the weekly series leaves out part weeks, including the one still in progress', () => {
+  const weeks = Array.from(dashboard([view('Report', 0, '192.0.2.1')]).computeStats_(90, 'all', '').weekly,
+    w => w.date);
+  assert.equal(weeks.at(-1), dateKey(lastFullWeekMonday()));
+  assert.ok(weeks[0] >= dateKey(89), 'the first week starts inside the window');
+  assert.ok(weeks.every(d => new Date(d + 'T12:00:00').getDay() === 1), 'every week starts on a Monday');
+});
+
+test('long windows offer a Daily / Weekly toggle on the activity chart, short ones do not', () => {
+  const render = days => dashboard([view('Report', 1, '192.0.2.1')])
+    .renderDashboard_({parameter: {view: 'dashboard', token: 'test-token', days: String(days)}}).html;
+  const year = render(365);
+  assert.match(year, /<button type="button" data-interval-btn="week">Weekly<\/button>/);
+  assert.match(year, /<div class="interval" data-interval="week">/);
+  assert.match(year, /data-date="Week of \d{4}-\d{2}-\d{2}"/);
+  assert.doesNotMatch(render(30), /<button[^>]*data-interval-btn/);
 });

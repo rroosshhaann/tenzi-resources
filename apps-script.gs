@@ -485,12 +485,13 @@ function computeStats_(days, siteFilter, pageFilter) {
   });
 
   // Gap-fill the daily series so empty days still render
-  var daily = [];
+  var daily = [], dayIps = [];
   for (var i = 0; i < days; i++) {
     var d = new Date(cutoff);
     d.setDate(cutoff.getDate() + i);
     var k = dateKey_(d);
     var entry = byDate[k] || { pageViews:0, ips:{}, ctaClicks:0, subscribers:0 };
+    dayIps.push(entry.ips);
     daily.push({
       date: k,
       pageViews: entry.pageViews,
@@ -545,6 +546,7 @@ function computeStats_(days, siteFilter, pageFilter) {
       uniqueVisitors: Object.keys(prevIps).length
     },
     daily: daily,
+    weekly: weeklySeries_(daily, dayIps),
     topPages: topPages,
     topCtas: topCtas,
     topReferrers: topReferrers,
@@ -568,6 +570,36 @@ function readSheetWithHeaders_(sheet, defaultHeaders) {
     headers.forEach(function(h, i) { obj[h] = row[i]; });
     return obj;
   });
+}
+
+// Calendar weeks (Monday to Sunday) for the activity chart's Weekly view. Only
+// complete weeks are kept: a part week at either end of the window would read
+// as a false dip. The window's last day is today, still in progress, so the
+// week holding it never counts as complete. Uniques are distinct IPs across the
+// whole week, so a visitor who comes back on three days counts once.
+function weeklySeries_(daily, dayIps) {
+  var weeks = [], week = null;
+  daily.slice(0, -1).forEach(function(day, i) {
+    if (isMonday_(day.date)) {
+      week = { date: day.date, days: 0, pageViews: 0, ips: {}, ctaClicks: 0, subscribers: 0 };
+      weeks.push(week);
+    }
+    if (!week) return; // before the window's first Monday
+    week.days++;
+    week.pageViews += day.pageViews;
+    week.ctaClicks += day.ctaClicks;
+    week.subscribers += day.subscribers;
+    Object.keys(dayIps[i]).forEach(function(ip) { week.ips[ip] = true; });
+  });
+  return weeks.filter(function(w) { return w.days === 7; }).map(function(w) {
+    return { date: w.date, pageViews: w.pageViews, uniqueVisitors: Object.keys(w.ips).length,
+             ctaClicks: w.ctaClicks, subscribers: w.subscribers };
+  });
+}
+
+function isMonday_(key) {
+  var p = key.split('-');
+  return new Date(+p[0], +p[1] - 1, +p[2]).getDay() === 1;
 }
 
 function parseTs_(value) {
@@ -709,7 +741,7 @@ function buildDashboardHtml_(stats, days, siteFilter, pageFilter, token) {
         uv: growthPct_(t.uniqueVisitors, p.uniqueVisitors),
         ratio: growthPct_(viewsPerUnique_(t.pageViews, t.uniqueVisitors),
                           viewsPerUnique_(p.pageViews, p.uniqueVisitors))
-      }, days) + '</div>' +
+      }, days, stats.weekly) + '</div>' +
 
       '<div class="grid-2">' +
         '<div>' +
@@ -771,17 +803,22 @@ function dashboardJs_() {
       'dps[i].addEventListener("mouseenter",function(){show(this)});' +
     '}' +
     'wrap.addEventListener("mouseleave",function(){tip.hidden=true});' +
-    // Series toggle: swap which pre-rendered variant is visible. Each variant
-    // carries its own y-axis, so uniques get the full chart height on its own.
-    'var sbtns=wrap.querySelectorAll("[data-series-btn]");' +
-    'for(var s=0;s<sbtns.length;s++){' +
-      '(function(b){b.addEventListener("click",function(){' +
-        'wrap.setAttribute("data-series",b.getAttribute("data-series-btn"));' +
-        'for(var k=0;k<sbtns.length;k++){sbtns[k].className=""}' +
-        'b.className="active";' +
-        'tip.hidden=true;' +
-      '})})(sbtns[s]);' +
+    // Series and Daily / Weekly toggles: swap which pre-rendered variant is
+    // visible. Each variant carries its own y-axis, so uniques get the full
+    // chart height on their own.
+    'function tabs(btnAttr,wrapAttr){' +
+      'var bs=wrap.querySelectorAll("["+btnAttr+"]");' +
+      'for(var s=0;s<bs.length;s++){' +
+        '(function(b){b.addEventListener("click",function(){' +
+          'wrap.setAttribute(wrapAttr,b.getAttribute(btnAttr));' +
+          'for(var k=0;k<bs.length;k++){bs[k].className=""}' +
+          'b.className="active";' +
+          'tip.hidden=true;' +
+        '})})(bs[s]);' +
+      '}' +
     '}' +
+    'tabs("data-series-btn","data-series");' +
+    'tabs("data-interval-btn","data-interval");' +
   '})();' +
   // Per-list pagination — one independent paginator per .paged container.
   '(function(){' +
@@ -843,17 +880,20 @@ function dashboardCss_() {
     '.chart{width:100%;height:220px;display:block;overflow:visible}' +
     '.chart-wrap{position:relative}' +
     // Series toggle — same shell as .range/.site-tabs, but buttons: switching is
-    // client-side (all three variants are already in the page), not a reload.
+    // client-side (every variant is already in the page), not a reload.
     '.series-tabs{display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;width:max-content;margin-bottom:10px}' +
     '.series-tabs button{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;padding:6px 12px;color:var(--muted);background:none;border:none;border-right:1px solid var(--border);letter-spacing:0.08em;text-transform:uppercase;cursor:pointer}' +
     '.series-tabs button:last-child{border-right:none}' +
     '.series-tabs button:hover{color:var(--text);background:var(--bg)}' +
     '.series-tabs button.active{background:var(--accent);color:#fff}' +
+    '.chart-controls{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}' +
     '.chart-wrap .chart{display:none}' +
     '.chart-wrap[data-series="both"] .chart[data-mode="both"],' +
     '.chart-wrap[data-series="views"] .chart[data-mode="views"],' +
     '.chart-wrap[data-series="unique"] .chart[data-mode="unique"],' +
     '.chart-wrap[data-series="ratio"] .chart[data-mode="ratio"]{display:block}' +
+    '.chart-wrap[data-interval="day"] .interval[data-interval="week"],' +
+    '.chart-wrap[data-interval="week"] .interval[data-interval="day"]{display:none}' +
     '.tip-sub{color:var(--accent)}' +
     '.kpi-sub{margin-top:6px}' +
     '.kpi-trend{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:0.06em;color:var(--muted)}' +
@@ -949,36 +989,50 @@ function sectionLabel_(left, right) {
   return '<div class="section-label"><span>' + escapeHtml_(left) + '</span><span class="num">' + escapeHtml_(right) + '</span></div>';
 }
 
-// Card wrapper: a segmented toggle plus all three series variants. Each variant
+// Card wrapper: a segmented toggle plus all four series variants. Each variant
 // is rendered server-side with its own y-axis so switching is a CSS swap rather
 // than a reload — and so uniques get the full height of the chart when page
 // views (which run an order of magnitude higher on scanner-heavy days) are off.
+// Long windows also get a Daily / Weekly toggle: a second set of the same four
+// variants drawn from complete calendar weeks, to average out day-to-day noise.
 // `growth` is {pv, uv, ratio} of percentage change vs the preceding window
 // (null where there's no prior window). Each variant prints the figure for its
 // own series in the chart's top-right corner.
-function buildChartCard_(daily, growth, days) {
+var WEEKLY_MIN_DAYS = 90; // ~13 weeks; shorter windows leave a weekly line too few points to trend
+function buildChartCard_(daily, growth, days, weekly) {
   if (!daily || !daily.length) return '<div class="empty">No data in this window.</div>';
-  function btn(label, mode, active) {
-    return '<button type="button" data-series-btn="' + mode + '"' +
+  function btn(attr, label, value, active) {
+    return '<button type="button" ' + attr + '="' + value + '"' +
       (active ? ' class="active"' : '') + '>' + label + '</button>';
   }
-  return '<div class="chart-wrap" data-series="both">' +
-    '<div class="series-tabs">' +
-      btn('Both', 'both', true) + btn('Page views', 'views', false) +
-      btn('Unique', 'unique', false) + btn('Ratio', 'ratio', false) +
+  function variants(points, interval) {
+    return '<div class="interval" data-interval="' + interval + '">' +
+      ['both', 'views', 'unique', 'ratio'].map(function(mode) {
+        return buildLineChart_(points, mode, growth, days, interval);
+      }).join('') +
+    '</div>';
+  }
+  var withWeekly = days >= WEEKLY_MIN_DAYS && weekly && weekly.length > 1;
+  return '<div class="chart-wrap" data-series="both" data-interval="day">' +
+    '<div class="chart-controls">' +
+      '<div class="series-tabs">' +
+        btn('data-series-btn', 'Both', 'both', true) + btn('data-series-btn', 'Page views', 'views', false) +
+        btn('data-series-btn', 'Unique', 'unique', false) + btn('data-series-btn', 'Ratio', 'ratio', false) +
+      '</div>' +
+      (withWeekly ? '<div class="series-tabs">' +
+        btn('data-interval-btn', 'Daily', 'day', true) + btn('data-interval-btn', 'Weekly', 'week', false) +
+      '</div>' : '') +
     '</div>' +
-    buildLineChart_(daily, 'both', growth, days) +
-    buildLineChart_(daily, 'views', growth, days) +
-    buildLineChart_(daily, 'unique', growth, days) +
-    buildLineChart_(daily, 'ratio', growth, days) +
+    variants(daily, 'day') + (withWeekly ? variants(weekly, 'week') : '') +
     '<div class="chart-tip" hidden></div>' +
   '</div>';
 }
 
 // mode: 'both' | 'views' | 'unique' | 'ratio'. The y-axis is scaled from the
-// visible series only, which is the whole point of the toggle.
-function buildLineChart_(daily, mode, growth, days) {
-  if (!daily || !daily.length) return '<div class="empty">No data in this window.</div>';
+// visible series only, which is the whole point of the toggle. `points` is the
+// daily or weekly series; `interval` ('day' | 'week') only changes the hover label.
+function buildLineChart_(points, mode, growth, days, interval) {
+  if (!points || !points.length) return '<div class="empty">No data in this window.</div>';
   mode = mode || 'both';
 
   var SERIES = {
@@ -997,11 +1051,11 @@ function buildLineChart_(daily, mode, growth, days) {
 
   var w = 1100, h = 220, padL = 50, padR = 14, padT = 28, padB = 30;
   var innerW = w - padL - padR, innerH = h - padT - padB;
-  var n = daily.length;
+  var n = points.length;
 
   var maxVal = 0;
   keys.forEach(function(k) {
-    daily.forEach(function(d) { var v = SERIES[k].val(d); if (v > maxVal) maxVal = v; });
+    points.forEach(function(d) { var v = SERIES[k].val(d); if (v > maxVal) maxVal = v; });
   });
   if (maxVal < 4) maxVal = 4;
   if (isRatio) {
@@ -1028,13 +1082,13 @@ function buildLineChart_(daily, mode, growth, days) {
   var xLabels = '';
   var step = Math.max(1, Math.floor(n / 8));
   for (var i = 0; i < n; i += step) {
-    var dt = daily[i].date.substring(5);
+    var dt = points[i].date.substring(5);
     xLabels += '<text x="' + x(i) + '" y="' + (h - 10) + '" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#a59f93">' + dt + '</text>';
   }
 
   // Computed before the legend, which needs it to decide on the SUBSCRIBERS entry.
   var anySubs = false;
-  for (var q = 0; q < n; q++) { if (daily[q].subscribers > 0) { anySubs = true; break; } }
+  for (var q = 0; q < n; q++) { if (points[q].subscribers > 0) { anySubs = true; break; } }
 
   var legend = '<g font-family="IBM Plex Mono,monospace" font-size="9" letter-spacing="0.08em">';
   var legendX = padL;
@@ -1072,7 +1126,7 @@ function buildLineChart_(daily, mode, growth, days) {
   }
 
   var lines = keys.map(function(k) {
-    var pts = daily.map(function(d, i) { return x(i) + ',' + y(SERIES[k].val(d)); }).join(' ');
+    var pts = points.map(function(d, i) { return x(i) + ',' + y(SERIES[k].val(d)); }).join(' ');
     return '<polyline points="' + pts + '" fill="none" stroke="' + SERIES[k].colour +
       '" stroke-width="' + SERIES[k].width + '"/>';
   }).join('');
@@ -1086,7 +1140,7 @@ function buildLineChart_(daily, mode, growth, days) {
   var subDots = '';
   if (anySubs) {
     for (var sIdx = 0; sIdx < n; sIdx++) {
-      var cnt = daily[sIdx].subscribers || 0;
+      var cnt = points[sIdx].subscribers || 0;
       if (!cnt) continue;
       var shown = Math.min(cnt, subCap);   // never let a big day overrun the plot
       for (var k2 = 0; k2 < shown; k2++) {
@@ -1096,7 +1150,7 @@ function buildLineChart_(daily, mode, growth, days) {
     }
   }
 
-  // Hover overlay — one group per day. Hit-zone rect captures hover for the
+  // Hover overlay — one group per day (or week). Hit-zone rect captures hover for the
   // whole vertical column; dots + guide line fade in via CSS; the tooltip is
   // positioned by JS off whichever dot the mode renders.
   var colW = n === 1 ? innerW : innerW / (n - 1);
@@ -1109,14 +1163,14 @@ function buildLineChart_(daily, mode, growth, days) {
     else if (j === n-1) { hitX = xi - colW / 2; hitW = colW / 2; }
     else                { hitX = xi - colW / 2; hitW = colW; }
     var dots = keys.map(function(k) {
-      return '<circle class="' + SERIES[k].cls + '" cx="' + xi + '" cy="' + y(SERIES[k].val(daily[j])) +
+      return '<circle class="' + SERIES[k].cls + '" cx="' + xi + '" cy="' + y(SERIES[k].val(points[j])) +
         '" r="3.5" fill="' + SERIES[k].colour + '" stroke="#fff" stroke-width="1.5" opacity="0"/>';
     }).join('');
     hover +=
-      '<g class="dp" data-date="' + daily[j].date +
-        '" data-pv="' + daily[j].pageViews +
-        '" data-uv="' + daily[j].uniqueVisitors +
-        '" data-sub="' + (daily[j].subscribers || 0) + '">' +
+      '<g class="dp" data-date="' + (interval === 'week' ? 'Week of ' : '') + points[j].date +
+        '" data-pv="' + points[j].pageViews +
+        '" data-uv="' + points[j].uniqueVisitors +
+        '" data-sub="' + (points[j].subscribers || 0) + '">' +
         '<line class="dp-guide" x1="' + xi + '" y1="' + padT + '" x2="' + xi + '" y2="' + (padT + innerH) + '" stroke="#1a1a1a" stroke-width="0.6" stroke-dasharray="2 3" opacity="0"/>' +
         dots +
         '<rect class="dp-hit" x="' + hitX + '" y="' + padT + '" width="' + hitW + '" height="' + innerH + '" fill="transparent"/>' +
