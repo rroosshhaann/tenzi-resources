@@ -33,7 +33,7 @@ tenzi-resources/
 - **Renewals** — Identification through market review, recommendation, and binding
 - **Claims Management** — First notice of loss through to resolution and file closure
 
-**Premium samples** (`premium-samples/`) — all listed at [`/premium-samples/`](https://resources.tenzi.ai/premium-samples/); the index page tiles the most recent three plus a link to the full library
+**Premium samples** (`premium-samples/`) — all listed at [`/premium-samples/`](https://resources.tenzi.ai/premium-samples/); the index page tiles the most recent seven plus a link to the full library
 - **GI Broker Network Health Score** — Composite 0–100 score across seven signals, ranked within peer size segment. Metrix Connect tops every Dominant; size isn't health
 - **GI Broker AFSL Race Chart** — Animated 24-month view of the Top 20 GI broker networks
 - **Resilium AR Flow Analysis** — 48 months of inbound/outbound AR movement for a single AFSL
@@ -49,6 +49,7 @@ tenzi-resources/
 - **The Top 20 Broker Networks, State by State** — each top 20 network's ARs and CARs by registered state at 23 September 2026, as a count and a share of the network's total; CBN, licensed in Victoria, holds more WA ARs than WA's three home-grown networks combined, and only four networks reach all eight states and territories (September 2026)
 - **Where Did Each Network's Joiners Come From?** — a year of individual ARs (and, in a second chart, corporate ARs) joining and leaving nine of the largest networks, by where each came from and went, with a play-month-by-month toggle on each chart; McLardy McShane and Insurance Advisernet lost ARs at the same rate, but McLardy McShane's intake rate was more than double (October 2025 to September 2026)
 - **When Is an AR Most Likely to Move Networks?** — moves to another licensee per 100 individual ARs a year by time at the network, flat at 3.7 to 4.0 for seven years and lower after, and the five-year share who moved by how they joined (8.9% first registration, 12.1% back after a break, 14.5% from another licensee); 13,587 registrations, March 2004 to September 2026
+- **How Did Today's Top 10 Networks Grow?** — ARs + CARs at today's ten largest networks at every month-end since March 2004, on the calendar and from a common start: half of CBN's growth came in three months and all of Ausure's net growth in seven, while McLardy McShane has never added more than 27 in a month
 
 ## Hosting
 
@@ -166,7 +167,7 @@ Every page must have all of the following:
 5. List it where it belongs:
    - `.tile-data` inside `.data-grid` in `index.html` — free reports/dashboards
    - `.tile-runbook` inside `.runbook-grid` in `index.html` — runbooks
-   - **Premium samples** → add a card to `premium-samples/index.html` (the full library). `.premium-grid` on the landing page is capped at ONE row — three newest samples plus the "Every premium sample" card — so putting a new sample on the index means displacing a tile, not appending one
+   - **Premium samples** → add a card to `premium-samples/index.html` (the full library). `.premium-grid` on the landing page is capped at TWO rows — seven newest samples plus the "Every premium sample" card — so putting a new sample on the index means displacing a tile, not appending one
 6. Add head metadata — canonical, ≤160-char meta description, OG/Twitter block pointing at `og.png` (copy from an existing page); data reports also get a `schema.org/Dataset` JSON-LD block — and add the page to `sitemap.xml` with a lastmod date
 7. Push to `main`
 
