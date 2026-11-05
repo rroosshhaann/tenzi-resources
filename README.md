@@ -48,6 +48,7 @@ tenzi-resources/
 - **Top 20 Authorised Rep Networks 2026 — the Insurance News special report** — hub page for the 40-page report Tenzi supplied the data and methodology for: what is inside, where to get it, and every companion analysis on this site (August 2026)
 - **The Top 20 Broker Networks, State by State** — each top 20 network's ARs and CARs by registered state at 23 September 2026, as a count and a share of the network's total; CBN, licensed in Victoria, holds more WA ARs than WA's three home-grown networks combined, and only four networks reach all eight states and territories (September 2026)
 - **Where Did Each Network's Joiners Come From?** — a year of individual ARs (and, in a second chart, corporate ARs) joining and leaving nine of the largest networks, by where each came from and went, with a play-month-by-month toggle on each chart; McLardy McShane and Insurance Advisernet lost ARs at the same rate, but McLardy McShane's intake rate was more than double (October 2025 to September 2026)
+- **When Is an AR Most Likely to Move Networks?** — moves to another licensee per 100 individual ARs a year by time at the network, flat at 3.7 to 4.0 for seven years and lower after, and the five-year share who moved by how they joined (8.9% first registration, 12.1% back after a break, 14.5% from another licensee); 13,587 registrations, March 2004 to September 2026
 
 ## Hosting
 
